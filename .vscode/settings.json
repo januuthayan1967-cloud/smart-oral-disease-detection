@@ -1,0 +1,15 @@
+{
+  "tailwindCSS.enable": true,
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.includeLanguages": {
+    "css": "css",
+    "postcss": "css",
+    "javascript": "javascript",
+    "javascriptreact": "html",
+    "typescriptreact": "html"
+  },
+  "tailwindCSS.experimental.configFile": "./frontend/tailwind.config.js",
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false
+}
