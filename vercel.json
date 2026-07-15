@@ -27,11 +27,15 @@
       "dest": "backend/src/app.js"
     },
     {
+      "src": "/((?!api|uploads|reports).*)",
+      "dest": "/frontend/dist/$1"
+    },
+    {
       "handle": "filesystem"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "src": "/((?!api|uploads|reports).*)",
+      "dest": "/frontend/dist/index.html"
     }
   ]
 }
