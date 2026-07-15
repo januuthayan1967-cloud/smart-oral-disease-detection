@@ -86,11 +86,22 @@ app.use('/uploads/medicines', express.static(path.join(__dirname, 'uploads/medic
 app.use('/uploads/pharmacy', express.static(path.join(__dirname, 'uploads/pharmacy')));
 app.use('/reports', express.static(path.join(__dirname, 'reports')));
 
+import mongoose from 'mongoose';
+
 app.get('/api/health', (_req, res) => {
   res.json({
     success: true,
     message: 'Oral Disease Detection API is running',
     timestamp: new Date().toISOString(),
+    dbState: mongoose.connection.readyState,
+    hasMongoUri: !!process.env.MONGODB_URI,
+    mongoUriLength: process.env.MONGODB_URI ? process.env.MONGODB_URI.length : 0,
+    envKeys: Object.keys(process.env).filter(k => 
+      !k.toLowerCase().includes('secret') && 
+      !k.toLowerCase().includes('pass') && 
+      !k.toLowerCase().includes('key') && 
+      !k.toLowerCase().includes('uri')
+    )
   });
 });
 
