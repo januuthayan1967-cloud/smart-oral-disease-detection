@@ -13,7 +13,9 @@ const connectDB = async () => {
   } catch (error) {
     console.error('MongoDB connection error:', error.message);
     console.error('Check backend/.env, verify MONGODB_URI, and make sure your Atlas IP access list allows this machine.');
-    process.exit(1);
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(1);
+    }
   }
 };
 
