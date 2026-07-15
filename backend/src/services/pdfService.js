@@ -7,8 +7,12 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const reportsDir = path.join(__dirname, '../reports');
 
-if (!fs.existsSync(reportsDir)) {
-  fs.mkdirSync(reportsDir, { recursive: true });
+try {
+  if (!fs.existsSync(reportsDir)) {
+    fs.mkdirSync(reportsDir, { recursive: true });
+  }
+} catch (err) {
+  console.warn(`Could not create reports directory: ${err.message}`);
 }
 
 export const generatePredictionReport = async ({ user, prediction, imagePath }) => {
