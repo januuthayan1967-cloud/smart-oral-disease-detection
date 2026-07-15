@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-07-14T16:03:43.129Z" agent="Antigravity" version="21.0.0" type="device">
+  <diagram id="diagram_1" name="Page-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="fillColor=#f8f9fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1200" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="400" y="200" width="400" height="460" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Sign In to your Account" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="430" y="230" width="340" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Email Address" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="430" y="280" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Enter your email (e.g. patient@gmail.com)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="430" y="305" width="340" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Password" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="430" y="360" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="••••••••••••" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="430" y="385" width="340" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Remember me" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="455" y="440" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#000000;align=center;" vertex="1" parent="1">
+          <mxGeometry x="430" y="442" width="16" height="16" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="Forgot Password?" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;fontColor=#0066cc;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="620" y="440" width="150" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="Sign In" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="430" y="485" width="340" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="or sign in as another role" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="430" y="545" width="340" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="Register as Patient" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#0066cc;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="430" y="580" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Register as Dentist" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#0066cc;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="610" y="580" width="160" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="Register as Pharmacy" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#0066cc;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="520" y="610" width="160" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

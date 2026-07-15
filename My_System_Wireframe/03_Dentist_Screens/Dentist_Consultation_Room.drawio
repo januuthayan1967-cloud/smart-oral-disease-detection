@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-07-14T16:03:43.147Z" agent="Antigravity" version="21.0.0" type="device">
+  <diagram id="diagram_1" name="Page-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="fillColor=#f8f9fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1200" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#e9ecef;strokeWidth=1;align=left;verticalAlign=middle;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Tooth Mascot [Animated]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;fontColor=#495057;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="20" y="15" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Smart Oral Health AI" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="170" y="15" width="250" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Welcome, User | Logout" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="950" y="15" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#cccccc;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="15" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#e9ecef;strokeWidth=1;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="0" y="60" width="220" height="840" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="[D]   Dashboard" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="80" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="10" y="124" width="200" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="[V]   Consultation Room" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="124" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="[A]   Availability Grid" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="168" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="[M]   Medicine Store" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="212" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="[U]   My Profile" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="256" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Tele-Consultation Portal" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="90" width="500" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="Direct video chat via Jitsi with your patient, view their AI diagnostics history, and issue digital prescriptions." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="250" y="120" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="250" y="150" width="520" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#111111;strokeColor=#000000;strokeWidth=2;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry x="270" y="170" width="480" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="[ Patient Video Camera Feed - John Doe ]" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#ffffff;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="320" width="480" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#333333;strokeColor=#ffffff;strokeWidth=2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="600" y="380" width="130" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="[ Your Video ]" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#ffffff;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="600" y="450" width="130" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="550" width="480" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="🎙 Mute" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;align=center;" vertex="1" parent="1">
+          <mxGeometry x="285" y="562" width="90" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="📷 Video Off" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;align=center;" vertex="1" parent="1">
+          <mxGeometry x="385" y="562" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="🖥 Share" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;align=center;" vertex="1" parent="1">
+          <mxGeometry x="495" y="562" width="90" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="🔴 Leave" style="rounded=1;whiteSpace=wrap;html=1;fillColor=red;strokeColor=red;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="635" y="562" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="Patient File Summary" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="630" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="Name: John Doe  •  Age: 25  •  Gender: Male  •  Phone: +1 448 194 028" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="270" y="655" width="480" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="Pre-Scan AI Diagnosis: Dental Calculus (Tartar) - 94.2% Confidence" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#e67e22;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="270" y="680" width="480" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="30" value="Complaint Note: My molar tooth is sensitive to hot drinks." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="270" y="705" width="480" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="31" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="790" y="150" width="380" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="32" value="Digital Prescription Editor" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="810" y="175" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="33" value="Medicine Name" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="220" width="330" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="34" value="Chlorhexidine Gluconate 0.12% Oral Rinse" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="810" y="240" width="330" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="35" value="Dosage (Frequency)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="290" width="330" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="36" value="Swish 15ml twice daily" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="810" y="310" width="330" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="37" value="Duration" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="360" width="150" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="38" value="14 days" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="810" y="380" width="150" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="39" value="Quantity" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="980" y="360" width="160" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="40" value="1 bottle" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="980" y="380" width="160" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="41" value="Instructions / Remarks" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="430" width="330" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="42" value="Avoid eating or drinking for 30 minutes after swishing." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="810" y="450" width="330" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="43" value="+ Add Another Medicine" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;align=center;" vertex="1" parent="1">
+          <mxGeometry x="810" y="520" width="330" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="44" value="Doctor Prescribing Notes / Advice" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="810" y="570" width="330" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="45" value="Refer for in-clinic Scaling and Polish session in next 2 weeks." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="810" y="590" width="330" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="46" value="Submit &amp; Issue Digital Rx" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="810" y="660" width="330" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="47" value="This generates a signed prescription code automatically forwarded to the patient&apos;s dashboard and partner e-pharmacy network." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#777777;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="810" y="715" width="330" height="35" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

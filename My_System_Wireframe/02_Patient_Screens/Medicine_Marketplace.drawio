@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-07-14T16:03:43.139Z" agent="Antigravity" version="21.0.0" type="device">
+  <diagram id="diagram_1" name="Page-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="fillColor=#f8f9fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1200" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#e9ecef;strokeWidth=1;align=left;verticalAlign=middle;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Tooth Mascot [Animated]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;fontColor=#495057;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="20" y="15" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Smart Oral Health AI" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="170" y="15" width="250" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Welcome, User | Logout" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="950" y="15" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#cccccc;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="15" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#e9ecef;strokeWidth=1;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="0" y="60" width="220" height="840" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="[D]   Dashboard" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="80" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="[S]   AI Disease Scan" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="124" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="[C]   Chat Assistant" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="168" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="[V]   Consultation" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="212" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="[H]   Scan History" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="256" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="10" y="300" width="200" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="[M]   Medicine Store" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="300" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="[O]   Shopping Cart" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="344" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="[T]   Track Orders" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="388" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="[P]   Prescriptions" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="432" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="[U]   My Profile" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="476" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="Dental E-Pharmacy Marketplace" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="90" width="500" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="Search and buy dental hygiene supplies, antiseptic mouthwashes, and doctor-prescribed antibiotics." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="250" y="120" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="🛒  Shopping Cart (3 items) - Checkout" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="920" y="90" width="250" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="Search medicines by name or category..." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="250" y="150" width="700" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="Search" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="960" y="150" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="Filter [v]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontColor=#000000;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1070" y="150" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="All Products" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;fontColor=#ffffff;strokeColor=#000000;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="250" y="210" width="130" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="Antiseptic Rinses" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;fontColor=#495057;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="395" y="210" width="130" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="Toothpastes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;fontColor=#495057;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="540" y="210" width="130" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="Pain Killers" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;fontColor=#495057;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="685" y="210" width="130" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="30" value="Dental Floss" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;fontColor=#495057;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="830" y="210" width="130" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="31" value="Antibiotics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;fontColor=#495057;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="975" y="210" width="130" height="28" as="geometry" />
+        </mxCell>
+        <mxCell id="32" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="250" y="260" width="290" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="33" value="Chlorhexidine Mouthwash" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="275" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="34" value="Antiseptic oral rinse to reduce oral bacteria." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="265" y="300" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="35" value="In Stock (Apex)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#ff6600;" vertex="1" parent="1">
+          <mxGeometry x="265" y="345" width="260" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="36" value="$12.50" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="375" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="37" value="Add to Cart" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="410" y="375" width="115" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="38" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="565" y="260" width="290" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="39" value="Sensodyne Toothpaste" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="580" y="275" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="40" value="Relieves tooth sensitivity and prevents cavities." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="580" y="300" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="41" value="In Stock (Apex)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#ff6600;" vertex="1" parent="1">
+          <mxGeometry x="580" y="345" width="260" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="42" value="$6.99" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="580" y="375" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="43" value="Add to Cart" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="725" y="375" width="115" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="44" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="880" y="260" width="290" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="45" value="Amoxicillin 500mg" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="895" y="275" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="46" value="Broad-spectrum oral antibiotic (requires digital RX approval)." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="895" y="300" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="47" value="Prescription Needed" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#ff6600;" vertex="1" parent="1">
+          <mxGeometry x="895" y="345" width="260" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="48" value="$18.00" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="895" y="375" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="49" value="Add to Cart" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="375" width="115" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="50" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="250" y="455" width="290" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="51" value="Dental Floss Tape (Mint)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="470" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="52" value="Removes plaque in tight spaces between teeth." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="265" y="495" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="53" value="In Stock (Broadway)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#ff6600;" vertex="1" parent="1">
+          <mxGeometry x="265" y="540" width="260" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="54" value="$3.50" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="265" y="570" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="55" value="Add to Cart" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="410" y="570" width="115" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="56" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="565" y="455" width="290" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="57" value="Ibuprofen 400mg Tablets" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="580" y="470" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="58" value="Reduces painful swelling and dental nerve pain." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="580" y="495" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="59" value="In Stock (Apex)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#ff6600;" vertex="1" parent="1">
+          <mxGeometry x="580" y="540" width="260" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="60" value="$8.20" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="580" y="570" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="61" value="Add to Cart" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="725" y="570" width="115" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="62" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="880" y="455" width="290" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="63" value="Oral-B Electric Toothbrush" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=12;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="895" y="470" width="260" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="64" value="Oscillating dental clean with smart timer." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;fontSize=10;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="895" y="495" width="260" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="65" value="Out of Stock" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=10;fontColor=#ff6600;" vertex="1" parent="1">
+          <mxGeometry x="895" y="540" width="260" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="66" value="$49.99" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;fontSize=14;fontStyle=1;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="895" y="570" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="67" value="Disabled" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#cccccc;fontColor=#bbbbbb;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="570" width="115" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

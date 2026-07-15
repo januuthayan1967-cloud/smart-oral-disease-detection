@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-07-14T16:03:43.151Z" agent="Antigravity" version="21.0.0" type="device">
+  <diagram id="diagram_1" name="Page-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="fillColor=#f8f9fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1200" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#e9ecef;strokeWidth=1;align=left;verticalAlign=middle;spacingLeft=20;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Tooth Mascot [Animated]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;fontColor=#495057;fontSize=10;align=center;" vertex="1" parent="1">
+          <mxGeometry x="20" y="15" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Smart Oral Health AI" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=16;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="170" y="15" width="250" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Welcome, User | Logout" style="text;html=1;strokeColor=none;fillColor=none;align=right;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#333333;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="950" y="15" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#cccccc;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1160" y="15" width="30" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=#e9ecef;strokeWidth=1;align=left;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="0" y="60" width="220" height="840" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="[D]   Dashboard" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="80" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="10" y="124" width="200" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="[O]   Manage Orders" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#ffffff;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="124" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="[P]   Prescription Uploads" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="168" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="[U]   Pharmacy Profile" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#495057;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="20" y="212" width="180" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="Customer Orders Management" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="90" width="500" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Manage medicine orders purchased by patients, packaging status, and courier dispatch updates." style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#666666;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="250" y="120" width="500" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="250" y="150" width="920" height="680" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="Customer Purchases" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="280" y="180" width="400" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="Order ID" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;strokeWidth=1;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="280" y="220" width="120" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="Patient Customer" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;strokeWidth=1;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="220" width="160" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="Delivery Address" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;strokeWidth=1;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="560" y="220" width="200" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="Order Price" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;strokeWidth=1;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="220" width="100" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="Fulfillment Status" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;strokeWidth=1;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="860" y="220" width="140" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="Fulfillment Actions" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f1f3f5;strokeColor=#cccccc;strokeWidth=1;fontStyle=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="220" width="150" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="#ORD-99482" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="280" y="255" width="120" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="John Doe" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="255" width="160" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="72 Broadway, NY" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="560" y="255" width="200" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="27" value="$31.48" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="255" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="28" value="preparing" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=left;spacingLeft=10;fontColor=orange;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="255" width="140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="29" value="Ship Package [🚚]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="262" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="30" value="#ORD-99318" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="280" y="300" width="120" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="31" value="Billy Vance" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="300" width="160" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="32" value="44 Wall St, NY" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="560" y="300" width="200" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="33" value="$12.50" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="300" width="100" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="34" value="completed" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=left;spacingLeft=10;fontColor=green;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="860" y="300" width="140" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="35" value="Archived Log" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#eeeeee;strokeWidth=1;align=center;fontColor=#bbbbbb;fontSize=9;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="307" width="130" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

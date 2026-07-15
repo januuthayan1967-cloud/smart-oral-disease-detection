@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-07-14T16:03:43.162Z" agent="Antigravity" version="21.0.0" type="device">
+  <diagram id="diagram_1" name="Page-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1400" height="950" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Smart Oral Health System Architecture Topology" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="30" width="800" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="FE_BOX" value="React Frontend Client
+(Vite App Spa)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#000000;strokeWidth=2;align=center;verticalAlign=top;spacingTop=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="150" width="300" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="FE_COMP" value="• React Components / Pages
+• Tailwind CSS styling
+• Axios REST client
+• Socket.io WebSocket link
+• Chart.js analytics engine
+• React Hook Form Validation" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="65" y="210" width="270" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="BE_BOX" value="Node.js Express REST API Backend Server
+(MVC Architecture)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#000000;strokeWidth=2;align=center;verticalAlign=top;spacingTop=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="150" width="350" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="BE_COMP" value="• API Routing &amp; Controllers
+• Mongoose schemas / Models
+• JSON Web Token Auth / bcrypt
+• PDFKit Report Generator
+• Socket.io Websocket handler
+• Multer Multipart upload engine
+• Security (Helmet, rate limits)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="515" y="210" width="320" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="AI_BOX" value="Flask AI Microservice
+(Python service)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#000000;strokeWidth=2;align=center;verticalAlign=top;spacingTop=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1000" y="150" width="320" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="AI_COMP" value="• Python Flask REST App
+• TensorFlow Keras Core
+• MobileNetV2 Deep Learning Weights
+• OpenCV teeth region analysis
+• Numpy image manipulation" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="1015" y="210" width="290" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="INT_BOX" value="Third-Party External APIs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#000000;strokeWidth=2;align=center;verticalAlign=top;spacingTop=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="600" width="300" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="INT_COMP" value="• Stripe API Gateway (Payments)
+• Jitsi Meet Server (Video Call)
+• Nodemailer Mailer (Verification)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="65" y="660" width="270" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="DB_BOX" value="Database Storage Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=#000000;strokeWidth=2;align=center;verticalAlign=top;spacingTop=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="600" width="350" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="DB_COMP" value="• MongoDB Atlas Cluster
+• Mongoose object relational mapping
+• Document Collections:
+  - Users / Dentists / Pharmacies
+  - Predictions / Prescriptions
+  - Orders / Payments / ChatLogs" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="515" y="660" width="320" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="HTTPS REST Requests
+(Axios / JSON payload)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="FE_BOX" target="BE_BOX">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5" value="Internal REST Call
+(Multipart image)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="BE_BOX" target="AI_BOX">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6" value="Stripe Checkout &amp; Jitsi Embed" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="FE_BOX" target="INT_BOX">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="7" value="Mongoose ODM CRUD operations" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="BE_BOX" target="DB_BOX">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

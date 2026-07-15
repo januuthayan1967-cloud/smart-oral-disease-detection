@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-07-14T16:03:43.163Z" agent="Antigravity" version="21.0.0" type="device">
+  <diagram id="diagram_1" name="Page-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1600" height="1200" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Mongoose Schema Database Entity Relationship Diagram (ERD)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="30" width="1000" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="U_HDR" value="User (Collection)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="U_BODY" value="_id: ObjectId
+name: String
+email: String
+password: String
+role: String [user, dentist, pharmacy, admin]
+approvalStatus: String
+professionalLicenseNumber: String
+pharmacyName: String
+pharmacyLicenseNumber: String
+address: String
+phone: String
+age: Number
+gender: String
+isEmailVerified: Boolean
+timestamps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="130" width="200" height="260" as="geometry" />
+        </mxCell>
+        <mxCell id="D_HDR" value="Dentist (Collection)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="100" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="D_BODY" value="_id: ObjectId
+userId: User Ref
+name: String
+qualification: String
+specialization: String
+experience: Number
+phone: String
+email: String
+availability: Array
+bio: String
+professionalLicenseNumber: String
+isActive: Boolean
+timestamps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="130" width="200" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="P_HDR" value="Pharmacy (Collection)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="750" y="100" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="P_BODY" value="_id: ObjectId
+pharmacyName: String
+ownerName: String
+email: String
+password: String
+phone: String
+address: String
+city: String
+district: String
+location: Coordinates
+licenseNumber: String
+documents: Documents
+status: String
+inventory: Array
+timestamps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="750" y="130" width="200" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="PR_HDR" value="Prediction (Collection)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="50" y="480" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="PR_BODY" value="_id: ObjectId
+userId: User Ref
+imageUrl: String
+diseaseName: String
+confidence: Number
+severity: String
+description: String
+causes: [String]
+treatmentSuggestions: [String]
+preventionTips: [String]
+recommendation: String
+timestamps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="510" width="200" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="AP_HDR" value="Appointment (Collection)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="480" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="AP_BODY" value="_id: ObjectId
+patientId: User Ref
+dentistId: Dentist Ref
+appointmentDate: Date
+appointmentTime: String
+status: String
+meetingLink: String
+notes: String
+timestamps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="510" width="200" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="RX_HDR" value="Prescription (Collection)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="750" y="480" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="RX_BODY" value="_id: ObjectId
+patientId: User Ref
+dentistId: Dentist Ref
+medicines: Array [medicineSchema]
+notes: String
+date: Date
+paymentStatus: String
+paymentId: Payment Ref
+prescriptionFee: Number
+timestamps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="750" y="510" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="CA_HDR" value="Cart (Collection)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="50" y="800" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="CA_BODY" value="_id: ObjectId
+userId: User Ref
+items: Array [cartItemSchema]
+- pharmacyId: Pharmacy Ref
+- pharmacyName: String
+- inventoryItemId: ObjectId
+- medicineName: String
+- category: String
+- unitPrice: Number
+- quantity: Number
+timestamps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="830" width="200" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="MO_HDR" value="MedicineOrder (Collection)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="400" y="800" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="MO_BODY" value="_id: ObjectId
+prescriptionId: Prescription Ref
+pharmacyId: Pharmacy Ref
+userId: User Ref
+status: String
+deliveryConfirmed: Boolean
+totalAmount: Number
+deliveryAddress: String
+rejectionReason: String
+timestamps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="830" width="200" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="DO_HDR" value="DirectOrder (Collection)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="750" y="800" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="DO_BODY" value="_id: ObjectId
+userId: User Ref
+pharmacyId: Pharmacy Ref
+items: Array [orderItemSchema]
+customerName: String
+deliveryAddress: String
+contactNumber: String
+notes: String
+totalAmount: Number
+status: String
+deliveryConfirmed: Boolean
+rejectionReason: String
+paymentMethod: String
+paymentStatus: String
+paymentId: Payment Ref
+timestamps" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=10;spacingTop=10;" vertex="1" parent="1">
+          <mxGeometry x="750" y="830" width="200" height="270" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="userId (1:1)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="D_BODY" target="U_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5" value="userId (1:N)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="PR_BODY" target="U_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="6" value="patientId (1:N)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="AP_BODY" target="U_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="7" value="dentistId (1:N)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="AP_BODY" target="D_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="8" value="patientId (1:N)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="RX_BODY" target="U_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="9" value="dentistId (1:N)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="RX_BODY" target="D_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="10" value="userId (1:1)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="CA_BODY" target="U_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="11" value="prescriptionId (1:1)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="MO_BODY" target="RX_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="12" value="pharmacyId (1:N)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="MO_BODY" target="P_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="13" value="userId (1:N)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="MO_BODY" target="U_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="14" value="userId (1:N)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="DO_BODY" target="U_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="15" value="pharmacyId (1:N)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#000000;strokeWidth=1.5;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="DO_BODY" target="P_BODY">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

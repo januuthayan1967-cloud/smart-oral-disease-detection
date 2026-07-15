@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-07-14T16:03:43.131Z" agent="Antigravity" version="21.0.0" type="device">
+  <diagram id="diagram_1" name="Page-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="fillColor=#f8f9fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1200" height="950" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="350" y="80" width="500" height="790" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="Pharmacy Registry Setup" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=20;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="385" y="110" width="430" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="Pharmacy Store Name" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="385" y="155" width="430" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="Apex Oral Care Pharmacy" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="385" y="175" width="430" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Owner Full Name" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="385" y="220" width="430" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="Robert Johnson" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="385" y="240" width="430" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="Pharmacy Business Email" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="385" y="285" width="430" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="contact@apexpharmacy.com" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="385" y="305" width="430" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="Password" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="385" y="350" width="430" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="••••••••" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="385" y="370" width="430" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="Contact Number" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="385" y="415" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="+1-555-019-284" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="385" y="435" width="200" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="Drug Store License Number" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="605" y="415" width="210" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="LIC-PHA-994827-NY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="605" y="435" width="210" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="Street Address" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="385" y="480" width="430" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="782 Medicine Way, Brooklyn, NY" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="385" y="500" width="430" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="City / District" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="385" y="545" width="200" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="New York City" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="385" y="565" width="200" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="Geographical Coordinates" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="605" y="545" width="210" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="40.7128, -74.0060" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;fontColor=#666666;align=left;spacingLeft=10;" vertex="1" parent="1">
+          <mxGeometry x="605" y="565" width="210" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="Required PDF Documents Uploads" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="385" y="615" width="430" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="   [Icon] Pharmacy License + Pharmacist Qualification PDFs" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#aaaaaa;strokeWidth=1;dashed=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="385" y="635" width="430" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="Register Pharmacy Branch" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="385" y="720" width="430" height="45" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="Back to Login" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#0066cc;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="385" y="780" width="430" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

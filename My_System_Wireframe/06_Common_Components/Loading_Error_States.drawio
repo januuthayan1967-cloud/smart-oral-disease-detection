@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-07-14T16:03:43.157Z" agent="Antigravity" version="21.0.0" type="device">
+  <diagram id="diagram_1" name="Page-1">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="2" value="" style="fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="0" y="0" width="1200" height="900" as="geometry" />
+        </mxCell>
+        <mxCell id="3" value="Common Loading, Error, and Empty Interface States" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="600" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="4" value="1. GLOBAL PAGE SPINNER STATE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="50" y="70" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="5" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="320" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="6" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffffff;strokeColor=#000000;align=center;" vertex="1" parent="1">
+          <mxGeometry x="185" y="160" width="50" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="7" value="Loading Oral AI..." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#555555;fontSize=12;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="220" width="320" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="8" value="Please hold while we initialize model weights." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#888888;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="245" width="320" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="9" value="2. COMPONENT SKELETON PLACEHOLDERS" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="420" y="70" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="10" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#cccccc;strokeWidth=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="420" y="100" width="320" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="11" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eeeeee;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="440" y="125" width="280" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="12" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="440" y="165" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="13" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="440" y="195" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="14" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="440" y="225" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="15" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8f9fa;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="440" y="255" width="280" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="16" value="3. SYSTEM ERROR ALERT FALLBACK" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="790" y="70" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="17" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=red;strokeWidth=1.5;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="790" y="100" width="320" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="18" value="⚠️ Network Connection Failed" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=red;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="790" y="130" width="320" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="19" value="We failed to sync with the Express backend REST API server. Please check your network cables or verify port 5000 is open." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#555555;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="810" y="165" width="280" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="20" value="Retry connection" style="rounded=1;whiteSpace=wrap;html=1;fillColor=red;strokeColor=red;fontColor=#ffffff;fontStyle=1;align=center;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="870" y="240" width="160" height="35" as="geometry" />
+        </mxCell>
+        <mxCell id="21" value="4. EMPTY CART / NO DATA STATE" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#000000;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="50" y="380" width="300" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="22" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#aaaaaa;strokeWidth=1;dashed=1;align=left;verticalAlign=top;spacingLeft=15;spacingTop=15;" vertex="1" parent="1">
+          <mxGeometry x="50" y="415" width="690" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="23" value="🛒" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontSize=36;" vertex="1" parent="1">
+          <mxGeometry x="50" y="450" width="690" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="24" value="Your Shopping Cart is Empty" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#333333;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="50" y="510" width="690" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="25" value="You have not added any dental medicines or hygiene items. Browse our marketplace to purchase stocks." style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#888888;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="50" y="535" width="690" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="26" value="Explore Marketplace [M]" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#000000;strokeColor=#000000;fontColor=#ffffff;fontStyle=1;align=center;" vertex="1" parent="1">
+          <mxGeometry x="295" y="570" width="200" height="35" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
