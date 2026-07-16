@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import AuthLayout from '../components/AuthLayout';
+import Button from '../components/Button';
+import Input from '../components/Input';
 
 export default function DentistRegister() {
   const { registerDentist } = useAuth();
@@ -23,109 +27,115 @@ export default function DentistRegister() {
   };
 
   return (
-    <div className="page-gradient min-h-screen px-4 py-8">
-      <div className="card mx-auto w-full max-w-lg">
-        {/* Header */}
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-theme-accent/15">
-            <span className="text-2xl">🦷</span>
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-theme-heading">Dentist Registration</h1>
-            <p className="text-sm text-theme-muted">Register your professional account for approval</p>
-          </div>
+    <AuthLayout title="Dentist Registration" subtitle="Register your professional account for approval">
+      <motion.div
+        className="mt-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-3 text-sm text-yellow-400"
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <strong>⏳ Approval Required:</strong> Dentist accounts are reviewed by an admin before you can log in.
+      </motion.div>
+
+      {error && (
+        <motion.div
+          className="mt-4 rounded-xl p-3 text-sm"
+          style={{ background: 'var(--error-bg)', color: 'var(--error)' }}
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {error}
+        </motion.div>
+      )}
+      
+      {success && (
+        <motion.div
+          className="mt-4 rounded-xl p-3 text-sm"
+          style={{ background: 'var(--success-bg)', color: 'var(--success)' }}
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          ✅ {success} <br />
+          <span className="text-xs opacity-75">Redirecting to login in a few seconds…</span>
+        </motion.div>
+      )}
+
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="md:col-span-2">
+          <Input
+            label="Full Name"
+            placeholder="Dr. John Smith"
+            {...register('name', { required: true })}
+          />
         </div>
 
-        {/* Pending notice */}
-        <div className="mb-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-3 text-sm text-yellow-400">
-          <strong>⏳ Approval Required:</strong> Dentist accounts are reviewed by an admin before you can log in.
+        <div className="md:col-span-2">
+          <Input
+            label="Email Address"
+            type="email"
+            placeholder="dentist@example.com"
+            {...register('email', { required: true })}
+          />
         </div>
 
-        {error && (
-          <div className="mb-4 rounded-xl p-3 text-sm" style={{ background: 'var(--error-bg)', color: 'var(--error)' }}>
-            {error}
-          </div>
-        )}
-        {success && (
-          <div className="mb-4 rounded-xl p-3 text-sm" style={{ background: 'var(--success-bg)', color: 'var(--success)' }}>
-            ✅ {success} <br />
-            <span className="text-xs opacity-75">Redirecting to login in a few seconds…</span>
-          </div>
-        )}
+        <Input
+          label="Password"
+          type="password"
+          placeholder="Min. 6 characters"
+          {...register('password', { required: true, minLength: 6 })}
+        />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4 md:grid-cols-2">
-          <div className="md:col-span-2">
-            <label className="mb-1 block text-sm font-medium text-theme-text">Full Name</label>
-            <input
-              className="input-field"
-              placeholder="Dr. John Smith"
-              {...register('name', { required: true })}
-            />
-          </div>
+        <Input
+          label="Phone Number"
+          placeholder="+1 234 567 8900"
+          {...register('phone')}
+        />
 
-          <div className="md:col-span-2">
-            <label className="mb-1 block text-sm font-medium text-theme-text">Email Address</label>
-            <input
-              type="email"
-              className="input-field"
-              placeholder="dentist@example.com"
-              {...register('email', { required: true })}
-            />
-          </div>
+        <div className="md:col-span-2">
+          <Input
+            label="Professional License Number"
+            placeholder="e.g. DDS-2024-001234"
+            {...register('professionalLicenseNumber', { required: true })}
+          />
+          <p className="mt-1 text-xs text-theme-muted">
+            Your official dental council license / registration number.
+          </p>
+        </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-theme-text">Password</label>
-            <input
-              type="password"
-              className="input-field"
-              placeholder="Min. 6 characters"
-              {...register('password', { required: true, minLength: 6 })}
-            />
-          </div>
+        <div className="md:col-span-2">
+          <Button type="submit" disabled={isSubmitting} className="w-full" size="lg">
+            {isSubmitting ? 'Submitting application…' : 'Submit Dentist Registration'}
+          </Button>
+        </div>
+      </form>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-theme-text">Phone Number</label>
-            <input
-              className="input-field"
-              placeholder="+1 234 567 8900"
-              {...register('phone')}
-            />
-          </div>
+      <p className="mt-4 text-center text-sm text-theme-muted">
+        Already approved?{' '}
+        <Link to="/login" className="text-theme-accent hover:underline">
+          Login
+        </Link>
+      </p>
 
-          <div className="md:col-span-2">
-            <label className="mb-1 block text-sm font-medium text-theme-text">
-              Professional License Number <span className="text-red-400">*</span>
-            </label>
-            <input
-              className="input-field"
-              placeholder="e.g. DDS-2024-001234"
-              {...register('professionalLicenseNumber', { required: true })}
-            />
-            <p className="mt-1 text-xs text-theme-muted">
-              Your official dental council license / registration number.
-            </p>
-          </div>
-
-          <div className="md:col-span-2">
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="btn-primary w-full"
-            >
-              {isSubmitting ? 'Submitting application…' : 'Submit Dentist Registration'}
-            </button>
-          </div>
-        </form>
-
-        <p className="mt-5 text-center text-sm text-theme-muted">
-          Already approved?{' '}
-          <Link to="/login" className="text-theme-accent hover:underline">Login</Link>
-          {' · '}
-          <Link to="/register" className="text-theme-accent hover:underline">User Registration</Link>
-          {' · '}
-          <Link to="/register-pharmacy" className="text-theme-accent hover:underline">Pharmacy Registration</Link>
+      <div className="mt-5 border-t border-theme-border/40 pt-4">
+        <p className="mb-3 text-center text-xs font-medium uppercase tracking-wide text-theme-muted">
+          Register other accounts instead
         </p>
+        <div className="grid grid-cols-2 gap-3">
+          <Link
+            to="/register"
+            className="flex items-center gap-2 rounded-xl border border-theme-border/50 bg-theme-surface/40 px-4 py-3 text-sm font-medium text-theme-text transition hover:border-theme-accent/40 hover:text-theme-accent"
+          >
+            <span>👤</span>
+            <span>User</span>
+          </Link>
+          <Link
+            to="/register-pharmacy"
+            className="flex items-center gap-2 rounded-xl border border-theme-border/50 bg-theme-surface/40 px-4 py-3 text-sm font-medium text-theme-text transition hover:border-theme-accent/40 hover:text-theme-accent"
+          >
+            <span>💊</span>
+            <span>Pharmacy</span>
+          </Link>
+        </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }

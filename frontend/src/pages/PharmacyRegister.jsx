@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
+import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import AuthLayout from '../components/AuthLayout';
+import Button from '../components/Button';
+import Input from '../components/Input';
 
 export default function PharmacyRegister() {
   const { registerPharmacy } = useAuth();
@@ -58,91 +62,138 @@ export default function PharmacyRegister() {
   };
 
   return (
-    <div className="page-gradient min-h-screen px-4 py-8">
-      <div className="card mx-auto w-full max-w-2xl">
-        <h1 className="text-2xl font-bold text-theme-heading">Pharmacy Registration</h1>
-        <p className="mt-1 text-sm text-theme-muted">Register your pharmacy for medicine delivery services</p>
+    <AuthLayout title="Pharmacy Registration" subtitle="Register your pharmacy for medicine delivery services">
+      <motion.div
+        className="mt-4 rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-3 text-sm text-yellow-400"
+        initial={{ opacity: 0, y: -8 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <strong>⏳ Approval Required:</strong> Pharmacy accounts are reviewed by an admin before you can log in.
+      </motion.div>
 
-        {error && <div className="mt-4 rounded-xl p-3 text-sm" style={{ background: 'var(--error-bg)', color: 'var(--error)' }}>{error}</div>}
-        {success && <div className="mt-4 rounded-xl p-3 text-sm" style={{ background: 'var(--success-bg)', color: 'var(--success)' }}>{success}</div>}
+      {error && (
+        <motion.div
+          className="mt-4 rounded-xl p-3 text-sm"
+          style={{ background: 'var(--error-bg)', color: 'var(--error)' }}
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {error}
+        </motion.div>
+      )}
+      
+      {success && (
+        <motion.div
+          className="mt-4 rounded-xl p-3 text-sm"
+          style={{ background: 'var(--success-bg)', color: 'var(--success)' }}
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {success}
+        </motion.div>
+      )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="mt-6 grid gap-4 md:grid-cols-2">
-          <div className="md:col-span-2">
-            <label className="mb-1 block text-sm font-medium">Pharmacy Name</label>
-            <input className="input-field" {...register('pharmacyName', { required: true })} />
-          </div>
-          <div className="md:col-span-2">
-            <label className="mb-1 block text-sm font-medium">Owner Name</label>
-            <input className="input-field" {...register('ownerName', { required: true })} />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">Email</label>
-            <input type="email" className="input-field" {...register('email', { required: true })} />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">Password</label>
-            <input type="password" className="input-field" {...register('password', { required: true, minLength: 6 })} />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">Phone</label>
-            <input className="input-field" {...register('phone', { required: true })} />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">License Number</label>
-            <input className="input-field" {...register('licenseNumber', { required: true })} />
-          </div>
-          <div className="md:col-span-2">
-            <label className="mb-1 block text-sm font-medium">Address</label>
-            <input className="input-field" {...register('address', { required: true })} />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">District</label>
-            <input className="input-field" {...register('district', { required: true })} />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">City</label>
-            <input className="input-field" {...register('city', { required: true })} />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">Latitude</label>
-            <input id="latitude" type="number" step="any" className="input-field" {...register('latitude', { required: true })} />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">Longitude</label>
-            <input id="longitude" type="number" step="any" className="input-field" {...register('longitude', { required: true })} />
-          </div>
-          <div className="md:col-span-2">
-            <button type="button" onClick={detectLocation} className="btn-secondary text-sm">
-              Detect Current Location
-            </button>
-          </div>
+      <form onSubmit={handleSubmit(onSubmit)} className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="md:col-span-2">
+          <Input label="Pharmacy Name" {...register('pharmacyName', { required: true })} />
+        </div>
+        <div className="md:col-span-2">
+          <Input label="Owner Name" {...register('ownerName', { required: true })} />
+        </div>
+        <div>
+          <Input label="Email" type="email" {...register('email', { required: true })} />
+        </div>
+        <div>
+          <Input label="Password" type="password" {...register('password', { required: true, minLength: 6 })} />
+        </div>
+        <div>
+          <Input label="Phone" {...register('phone', { required: true })} />
+        </div>
+        <div>
+          <Input label="License Number" {...register('licenseNumber', { required: true })} />
+        </div>
+        <div className="md:col-span-2">
+          <Input label="Address" {...register('address', { required: true })} />
+        </div>
+        <div>
+          <Input label="District" {...register('district', { required: true })} />
+        </div>
+        <div>
+          <Input label="City" {...register('city', { required: true })} />
+        </div>
+        <div>
+          <Input id="latitude" label="Latitude" type="number" step="any" {...register('latitude', { required: true })} />
+        </div>
+        <div>
+          <Input id="longitude" label="Longitude" type="number" step="any" {...register('longitude', { required: true })} />
+        </div>
+        
+        <div className="md:col-span-2">
+          <Button type="button" variant="secondary" onClick={detectLocation} className="w-full text-sm">
+            Detect Current Location
+          </Button>
+        </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium">Pharmacy License Certificate</label>
-            <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="input-field" onChange={(e) => handleDocChange('pharmacyLicense', e.target.files[0])} />
-          </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">Business Registration Certificate</label>
-            <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="input-field" onChange={(e) => handleDocChange('businessRegistration', e.target.files[0])} />
-          </div>
-          <div className="md:col-span-2">
-            <label className="mb-1 block text-sm font-medium">Pharmacist Qualification Certificate</label>
-            <input type="file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="input-field" onChange={(e) => handleDocChange('pharmacistQualification', e.target.files[0])} />
-          </div>
+        <div>
+          <Input
+            label="Pharmacy License Certificate"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp"
+            onChange={(e) => handleDocChange('pharmacyLicense', e.target.files[0])}
+          />
+        </div>
+        <div>
+          <Input
+            label="Business Registration Certificate"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp"
+            onChange={(e) => handleDocChange('businessRegistration', e.target.files[0])}
+          />
+        </div>
+        <div className="md:col-span-2">
+          <Input
+            label="Pharmacist Qualification Certificate"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp"
+            onChange={(e) => handleDocChange('pharmacistQualification', e.target.files[0])}
+          />
+        </div>
 
-          <div className="md:col-span-2">
-            <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
-              {isSubmitting ? 'Submitting...' : 'Register Pharmacy'}
-            </button>
-          </div>
-        </form>
+        <div className="md:col-span-2">
+          <Button type="submit" disabled={isSubmitting} className="w-full" size="lg">
+            {isSubmitting ? 'Submitting...' : 'Register Pharmacy'}
+          </Button>
+        </div>
+      </form>
 
-        <p className="mt-4 text-center text-sm text-theme-muted">
-          Already registered? <Link to="/login" className="text-theme-accent hover:underline">Login</Link>
-          {' · '}
-          <Link to="/register" className="text-theme-accent hover:underline">User Registration</Link>
+      <p className="mt-4 text-center text-sm text-theme-muted">
+        Already registered?{' '}
+        <Link to="/login" className="text-theme-accent hover:underline">
+          Login
+        </Link>
+      </p>
+
+      <div className="mt-5 border-t border-theme-border/40 pt-4">
+        <p className="mb-3 text-center text-xs font-medium uppercase tracking-wide text-theme-muted">
+          Register other accounts instead
         </p>
+        <div className="grid grid-cols-2 gap-3">
+          <Link
+            to="/register"
+            className="flex items-center gap-2 rounded-xl border border-theme-border/50 bg-theme-surface/40 px-4 py-3 text-sm font-medium text-theme-text transition hover:border-theme-accent/40 hover:text-theme-accent"
+          >
+            <span>👤</span>
+            <span>User</span>
+          </Link>
+          <Link
+            to="/register-dentist"
+            className="flex items-center gap-2 rounded-xl border border-theme-border/50 bg-theme-surface/40 px-4 py-3 text-sm font-medium text-theme-text transition hover:border-theme-accent/40 hover:text-theme-accent"
+          >
+            <span>🦷</span>
+            <span>Dentist</span>
+          </Link>
+        </div>
       </div>
-    </div>
+    </AuthLayout>
   );
 }
