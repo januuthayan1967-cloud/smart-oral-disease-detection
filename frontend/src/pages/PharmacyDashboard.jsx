@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import MedicineCard from '../components/MedicineCard';
@@ -193,432 +194,544 @@ export default function PharmacyDashboard() {
     <Layout>
       <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-theme-heading">Pharmacy Dashboard</h1>
+          <h1 className="text-3xl font-bold text-theme-heading font-heading">Pharmacy Dashboard</h1>
           <p className="mt-1 text-theme-muted">{profile?.pharmacyName} — Fulfill orders and manage inventory</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="mt-6 flex flex-wrap gap-2 border-b border-theme-border/40 pb-4">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-              activeTab === tab.id
-                ? 'bg-theme-accent text-theme-primary font-bold shadow-glow'
-                : 'bg-theme-surface/50 text-theme-muted hover:bg-theme-surface hover:text-theme-text border border-theme-border/20'
-            }`}
-          >
-            {tab.label}
-            {tab.count !== undefined && tab.count > 0 ? (
-              <span className="ml-1.5 rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                {tab.count}
+      <div className="mt-6 flex flex-wrap gap-2 border-b border-theme-border/40 pb-4 relative">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`relative rounded-xl px-4 py-2.5 text-sm font-semibold transition duration-200 ${
+                isActive
+                  ? 'text-theme-primary z-10 font-bold shadow-glow-sm'
+                  : 'text-theme-muted hover:text-theme-text hover:bg-theme-surface/30 border border-theme-border/20'
+              }`}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="pharmacy-active-tab"
+                  className="absolute inset-0 rounded-xl"
+                  style={{ background: 'var(--gradient-accent)' }}
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+              <span className="relative z-20 flex items-center gap-1.5">
+                {tab.label}
+                {tab.count !== undefined && tab.count > 0 ? (
+                  <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${isActive ? 'bg-theme-primary text-theme-accent' : 'bg-red-500 text-white'}`}>
+                    {tab.count}
+                  </span>
+                ) : null}
               </span>
-            ) : null}
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
 
-      {/* ─── NEW PAGE: Direct Orders (Marketplace Orders) ────────────────────── */}
-      {activeTab === 'direct-orders' && (
-        <div className="mt-6 space-y-6">
-          {/* Search and status filters */}
-          <div className="card p-4 border border-theme-border/40 bg-theme-surface/40 flex flex-col md:flex-row gap-4 items-center justify-between">
-            <div className="flex-1 w-full">
-              <input
-                type="text"
-                placeholder="Search by customer name, order ID, or medicine..."
-                className="input-field w-full text-sm"
-                value={directOrdersSearch}
-                onChange={(e) => setDirectOrdersSearch(e.target.value)}
-              />
+      <AnimatePresence mode="wait">
+        {/* ─── NEW PAGE: Direct Orders (Marketplace Orders) ────────────────────── */}
+        {activeTab === 'direct-orders' && (
+          <motion.div
+            key="direct-orders"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="mt-6 space-y-6"
+          >
+            {/* Search and status filters */}
+            <div className="card p-4 border border-theme-border/40 bg-theme-surface/40 flex flex-col md:flex-row gap-4 items-center justify-between">
+              <div className="flex-1 w-full">
+                <input
+                  type="text"
+                  placeholder="Search by customer name, order ID, or medicine..."
+                  className="input-field w-full text-sm"
+                  value={directOrdersSearch}
+                  onChange={(e) => setDirectOrdersSearch(e.target.value)}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2 w-full md:w-auto">
+                {['All', 'pending', 'accepted', 'out_for_delivery', 'delivered', 'completed', 'cancelled'].map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => setDirectOrdersFilter(status)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition ${
+                      directOrdersFilter === status
+                        ? 'bg-theme-accent text-theme-primary font-bold shadow-glow-sm'
+                        : 'bg-theme-surface/50 text-theme-muted hover:bg-theme-surface hover:text-theme-text border border-theme-border/20'
+                    }`}
+                  >
+                    {STATUS_LABELS[status] || status}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-wrap gap-2 w-full md:w-auto">
-              {['All', 'pending', 'accepted', 'out_for_delivery', 'delivered', 'completed', 'cancelled'].map((status) => (
-                <button
-                  key={status}
-                  onClick={() => setDirectOrdersFilter(status)}
-                  className={`rounded-lg px-3 py-1.5 text-xs font-semibold uppercase tracking-wider transition ${
-                    directOrdersFilter === status
-                      ? 'bg-theme-accent text-theme-primary font-bold shadow-glow'
-                      : 'bg-theme-surface/50 text-theme-muted hover:bg-theme-surface hover:text-theme-text border border-theme-border/20'
-                  }`}
-                >
-                  {STATUS_LABELS[status] || status}
-                </button>
-              ))}
-            </div>
-          </div>
 
-          {filteredDirectOrders.length === 0 ? (
-            <div className="card text-center py-12 text-theme-muted border border-theme-border/30 bg-theme-surface/30">
-              <p className="text-4xl mb-2">📋</p>
-              <p className="font-semibold text-theme-heading text-lg">No direct orders found</p>
-              <p className="text-sm mt-1">Incoming marketplace orders will show up here.</p>
+            {filteredDirectOrders.length === 0 ? (
+              <div className="card text-center py-12 text-theme-muted border border-theme-border/30 bg-theme-surface/30 shadow-inner">
+                <p className="text-4xl mb-2">📋</p>
+                <p className="font-semibold text-theme-heading text-lg">No direct orders found</p>
+                <p className="text-sm mt-1">Incoming marketplace orders will show up here.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {filteredDirectOrders.map((order, i) => {
+                  const currentIdx = STATUS_FLOW.indexOf(order.status);
+                  const nextStatus = STATUS_FLOW[currentIdx + 1];
+
+                  return (
+                    <motion.div
+                      key={order._id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: i * 0.04 }}
+                      className="card border border-theme-border/40 bg-theme-surface/50 p-5 space-y-4 hover:border-theme-accent/30 hover:shadow-glow-sm transition duration-200"
+                    >
+                      {/* Header */}
+                      <div className="flex flex-wrap justify-between items-start gap-4">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-theme-heading text-base">Order #{order._id.slice(-8)}</span>
+                            <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${STATUS_BADGES[order.status]}`}>
+                              {STATUS_LABELS[order.status]}
+                            </span>
+                          </div>
+                          <p className="text-xs text-theme-muted mt-1">
+                            Placed: {new Date(order.createdAt).toLocaleString()}
+                          </p>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="text-xs text-theme-muted block">Total Amount</span>
+                          <span className="text-lg font-bold text-theme-accent">Rs. {order.totalAmount.toFixed(2)}</span>
+                        </div>
+                      </div>
+
+                      {/* Customer Info */}
+                      <div className="grid gap-4 sm:grid-cols-3 text-xs text-theme-muted border-t border-b border-theme-border/20 py-3 bg-theme-background/20 px-3 rounded-xl">
+                        <div>
+                          <span className="font-bold text-theme-heading block">Customer</span>
+                          <p className="font-medium text-theme-text mt-0.5">{order.customerName}</p>
+                        </div>
+                        <div>
+                          <span className="font-bold text-theme-heading block">Contact</span>
+                          <p className="font-medium text-theme-text mt-0.5">{order.contactNumber}</p>
+                        </div>
+                        <div>
+                          <span className="font-bold text-theme-heading block">Delivery Address</span>
+                          <p className="font-medium text-theme-text mt-0.5 break-words">{order.deliveryAddress}</p>
+                        </div>
+                      </div>
+
+                      {/* Medicines Ordered */}
+                      <div className="space-y-2">
+                        <span className="text-xs font-bold text-theme-heading uppercase tracking-wider block">Items Ordered</span>
+                        <div className="space-y-1.5">
+                          {order.items.map((item, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-sm border-b border-theme-border/10 pb-1.5">
+                              <div>
+                                <span className="font-semibold text-theme-heading">{item.medicineName}</span>
+                                <span className="text-xs text-theme-muted ml-2">({item.category})</span>
+                              </div>
+                              <span className="text-sm text-theme-text font-mono">
+                                Rs. {item.unitPrice.toFixed(2)} × {item.quantity} = Rs. {item.totalPrice.toFixed(2)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Notes / Reason */}
+                      {order.notes && (
+                        <div className="text-xs bg-theme-background/30 p-2.5 rounded-lg border border-theme-border/25">
+                          <span className="font-bold text-theme-heading block">Customer Note:</span>
+                          <p className="text-theme-text italic mt-0.5">{order.notes}</p>
+                        </div>
+                      )}
+
+                      {order.rejectionReason && (
+                        <div className="text-xs bg-red-500/5 p-2.5 rounded-lg border border-red-500/20 text-red-400">
+                          <span className="font-bold block">Rejection/Cancellation Reason:</span>
+                          <p className="italic mt-0.5">{order.rejectionReason}</p>
+                        </div>
+                      )}
+
+                      {/* Status change actions */}
+                      <div className="flex flex-wrap justify-end gap-2 pt-2 border-t border-theme-border/20">
+                        {order.status !== 'cancelled' && order.status !== 'delivered' && (
+                          <>
+                            <button
+                              onClick={() => handleUpdateDirectStatus(order._id, 'cancelled')}
+                              className="rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 px-4 py-2 text-xs font-semibold transition"
+                            >
+                              Cancel Order
+                            </button>
+                            {nextStatus && (
+                              <button
+                                onClick={() => handleUpdateDirectStatus(order._id, nextStatus)}
+                                className={`btn-primary py-2 px-5 text-xs font-bold shadow-glow ${
+                                  nextStatus === 'delivered' ? 'bg-green-600 hover:bg-green-700' : ''
+                                }`}
+                              >
+                                {nextStatus === 'delivered' ? 'Mark as Delivered' : `Update status to: ${STATUS_LABELS[nextStatus]}`}
+                              </button>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* ─── NEW PAGE: Orders & Payments (COD / Card status management) ───────── */}
+        {activeTab === 'orders-payments' && (
+          <motion.div
+            key="orders-payments"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="mt-6 space-y-4"
+          >
+            <div className="overflow-x-auto rounded-2xl border border-theme-border/40 bg-theme-surface/30 shadow-theme">
+              <table className="w-full border-collapse text-left text-sm text-theme-text font-normal">
+                <thead>
+                  <tr className="border-b border-theme-border/40 bg-theme-surface/50 text-xs font-bold uppercase tracking-wider text-theme-muted">
+                    <th className="px-6 py-4">Customer Name</th>
+                    <th className="px-6 py-4">Order ID</th>
+                    <th className="px-6 py-4">Ordered Products</th>
+                    <th className="px-6 py-4">Payment Method</th>
+                    <th className="px-6 py-4">Payment Status</th>
+                    <th className="px-6 py-4">Order Status</th>
+                    <th className="px-6 py-4">Order Date & Time</th>
+                    <th className="px-6 py-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-theme-border/20">
+                  {directOrders.map((order) => (
+                    <tr key={order._id} className="hover:bg-theme-surface/20 transition duration-150">
+                      <td className="px-6 py-4 font-semibold text-theme-heading">
+                        {order.customerName}
+                      </td>
+                      <td className="px-6 py-4 font-mono text-xs text-theme-muted font-semibold">
+                        #{order._id.slice(-8)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="max-w-xs truncate font-medium" title={order.items?.map(item => `${item.medicineName} (${item.quantity})`).join(', ')}>
+                          {order.items?.map(item => `${item.medicineName} (${item.quantity})`).join(', ') || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 font-bold uppercase text-xs">
+                        {order.paymentMethod === 'card' ? '💳 Card' : '💵 COD'}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
+                            order.paymentStatus === 'paid'
+                              ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400'
+                              : 'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400'
+                          }`}
+                        >
+                          {order.paymentStatus === 'paid' ? '✓ Paid' : '⏳ Pending'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${STATUS_BADGES[order.status]}`}>
+                          {STATUS_LABELS[order.status]}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-theme-muted text-xs">
+                        {new Date(order.createdAt).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4">
+                        {order.paymentStatus === 'pending' && order.paymentMethod === 'cod' && (
+                          <button
+                            onClick={async () => {
+                              if (window.confirm('Mark this COD order as Paid?')) {
+                                try {
+                                  await pharmacyAPI.updateDirectOrderPaymentStatus(order._id, 'paid');
+                                  loadData();
+                                } catch (err) {
+                                  alert(err.response?.data?.message || 'Failed to update payment status.');
+                                }
+                              }
+                            }}
+                            className="rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 text-xs font-bold transition cursor-pointer"
+                          >
+                            Mark as Paid
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {filteredDirectOrders.map((order) => {
+            {directOrders.length === 0 && (
+              <div className="text-center py-12 text-theme-muted bg-theme-surface/10 rounded-2xl border border-theme-border/20 shadow-inner">
+                <p className="text-4xl mb-2">💵</p>
+                <p className="font-semibold text-theme-heading text-lg">No orders placed yet</p>
+              </div>
+            )}
+          </motion.div>
+        )}
+
+        {/* ─── REDESIGNED PAGE: Inventory Card/Grid Layout ───────────────────── */}
+        {activeTab === 'inventory' && (
+          <motion.div
+            key="inventory"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="mt-6 space-y-6"
+          >
+            {/* Header & filters */}
+            <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between">
+              <div className="flex-1 flex gap-3">
+                <input
+                  type="text"
+                  placeholder="Search inventory medicines..."
+                  className="input-field flex-1 text-sm bg-theme-surface/50 border border-theme-border/60"
+                  value={inventorySearch}
+                  onChange={(e) => setInventorySearch(e.target.value)}
+                />
+                <select
+                  className="rounded-xl border border-theme-border bg-theme-surface px-4 text-theme-text text-sm transition focus:border-theme-accent focus:outline-none"
+                  value={inventoryFilter}
+                  onChange={(e) => setInventoryFilter(e.target.value)}
+                  style={{ color: 'var(--text)', backgroundColor: 'var(--surface)' }}
+                >
+                  {inventoryCategories.map((cat) => (
+                    <option key={cat} value={cat} className="bg-theme-surface text-theme-text">
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                onClick={handleOpenAddModal}
+                className="btn-primary px-5 py-3 text-sm font-bold flex items-center justify-center gap-1.5 shadow-glow shrink-0"
+              >
+                <span>➕</span>
+                <span>Add Medicine</span>
+              </button>
+            </div>
+
+            {filteredInventory.length === 0 ? (
+              <div className="card text-center py-16 text-theme-muted border border-theme-border/30 bg-theme-surface/30 shadow-inner">
+                <p className="text-5xl mb-3">💊</p>
+                <h3 className="text-lg font-bold text-theme-heading">No medicines in inventory</h3>
+                <p className="text-sm mt-1">Get started by clicking &quot;Add Medicine&quot; above.</p>
+              </div>
+            ) : (
+              <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {filteredInventory.map((item) => (
+                  <MedicineCard
+                    key={item._id}
+                    medicine={{ ...item, pharmacyName: profile?.pharmacyName }}
+                    isPharmacyView
+                    onEdit={handleOpenEditModal}
+                    onDelete={handleDeleteMedicine}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Reusable Medicine modal */}
+            <MedicineModal
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              onSubmit={handleModalSubmit}
+              medicine={editingMedicine}
+            />
+          </motion.div>
+        )}
+
+        {/* ─── Prescription Requests (existing) ────────────────────────────────── */}
+        {activeTab === 'orders' && (
+          <motion.div
+            key="orders"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="mt-6 space-y-4"
+          >
+            {pendingPrescriptionOrders.length === 0 ? (
+              <div className="text-center py-12 text-theme-muted bg-theme-surface/10 rounded-2xl border border-theme-border/20 shadow-inner">
+                <p className="text-4xl mb-2">📝</p>
+                <p className="font-semibold text-theme-heading text-lg">No pending prescription requests</p>
+              </div>
+            ) : (
+              pendingPrescriptionOrders.map((order, i) => (
+                <motion.div
+                  key={order._id}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="card border border-theme-border/40 bg-theme-surface/50 p-5 hover:border-theme-accent/30 transition duration-200"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div>
+                      <p className="font-bold text-theme-heading text-lg">{order.userId?.name}</p>
+                      <p className="text-xs text-theme-muted mt-0.5">{order.userId?.phone} · {order.userId?.email}</p>
+                      <div className="mt-3 text-sm space-y-1 text-theme-text bg-theme-background/30 p-3 rounded-xl border border-theme-border/20">
+                        <p><span className="font-bold text-theme-heading text-xs uppercase tracking-wider block mb-1">Delivery Address</span> {order.deliveryAddress}</p>
+                        <p className="mt-2"><span className="font-bold text-theme-heading text-xs uppercase tracking-wider block mb-1">Total Bill</span> <span className="text-theme-accent font-bold">Rs. {order.totalAmount?.toFixed(2) || '0.00'}</span></p>
+                      </div>
+                      {order.prescriptionId?.medicines && (
+                        <div className="mt-4">
+                          <p className="text-xs font-bold text-theme-accent uppercase tracking-wider mb-2">Prescribed Medicines:</p>
+                          <div className="space-y-1.5 pl-2">
+                            {order.prescriptionId.medicines.map((m, i) => (
+                              <div key={i} className="text-sm text-theme-text flex items-center gap-2">
+                                <span className="h-1.5 w-1.5 bg-theme-accent rounded-full" />
+                                <span>{m.medicineName} — <span className="text-theme-muted">{m.dosage}, {m.duration}, Qty: {m.quantity}</span></span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <button onClick={() => handleAcceptPrescriptionOrder(order._id)} className="btn-primary text-xs py-2 px-4 shadow-glow">Accept Request</button>
+                      <button onClick={() => handleRejectPrescriptionOrder(order._id)} className="btn-secondary text-xs py-2 px-4 font-semibold text-red-400 hover:text-red-300">Reject</button>
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </motion.div>
+        )}
+
+        {/* ─── Active Prescription Orders (existing) ────────────────────────────── */}
+        {activeTab === 'active' && (
+          <motion.div
+            key="active"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="mt-6 space-y-4"
+          >
+            {activePrescriptionOrders.length === 0 ? (
+              <div className="text-center py-12 text-theme-muted bg-theme-surface/10 rounded-2xl border border-theme-border/20 shadow-inner">
+                <p className="text-4xl mb-2">🚚</p>
+                <p className="font-semibold text-theme-heading text-lg">No active prescription orders</p>
+              </div>
+            ) : (
+              activePrescriptionOrders.map((order, i) => {
                 const currentIdx = STATUS_FLOW.indexOf(order.status);
                 const nextStatus = STATUS_FLOW[currentIdx + 1];
-
                 return (
-                  <div key={order._id} className="card border border-theme-border/40 bg-theme-surface/50 p-5 space-y-4">
-                    {/* Header */}
-                    <div className="flex flex-wrap justify-between items-start gap-4">
+                  <motion.div
+                    key={order._id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="card border border-theme-border/40 bg-theme-surface/50 p-5 hover:border-theme-accent/30 transition duration-200"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-4">
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-theme-heading">Order #{order._id.substring(order._id.length - 8)}</span>
-                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${STATUS_BADGES[order.status]}`}>
+                        <p className="font-bold text-theme-heading text-lg">{order.userId?.name}</p>
+                        <p className="text-xs text-theme-muted mt-0.5">{order.deliveryAddress}</p>
+                        <div className="mt-3">
+                          <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold capitalize ${STATUS_BADGES[order.status]}`}>
                             {STATUS_LABELS[order.status]}
                           </span>
                         </div>
-                        <p className="text-xs text-theme-muted mt-1">
-                          Placed: {new Date(order.createdAt).toLocaleString()}
-                        </p>
                       </div>
-
-                      <div className="text-right">
-                        <span className="text-xs text-theme-muted block">Total Amount</span>
-                        <span className="text-lg font-bold text-theme-accent">Rs. {order.totalAmount.toFixed(2)}</span>
-                      </div>
-                    </div>
-
-                    {/* Customer Info */}
-                    <div className="grid gap-4 sm:grid-cols-3 text-xs text-theme-muted border-t border-b border-theme-border/20 py-3 bg-theme-background/20 px-3 rounded-xl">
-                      <div>
-                        <span className="font-bold text-theme-heading block">Customer</span>
-                        <p className="font-medium text-theme-text mt-0.5">{order.customerName}</p>
-                      </div>
-                      <div>
-                        <span className="font-bold text-theme-heading block">Contact</span>
-                        <p className="font-medium text-theme-text mt-0.5">{order.contactNumber}</p>
-                      </div>
-                      <div>
-                        <span className="font-bold text-theme-heading block">Delivery Address</span>
-                        <p className="font-medium text-theme-text mt-0.5 break-words">{order.deliveryAddress}</p>
-                      </div>
-                    </div>
-
-                    {/* Medicines Ordered */}
-                    <div className="space-y-2">
-                      <span className="text-xs font-bold text-theme-heading uppercase tracking-wider block">Items Ordered</span>
-                      <div className="space-y-1.5">
-                        {order.items.map((item, idx) => (
-                          <div key={idx} className="flex justify-between items-center text-sm border-b border-theme-border/10 pb-1.5">
-                            <div>
-                              <span className="font-semibold text-theme-heading">{item.medicineName}</span>
-                              <span className="text-xs text-theme-muted ml-2">({item.category})</span>
-                            </div>
-                            <span className="text-sm text-theme-text font-mono">
-                              Rs. {item.unitPrice.toFixed(2)} × {item.quantity} = Rs. {item.totalPrice.toFixed(2)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Notes / Reason */}
-                    {order.notes && (
-                      <div className="text-xs bg-theme-background/30 p-2.5 rounded-lg border border-theme-border/25">
-                        <span className="font-bold text-theme-heading block">Customer Note:</span>
-                        <p className="text-theme-text italic mt-0.5">{order.notes}</p>
-                      </div>
-                    )}
-
-                    {order.rejectionReason && (
-                      <div className="text-xs bg-red-500/5 p-2.5 rounded-lg border border-red-500/20 text-red-400">
-                        <span className="font-bold block">Rejection/Cancellation Reason:</span>
-                        <p className="italic mt-0.5">{order.rejectionReason}</p>
-                      </div>
-                    )}
-
-                    {/* Status change actions */}
-                    <div className="flex flex-wrap justify-end gap-2 pt-2 border-t border-theme-border/20">
-                      {order.status !== 'cancelled' && order.status !== 'delivered' && (
-                        <>
-                          <button
-                            onClick={() => handleUpdateDirectStatus(order._id, 'cancelled')}
-                            className="rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 px-4 py-2 text-xs font-semibold transition"
-                          >
-                            Cancel Order
-                          </button>
-                          {nextStatus && (
-                            <button
-                              onClick={() => handleUpdateDirectStatus(order._id, nextStatus)}
-                              className={`btn-primary py-2 px-5 text-xs font-bold shadow-glow ${
-                                nextStatus === 'delivered' ? 'bg-green-600 hover:bg-green-700' : ''
-                              }`}
-                            >
-                              {nextStatus === 'delivered' ? 'Mark as Delivered' : `Update status to: ${STATUS_LABELS[nextStatus]}`}
-                            </button>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ─── NEW PAGE: Orders & Payments (COD / Card status management) ───────── */}
-      {activeTab === 'orders-payments' && (
-        <div className="mt-6 space-y-4">
-          <div className="overflow-x-auto rounded-xl border border-theme-border/40 bg-theme-surface/30">
-            <table className="w-full border-collapse text-left text-sm text-theme-text font-normal">
-              <thead>
-                <tr className="border-b border-theme-border/40 bg-theme-surface/50 text-xs font-semibold uppercase text-theme-muted">
-                  <th className="px-6 py-4">Customer Name</th>
-                  <th className="px-6 py-4">Order ID</th>
-                  <th className="px-6 py-4">Ordered Products</th>
-                  <th className="px-6 py-4">Payment Method</th>
-                  <th className="px-6 py-4">Payment Status</th>
-                  <th className="px-6 py-4">Order Status</th>
-                  <th className="px-6 py-4">Order Date & Time</th>
-                  <th className="px-6 py-4">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-theme-border/20">
-                {directOrders.map((order) => (
-                  <tr key={order._id} className="hover:bg-theme-surface/20 transition">
-                    <td className="px-6 py-4 font-medium text-theme-heading">
-                      {order.customerName}
-                    </td>
-                    <td className="px-6 py-4 font-mono text-xs text-theme-muted font-semibold">
-                      #{order._id.substring(order._id.length - 8)}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="max-w-xs truncate" title={order.items?.map(item => `${item.medicineName} (${item.quantity})`).join(', ')}>
-                        {order.items?.map(item => `${item.medicineName} (${item.quantity})`).join(', ') || 'N/A'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 font-semibold uppercase">
-                      {order.paymentMethod === 'card' ? '💳 Card' : '💵 COD'}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold border ${
-                          order.paymentStatus === 'paid'
-                            ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400'
-                            : 'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400'
-                        }`}
-                      >
-                        {order.paymentStatus === 'paid' ? '✓ Paid' : '⏳ Pending'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${STATUS_BADGES[order.status]}`}>
-                        {STATUS_LABELS[order.status]}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-theme-muted">
-                      {new Date(order.createdAt).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      {order.paymentStatus === 'pending' && order.paymentMethod === 'cod' && (
+                      {nextStatus && (
                         <button
-                          onClick={async () => {
-                            if (window.confirm('Mark this COD order as Paid?')) {
-                              try {
-                                await pharmacyAPI.updateDirectOrderPaymentStatus(order._id, 'paid');
-                                loadData();
-                              } catch (err) {
-                                alert(err.response?.data?.message || 'Failed to update payment status.');
-                              }
-                            }
-                          }}
-                          className="rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-3 py-1 text-xs font-semibold transition cursor-pointer"
+                          onClick={() => handlePrescriptionStatusUpdate(order._id, nextStatus)}
+                          className={`btn-primary text-xs py-2.5 px-5 shadow-glow ${
+                            nextStatus === 'delivered' ? 'bg-green-600 hover:bg-green-700' : ''
+                          }`}
                         >
-                          Mark as Paid
+                          {nextStatus === 'delivered' ? 'Mark as Delivered' : `Mark as ${STATUS_LABELS[nextStatus]}`}
                         </button>
                       )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {directOrders.length === 0 && (
-            <p className="text-center py-8 text-theme-muted bg-theme-surface/10 rounded-xl border border-theme-border/20">
-              No orders placed yet.
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* ─── REDESIGNED PAGE: Inventory Card/Grid Layout ───────────────────── */}
-      {activeTab === 'inventory' && (
-        <div className="mt-6 space-y-6">
-          {/* Header & filters */}
-          <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between">
-            <div className="flex-1 flex gap-2">
-              <input
-                type="text"
-                placeholder="Search inventory medicines..."
-                className="input-field flex-1 text-sm"
-                value={inventorySearch}
-                onChange={(e) => setInventorySearch(e.target.value)}
-              />
-              <select
-                className="input-field rounded-xl border border-theme-border bg-theme-surface px-4 text-theme-text text-sm"
-                value={inventoryFilter}
-                onChange={(e) => setInventoryFilter(e.target.value)}
-              >
-                {inventoryCategories.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <button
-              onClick={handleOpenAddModal}
-              className="btn-primary px-5 py-3 text-sm font-semibold flex items-center justify-center gap-1.5 shadow-glow shrink-0"
-            >
-              <span>➕</span>
-              <span>Add Medicine</span>
-            </button>
-          </div>
-
-          {filteredInventory.length === 0 ? (
-            <div className="card text-center py-16 text-theme-muted border border-theme-border/30 bg-theme-surface/30">
-              <p className="text-5xl mb-3">💊</p>
-              <h3 className="text-lg font-bold text-theme-heading">No medicines in inventory</h3>
-              <p className="text-sm mt-1">Get started by clicking &quot;Add Medicine&quot; above.</p>
-            </div>
-          ) : (
-            <div className="grid gap-6 grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {filteredInventory.map((item) => (
-                <MedicineCard
-                  key={item._id}
-                  medicine={{ ...item, pharmacyName: profile?.pharmacyName }}
-                  isPharmacyView
-                  onEdit={handleOpenEditModal}
-                  onDelete={handleDeleteMedicine}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Reusable Medicine modal */}
-          <MedicineModal
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSubmit={handleModalSubmit}
-            medicine={editingMedicine}
-          />
-        </div>
-      )}
-
-      {/* ─── Prescription Requests (existing) ────────────────────────────────── */}
-      {activeTab === 'orders' && (
-        <div className="mt-6 space-y-4">
-          {pendingPrescriptionOrders.length === 0 ? (
-            <p className="text-theme-muted">No pending prescription requests.</p>
-          ) : (
-            pendingPrescriptionOrders.map((order) => (
-              <div key={order._id} className="card">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                  <div>
-                    <p className="font-semibold text-theme-heading">{order.userId?.name}</p>
-                    <p className="text-sm text-theme-muted">{order.userId?.phone} · {order.userId?.email}</p>
-                    <p className="mt-2 text-sm text-theme-text">Delivery: {order.deliveryAddress}</p>
-                    <p className="text-sm text-theme-text">Amount: Rs. {order.totalAmount?.toFixed(2) || '0.00'}</p>
-                    {order.prescriptionId?.medicines && (
-                      <div className="mt-2">
-                        <p className="text-sm font-medium text-theme-text">Medicines:</p>
-                        {order.prescriptionId.medicines.map((m, i) => (
-                          <p key={i} className="text-sm text-theme-muted">
-                            {m.medicineName} — {m.dosage}, {m.duration}, Qty: {m.quantity}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <button onClick={() => handleAcceptPrescriptionOrder(order._id)} className="btn-primary text-sm">Accept</button>
-                    <button onClick={() => handleRejectPrescriptionOrder(order._id)} className="btn-secondary text-sm text-red-600">Reject</button>
-                  </div>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      )}
-
-      {/* ─── Active Prescription Orders (existing) ────────────────────────────── */}
-      {activeTab === 'active' && (
-        <div className="mt-6 space-y-4">
-          {activePrescriptionOrders.length === 0 ? (
-            <p className="text-theme-muted">No active prescription orders.</p>
-          ) : (
-            activePrescriptionOrders.map((order) => {
-              const currentIdx = STATUS_FLOW.indexOf(order.status);
-              const nextStatus = STATUS_FLOW[currentIdx + 1];
-              return (
-                <div key={order._id} className="card">
-                  <div className="flex flex-wrap items-center justify-between gap-4">
-                    <div>
-                      <p className="font-semibold text-theme-heading">{order.userId?.name}</p>
-                      <p className="text-sm text-theme-muted">{order.deliveryAddress}</p>
-                      <span className={`mt-2 inline-block rounded-full px-3 py-1 text-xs font-medium ${STATUS_BADGES[order.status]}`}>
-                        {STATUS_LABELS[order.status]}
-                      </span>
                     </div>
-                    {nextStatus && (
-                      <button
-                        onClick={() => handlePrescriptionStatusUpdate(order._id, nextStatus)}
-                        className={`btn-primary text-sm ${
-                          nextStatus === 'delivered' ? 'bg-green-600 hover:bg-green-700' : ''
-                        }`}
-                      >
-                        {nextStatus === 'delivered' ? 'Mark as Delivered' : `Mark as ${STATUS_LABELS[nextStatus]}`}
-                      </button>
-                    )}
-                  </div>
+                  </motion.div>
+                );
+              })
+            )}
+          </motion.div>
+        )}
+
+        {/* ─── Prescription Order History (existing) ─────────────────────────────── */}
+        {activeTab === 'history' && (
+          <motion.div
+            key="history"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="mt-6 space-y-3"
+          >
+            {completedPrescriptionOrders.map((order, i) => (
+              <motion.div
+                key={order._id}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.04 }}
+                className="card border border-theme-border/40 bg-theme-surface/50 p-4 flex items-center justify-between hover:border-theme-accent/20 transition duration-150"
+              >
+                <div>
+                  <p className="font-semibold text-theme-heading">{order.userId?.name}</p>
+                  <p className="text-xs text-theme-muted mt-0.5">Completed: {new Date(order.createdAt).toLocaleDateString()}</p>
                 </div>
-              );
-            })
-          )}
-        </div>
-      )}
-
-      {/* ─── Prescription Order History (existing) ─────────────────────────────── */}
-      {activeTab === 'history' && (
-        <div className="mt-6 space-y-3">
-          {completedPrescriptionOrders.map((order) => (
-            <div key={order._id} className="card flex items-center justify-between">
-              <div>
-                <p className="font-medium text-theme-heading">{order.userId?.name}</p>
-                <p className="text-xs text-theme-muted">{new Date(order.createdAt).toLocaleDateString()}</p>
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_BADGES[order.status]}`}>
+                  {STATUS_LABELS[order.status]}
+                </span>
+              </motion.div>
+            ))}
+            {completedPrescriptionOrders.length === 0 && (
+              <div className="text-center py-12 text-theme-muted bg-theme-surface/10 rounded-2xl border border-theme-border/20 shadow-inner">
+                <p className="text-4xl mb-2">📁</p>
+                <p className="font-semibold text-theme-heading text-lg">No prescription order history yet</p>
               </div>
-              <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_BADGES[order.status]}`}>
-                {STATUS_LABELS[order.status]}
-              </span>
-            </div>
-          ))}
-          {completedPrescriptionOrders.length === 0 && <p className="text-theme-muted">No order history yet.</p>}
-        </div>
-      )}
+            )}
+          </motion.div>
+        )}
 
-      {/* ─── Profile Tab (existing) ───────────────────────────────────────────── */}
-      {activeTab === 'profile' && (
-        <form onSubmit={handleProfileUpdate} className="card mt-6 grid gap-4 md:grid-cols-2">
-          {['pharmacyName', 'ownerName', 'phone', 'address', 'city', 'district'].map((field) => (
-            <div key={field}>
-              <label className="mb-1 block text-sm font-medium capitalize text-theme-text">{field.replace(/([A-Z])/g, ' $1')}</label>
-              <input className="input-field" value={profileForm[field] || ''} onChange={(e) => setProfileForm({ ...profileForm, [field]: e.target.value })} />
+        {/* ─── Profile Tab (existing) ───────────────────────────────────────────── */}
+        {activeTab === 'profile' && (
+          <motion.form
+            key="profile"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            onSubmit={handleProfileUpdate}
+            className="card mt-6 grid gap-4 md:grid-cols-2 border border-theme-border/50 bg-theme-surface/40"
+          >
+            <div className="md:col-span-2 border-b border-theme-border/10 pb-3 mb-2">
+              <h2 className="text-xl font-bold text-theme-heading font-heading">Pharmacy Profile</h2>
+              <p className="text-sm text-theme-muted mt-0.5">Manage your pharmacy business details and address.</p>
             </div>
-          ))}
-          <div className="md:col-span-2">
-            <button type="submit" className="btn-primary">Update Profile</button>
-          </div>
-        </form>
-      )}
+            {['pharmacyName', 'ownerName', 'phone', 'address', 'city', 'district'].map((field) => (
+              <div key={field}>
+                <label className="mb-2 block text-sm font-semibold text-theme-heading capitalize">{field.replace(/([A-Z])/g, ' $1')}</label>
+                <input
+                  className="w-full rounded-xl border border-theme-border bg-theme-surface/60 px-4 py-3 text-theme-text placeholder:text-theme-muted transition focus:border-theme-accent focus:outline-none"
+                  value={profileForm[field] || ''}
+                  onChange={(e) => setProfileForm({ ...profileForm, [field]: e.target.value })}
+                />
+              </div>
+            ))}
+            <div className="md:col-span-2 pt-2 border-t border-theme-border/10">
+              <button type="submit" className="btn-primary py-3 px-6 shadow-glow font-bold text-sm">
+                Update Profile Settings
+              </button>
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
     </Layout>
   );
 }

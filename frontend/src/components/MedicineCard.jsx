@@ -125,14 +125,20 @@ export default function MedicineCard({
               className="rounded-lg border border-theme-border bg-theme-surface hover:bg-theme-accent/10 p-2 text-theme-text hover:text-theme-accent transition"
               title="Edit Medicine"
             >
-              ✏️
+              <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+              </svg>
             </button>
             <button
               onClick={() => onDelete(medicine)}
               className="rounded-lg border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 p-2 text-red-400 transition"
               title="Delete Medicine"
             >
-              🗑️
+              <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6" />
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              </svg>
             </button>
           </div>
         ) : onAddToCart ? (
@@ -143,7 +149,11 @@ export default function MedicineCard({
               quantity === 0 ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            <span>🛒</span>
+            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
             <span>{isAdding ? 'Adding...' : 'Add to Cart'}</span>
           </button>
         ) : null}
