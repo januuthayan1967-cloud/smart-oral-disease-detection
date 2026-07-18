@@ -16,28 +16,33 @@ app = Flask(__name__)
 CORS(app)
 
 CLASSES = [
-    "Dental Caries",
     "Dental Calculus",
+    "Dental Caries",
     "Gingivitis",
+    "Normal Teeth",
     "Mouth Ulcer",
     "Tooth Discoloration",
-    "Normal Teeth",
 ]
 
 MODEL = None
-MODEL_PATH = os.getenv("MODEL_PATH", "./models/oral_disease_model.keras")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.getenv("MODEL_PATH", os.path.join(BASE_DIR, "models", "mymodel_checkpoint.keras"))
 
 
 def load_model():
     """Load TensorFlow/Keras MobileNetV2 model if available."""
     global MODEL
 
-    if os.path.exists(MODEL_PATH):
+    resolved_path = MODEL_PATH
+    if not os.path.isabs(resolved_path):
+        resolved_path = os.path.abspath(os.path.join(BASE_DIR, resolved_path))
+
+    if os.path.exists(resolved_path):
         try:
             import tensorflow as tf
 
-            MODEL = tf.keras.models.load_model(MODEL_PATH)
-            print(f"Model loaded from {MODEL_PATH}")
+            MODEL = tf.keras.models.load_model(resolved_path)
+            print(f"Model loaded from {resolved_path}")
             return True
         except Exception as exc:
             print(f"Failed to load model: {exc}")
@@ -63,9 +68,10 @@ def preprocess_image(image_bytes):
     lab[:, :, 0] = clahe.apply(lab[:, :, 0])
     img = cv2.cvtColor(lab, cv2.COLOR_LAB2RGB)
 
-    img_array = img.astype(np.float32) / 255.0
+    img_array = img.astype(np.float32)
     img_array = np.expand_dims(img_array, axis=0)
     return img_array, img
+
 
 
 def heuristic_predict(img):
