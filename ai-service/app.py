@@ -52,25 +52,26 @@ def load_model():
 
 
 def preprocess_image(image_bytes):
-    """Preprocess image using OpenCV and return normalized array."""
-    nparr = np.frombuffer(image_bytes, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    """Preprocess image using PIL to match Google Colab pipeline exactly (NEAREST resizing)."""
+    img_pil = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+    orig_dims = img_pil.size
+    orig_mode = img_pil.mode
 
-    if img is None:
-        raise ValueError("Invalid image file")
+    # Resize to 224x224 using Nearest-Neighbor to match Keras's image.load_img
+    img_resized = img_pil.resize((224, 224), resample=Image.NEAREST)
 
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    img = cv2.resize(img, (224, 224))
-    img = cv2.GaussianBlur(img, (3, 3), 0)
+    # Convert to float32 array
+    img_array = np.array(img_resized, dtype=np.float32)
+    img_array_expanded = np.expand_dims(img_array, axis=0)
 
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
-    lab = cv2.cvtColor(img, cv2.COLOR_RGB2LAB)
-    lab[:, :, 0] = clahe.apply(lab[:, :, 0])
-    img = cv2.cvtColor(lab, cv2.COLOR_LAB2RGB)
+    # Keep a uint8 version for fallback heuristic predict compatibilities
+    img_uint8 = np.array(img_resized, dtype=np.uint8)
 
-    img_array = img.astype(np.float32)
-    img_array = np.expand_dims(img_array, axis=0)
-    return img_array, img
+    return img_array_expanded, img_uint8, {
+        "orig_dims": orig_dims,
+        "orig_mode": orig_mode,
+        "resized_dims": (224, 224),
+    }
 
 
 
@@ -105,17 +106,61 @@ def heuristic_predict(img):
     return best_class, round(confidence, 2)
 
 
-def predict(image_bytes):
-    """Run model or heuristic prediction."""
-    img_array, processed_img = preprocess_image(image_bytes)
+def predict(image_bytes, debug_mode=False):
+    """Run model or heuristic prediction and support returning debug metadata."""
+    img_array, processed_img, meta = preprocess_image(image_bytes)
+
+    # Get model details if loaded
+    model_hash = None
+    model_size = None
+    if MODEL is not None:
+        resolved_path = MODEL_PATH
+        if not os.path.isabs(resolved_path):
+            resolved_path = os.path.abspath(os.path.join(BASE_DIR, resolved_path))
+        if os.path.exists(resolved_path):
+            model_size = os.path.getsize(resolved_path)
+            sha256 = hashlib.sha256()
+            with open(resolved_path, "rb") as f:
+                for chunk in iter(lambda: f.read(4096), b""):
+                    sha256.update(chunk)
+            model_hash = sha256.hexdigest()
 
     if MODEL is not None:
         predictions = MODEL.predict(img_array, verbose=0)[0]
         class_idx = int(np.argmax(predictions))
         confidence = float(predictions[class_idx] * 100)
-        return CLASSES[class_idx], round(confidence, 2)
 
-    return heuristic_predict(processed_img)
+        # Build class names order to match training keys
+        colab_classes_keys = [
+            'calculus', 'caries', 'gingivitis', 'healthy_teeth', 'mouth_ulcer', 'tooth_discoloration'
+        ]
+        probabilities = {
+            colab_classes_keys[i]: float(predictions[i] * 100) for i in range(len(predictions))
+        }
+
+        debug_info = {}
+        if debug_mode:
+            debug_info = {
+                "modelFilePath": MODEL_PATH,
+                "modelFileSize": model_size,
+                "modelHash": model_hash,
+                "modelInputShape": list(MODEL.input_shape),
+                "imageOriginalDimensions": f"{meta['orig_dims'][0]}x{meta['orig_dims'][1]}",
+                "imageResizedDimensions": f"{meta['resized_dims'][0]}x{meta['resized_dims'][1]}",
+                "imageColorMode": meta["orig_mode"],
+                "tensorShape": list(img_array.shape),
+                "tensorDtype": str(img_array.dtype),
+                "minPixelValue": float(np.min(img_array)),
+                "maxPixelValue": float(np.max(img_array)),
+                "meanPixelValue": float(np.mean(img_array)),
+                "classProbabilities": probabilities,
+                "finalPredictedClass": CLASSES[class_idx],
+            }
+        return CLASSES[class_idx], round(confidence, 2), debug_info
+
+    # Fallback to heuristic
+    best_class, confidence = heuristic_predict(processed_img)
+    return best_class, confidence, {}
 
 
 @app.route("/health", methods=["GET"])
@@ -133,6 +178,7 @@ def predict_endpoint():
         return jsonify({"error": "No image file provided"}), 400
 
     file = request.files["image"]
+    debug_mode = request.args.get("debug", "false").lower() == "true"
 
     if file.filename == "":
         return jsonify({"error": "Empty filename"}), 400
@@ -141,14 +187,18 @@ def predict_endpoint():
         image_bytes = file.read()
         Image.open(io.BytesIO(image_bytes)).verify()
 
-        disease_name, confidence = predict(image_bytes)
+        disease_name, confidence, debug_info = predict(image_bytes, debug_mode=debug_mode)
 
-        return jsonify({
+        response = {
             "success": True,
             "diseaseName": disease_name,
             "confidence": confidence,
             "modelUsed": "mobilenetv2" if MODEL is not None else "heuristic",
-        })
+        }
+        if debug_mode:
+            response["debug"] = debug_info
+
+        return jsonify(response)
     except Exception as exc:
         return jsonify({"error": str(exc)}), 400
 
