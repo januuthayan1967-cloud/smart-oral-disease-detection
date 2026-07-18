@@ -5,7 +5,8 @@ import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const reportsDir = path.join(__dirname, '../reports');
+const isVercel = process.env.VERCEL === '1';
+const reportsDir = isVercel ? '/tmp/reports' : path.join(__dirname, '../reports');
 
 try {
   if (!fs.existsSync(reportsDir)) {

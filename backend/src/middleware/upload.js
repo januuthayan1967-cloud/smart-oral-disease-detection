@@ -6,7 +6,8 @@ import { AppError } from '../utils/AppError.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const uploadDir = path.join(__dirname, '../uploads');
+const isVercel = process.env.VERCEL === '1';
+const uploadDir = isVercel ? '/tmp/uploads' : path.join(__dirname, '../uploads');
 
 try {
   if (!fs.existsSync(uploadDir)) {
