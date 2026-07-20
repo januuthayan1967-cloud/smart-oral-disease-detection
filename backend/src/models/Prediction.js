@@ -27,6 +27,10 @@ const predictionSchema = new mongoose.Schema(
       enum: ['Low', 'Moderate', 'High', 'None'],
       default: 'Low',
     },
+    probabilities: {
+      type: mongoose.Schema.Types.Mixed,
+      default: {},
+    },
     description: String,
     causes: [String],
     treatmentSuggestions: [String],

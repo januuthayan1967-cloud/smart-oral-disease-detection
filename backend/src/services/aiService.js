@@ -16,7 +16,7 @@ export const predictDisease = async (imagePath) => {
       timeout: 30000,
     });
 
-    const { diseaseName, confidence } = response.data;
+    const { diseaseName, confidence, probabilities } = response.data;
     const info = DISEASE_INFO[diseaseName] || DISEASE_INFO['Normal Teeth'];
     const severity = getSeverity(diseaseName, confidence);
     const recommendation = getRecommendation(diseaseName, severity);
@@ -25,6 +25,7 @@ export const predictDisease = async (imagePath) => {
       diseaseName,
       confidence,
       severity,
+      probabilities: probabilities || {},
       description: info.description,
       causes: info.causes,
       treatmentSuggestions: info.treatmentSuggestions,

@@ -5,16 +5,16 @@ A production-ready full-stack web application for detecting oral diseases using 
 ## Architecture
 
 ```
-React Frontend (Vite) → Express Backend → Flask AI Service → MongoDB Atlas
+React Frontend (Vite) → Express Backend → Flask AI Service → MobileNetV3 Model
 ```
 
 ## Tech Stack
 
 | Layer | Technologies |
 |-------|-------------|
-| Frontend | React, Vite, Tailwind CSS, Chart.js, React Hook Form, Axios, Socket.io |
+| Frontend | React, Vite, Tailwind CSS, Chart.js, React Hook Form, Axios, Socket.io, React Image Crop |
 | Backend | Node.js, Express, JWT, bcrypt, Multer, PDFKit, Socket.io |
-| AI Service | Python Flask, TensorFlow/Keras MobileNetV2, OpenCV |
+| AI Service | Python Flask, TensorFlow/Keras MobileNetV3, OpenCV |
 | Database | MongoDB Atlas, Mongoose |
 
 ## Project Structure
@@ -23,7 +23,7 @@ React Frontend (Vite) → Express Backend → Flask AI Service → MongoDB Atlas
 smart-oral-disease-detection/
 ├── backend/          # Express REST API
 ├── frontend/         # React Vite SPA
-├── ai-service/       # Flask AI microservice
+├── ai-service/       # Flask AI microservice (MobileNetV3)
 ├── docs/             # API documentation
 └── README.md
 ```
@@ -70,7 +70,7 @@ cp .env.example .env
 python app.py                 # Starts on http://localhost:5001
 ```
 
-Optional: Create base MobileNetV2 model:
+Optional: Create base MobileNetV3 model:
 ```bash
 python train_model.py
 ```
@@ -87,7 +87,7 @@ npm run dev                   # Starts on http://localhost:5173
 ## Features
 
 - **User Authentication** — Register, login, JWT + refresh tokens, forgot/reset password, email verification
-- **AI Disease Detection** — Upload oral images, get predictions with confidence, severity, and recommendations
+- **AI Disease Detection & Manual Teeth Crop** — Interactive teeth crop workflow, MobileNetV3 disease predictions with confidence scores and class probabilities
 - **PDF Reports** — Auto-generated downloadable reports after each prediction
 - **Chat Assistant** — FAQ-based dental care chatbot with history
 - **Education Module** — Articles, tutorials, prevention guides (admin-managed)
@@ -96,12 +96,12 @@ npm run dev                   # Starts on http://localhost:5173
 
 ## Supported Disease Classes
 
-1. Dental Caries
-2. Dental Calculus
+1. Dental Calculus
+2. Dental Caries
 3. Gingivitis
-4. Mouth Ulcer
-5. Tooth Discoloration
-6. Normal Teeth
+4. Normal Teeth
+5. Mouth Ulcer
+6. Tooth Discoloration
 
 ## Security
 
@@ -120,7 +120,7 @@ See [docs/API.md](docs/API.md) for complete REST API reference.
 1. Set `NODE_ENV=production` in backend
 2. Use strong JWT secrets
 3. Configure SMTP for email features
-4. Train and deploy MobileNetV2 model with your dataset
+4. Deploy MobileNetV3 model with your dataset (`mobilenetv3_checkpoint.keras`)
 5. Use gunicorn for Flask: `gunicorn -w 4 -b 0.0.0.0:5001 app:app`
 6. Build frontend: `npm run build` and serve via nginx/CDN
 

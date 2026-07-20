@@ -5,6 +5,7 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import SeverityBadge from '../components/SeverityBadge';
 import LoadingAnimation from '../components/LoadingAnimation';
+import TeethCropModal from '../components/TeethCropModal';
 import { predictionAPI, reportAPI } from '../services/api';
 
 /* ── Animated confidence bar ─────────────────────────────────────── */
@@ -44,7 +45,7 @@ function ConfidenceBar({ value }) {
 }
 
 /* ── Section block in results ────────────────────────────────────── */
-function ResultSection({ icon, title, items, type = 'list' }) {
+function ResultSection({ icon, title, items }) {
   if (!items || items.length === 0) return null;
   return (
     <div
@@ -67,6 +68,39 @@ function ResultSection({ icon, title, items, type = 'list' }) {
   );
 }
 
+/* ── Class Probabilities List ───────────────────────────────────── */
+function ProbabilitiesList({ probabilities }) {
+  if (!probabilities || Object.keys(probabilities).length === 0) return null;
+  return (
+    <div
+      className="mt-4 rounded-xl p-4"
+      style={{ background: 'color-mix(in srgb, var(--surface-2) 60%, transparent)', border: '1px solid var(--border-soft)' }}
+    >
+      <p className="mb-2 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--accent)' }}>
+        Class Probabilities (MobileNetV3)
+      </p>
+      <div className="space-y-2">
+        {Object.entries(probabilities).map(([className, prob]) => (
+          <div key={className} className="flex items-center justify-between text-xs">
+            <span style={{ color: 'var(--text)' }}>{className}</span>
+            <div className="flex items-center gap-2">
+              <div className="h-1.5 w-24 overflow-hidden rounded-full bg-gray-700/30">
+                <div
+                  className="h-full rounded-full"
+                  style={{ width: `${Math.min(100, prob)}%`, background: 'var(--accent)' }}
+                />
+              </div>
+              <span className="w-12 text-right font-mono font-medium" style={{ color: 'var(--muted)' }}>
+                {prob.toFixed(1)}%
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ── Upload zone icon ────────────────────────────────────────────── */
 function CameraIcon() {
   return (
@@ -81,46 +115,102 @@ function CameraIcon() {
 }
 
 export default function Detection() {
-  const [file, setFile] = useState(null);
-  const [preview, setPreview] = useState(null);
+  const [rawImageSrc, setRawImageSrc] = useState(null);
+  const [croppedFile, setCroppedFile] = useState(null);
+  const [croppedPreview, setCroppedPreview] = useState(null);
+  const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [dragging, setDragging] = useState(false);
   const fileRef = useRef();
 
+  const validateAndProcessFile = (selectedFile) => {
+    if (!selectedFile) return;
+
+    // File validation
+    if (!selectedFile.type.startsWith('image/')) {
+      setError('Invalid file type. Please upload an image (JPEG, PNG, WebP).');
+      return;
+    }
+
+    if (selectedFile.size > 5 * 1024 * 1024) {
+      setError('File is too large. Maximum file size is 5MB.');
+      return;
+    }
+
+    setError('');
+    setResult(null);
+
+    // Reset crop state on new upload
+    setCroppedFile(null);
+    setCroppedPreview(null);
+
+    // Create preview URL for raw image and open crop tool modal automatically
+    const rawUrl = URL.createObjectURL(selectedFile);
+    setRawImageSrc(rawUrl);
+    setIsCropModalOpen(true);
+  };
+
   const handleFileChange = (e) => {
     const selected = e.target.files[0];
-    if (selected) {
-      setFile(selected);
-      setPreview(URL.createObjectURL(selected));
-      setResult(null);
-    }
+    validateAndProcessFile(selected);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     setDragging(false);
     const dropped = e.dataTransfer.files[0];
-    if (dropped && dropped.type.startsWith('image/')) {
-      setFile(dropped);
-      setPreview(URL.createObjectURL(dropped));
-      setResult(null);
+    validateAndProcessFile(dropped);
+  };
+
+  const handleConfirmCrop = ({ file, previewUrl }) => {
+    setCroppedFile(file);
+    setCroppedPreview(previewUrl);
+    setIsCropModalOpen(false);
+    setError('');
+  };
+
+  const handleCancelCrop = () => {
+    setIsCropModalOpen(false);
+    // If no confirmed crop exists, reset raw image as well
+    if (!croppedFile) {
+      setRawImageSrc(null);
     }
   };
 
+  const handleRecrop = () => {
+    if (!rawImageSrc) return;
+    // Clear crop state when user chooses to re-crop
+    setCroppedFile(null);
+    setCroppedPreview(null);
+    setResult(null);
+    setIsCropModalOpen(true);
+  };
+
   const handlePredict = async () => {
-    if (!file) return;
+    // Only proceed if confirmed cropped file exists
+    if (!croppedFile) {
+      setError('Please crop and confirm the teeth area before starting analysis.');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
     try {
       const formData = new FormData();
-      formData.append('image', file);
+      formData.append('image', croppedFile);
+
       const { data } = await predictionAPI.predict(formData);
-      setResult(data.data);
+      if (data.success && data.data) {
+        setResult(data.data);
+      } else {
+        throw new Error(data.message || 'Prediction service returned an invalid response.');
+      }
     } catch (err) {
-      setError(err.response?.data?.message || 'Prediction failed');
+      const apiErrMsg = err.response?.data?.message || err.message || 'Prediction failed. Please try again.';
+      setError(apiErrMsg);
     } finally {
       setLoading(false);
     }
@@ -128,12 +218,16 @@ export default function Detection() {
 
   const handleDownloadReport = async () => {
     if (!result?.reportId) return;
-    const { data } = await reportAPI.download(result.reportId);
-    const url = window.URL.createObjectURL(new Blob([data]));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'oral-health-report.pdf';
-    link.click();
+    try {
+      const { data } = await reportAPI.download(result.reportId);
+      const url = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'oral-health-report.pdf';
+      link.click();
+    } catch (err) {
+      alert('Failed to download PDF report. Please try again later.');
+    }
   };
 
   return (
@@ -151,54 +245,88 @@ export default function Detection() {
             <h1 className="text-3xl font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}>
               Oral Disease Detection
             </h1>
-            <p className="mt-0.5 text-sm" style={{ color: 'var(--muted)' }}>Upload an oral image for AI-powered analysis</p>
+            <p className="mt-0.5 text-sm" style={{ color: 'var(--muted)' }}>
+              Upload an oral image and crop the teeth area for AI-powered MobileNetV3 analysis
+            </p>
           </div>
         </div>
       </motion.div>
 
+      {/* Main Grid */}
       <div className="mt-8 grid gap-8 lg:grid-cols-2">
-        {/* ── LEFT: Upload ── */}
+        {/* ── LEFT: Upload & Manual Crop Section ── */}
         <motion.div initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}>
           <Card>
-            <h2 className="mb-5 text-lg font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}>
-              Upload Dental Image
+            <h2 className="mb-3 text-lg font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}>
+              Upload & Crop Dental Image
             </h2>
 
-            {/* Drop zone */}
+            {/* Instruction Notice */}
+            <div
+              className="mb-4 flex items-start gap-2.5 rounded-xl p-3 text-xs leading-relaxed"
+              style={{
+                background: 'var(--accent-dim)',
+                border: '1px solid rgba(6,182,212,0.25)',
+                color: 'var(--text)',
+              }}
+            >
+              <span className="text-base shrink-0">💡</span>
+              <p>
+                <strong>Important:</strong> For the best prediction results, please crop and select the teeth area before starting the analysis.
+              </p>
+            </div>
+
+            {/* Drop zone / Cropped Preview Area */}
             <div
               role="button"
               tabIndex={0}
-              onClick={() => fileRef.current?.click()}
-              onKeyDown={(e) => e.key === 'Enter' && fileRef.current?.click()}
+              onClick={() => {
+                if (!croppedPreview) {
+                  fileRef.current?.click();
+                }
+              }}
+              onKeyDown={(e) => e.key === 'Enter' && !croppedPreview && fileRef.current?.click()}
               onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
               onDrop={handleDrop}
               className={`upload-zone ${dragging ? 'dragging' : ''}`}
             >
               <AnimatePresence mode="wait">
-                {preview ? (
+                {croppedPreview ? (
                   <motion.div
-                    key="preview"
-                    className="relative"
+                    key="croppedPreview"
+                    className="relative flex flex-col items-center gap-3"
                     initial={{ opacity: 0, scale: 0.92 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.92 }}
                   >
-                    <img
-                      src={preview}
-                      alt="Preview"
-                      className="max-h-64 rounded-xl object-contain shadow-theme"
-                    />
-                    <span
-                      className="absolute right-2 top-2 rounded-lg px-2.5 py-1 text-xs font-semibold text-white"
-                      style={{ background: 'var(--gradient-accent)' }}
-                    >
-                      Click to change
-                    </span>
+                    <div className="relative">
+                      <img
+                        src={croppedPreview}
+                        alt="Cropped Teeth Preview"
+                        className="max-h-64 rounded-xl object-contain shadow-theme"
+                      />
+                      <span
+                        className="absolute right-2 top-2 rounded-lg px-2.5 py-1 text-xs font-semibold text-white shadow"
+                        style={{ background: 'var(--gradient-accent)' }}
+                      >
+                        ✓ Teeth Cropped
+                      </span>
+                    </div>
+
+                    {/* Re-crop & Change Image Action Buttons */}
+                    <div className="flex items-center gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
+                      <Button size="sm" variant="secondary" onClick={handleRecrop}>
+                        ✂️ Re-crop Teeth Area
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={() => fileRef.current?.click()}>
+                        📁 Upload Different Image
+                      </Button>
+                    </div>
                   </motion.div>
                 ) : (
                   <motion.div
-                    key="empty"
+                    key="emptyUpload"
                     className="flex flex-col items-center gap-3"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -212,10 +340,13 @@ export default function Detection() {
                     </motion.div>
                     <div className="text-center">
                       <p className="font-semibold" style={{ color: 'var(--heading)' }}>
-                        {dragging ? 'Drop your image here' : 'Click or drag & drop'}
+                        {dragging ? 'Drop oral image here' : 'Click or drag & drop oral image'}
                       </p>
-                      <p className="mt-1 text-sm" style={{ color: 'var(--muted)' }}>
+                      <p className="mt-1 text-xs" style={{ color: 'var(--muted)' }}>
                         JPEG, PNG, WebP — max 5MB
+                      </p>
+                      <p className="mt-2 text-xs font-medium" style={{ color: 'var(--accent)' }}>
+                        Crop tool will open automatically after upload
                       </p>
                     </div>
                   </motion.div>
@@ -223,17 +354,30 @@ export default function Detection() {
               </AnimatePresence>
             </div>
 
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
 
+            {/* Analysis Button - ENABLED ONLY WHEN A VALID CONFIRMED CROPPED FILE EXISTS */}
             <Button
               onClick={handlePredict}
-              disabled={!file}
+              disabled={!croppedFile || loading || isCropModalOpen}
               loading={loading}
               className="mt-5 w-full"
               size="lg"
             >
-              {loading ? 'Analyzing...' : '🧠 Analyze Image'}
+              {loading ? 'Analyzing Cropped Image...' : '🧠 Start Analysis'}
             </Button>
+
+            {!croppedFile && (
+              <p className="mt-2 text-center text-xs" style={{ color: 'var(--muted)' }}>
+                * Analysis is disabled until teeth crop is confirmed.
+              </p>
+            )}
 
             <AnimatePresence>
               {error && (
@@ -251,9 +395,9 @@ export default function Detection() {
           </Card>
         </motion.div>
 
-        {/* ── RIGHT: Results ── */}
+        {/* ── RIGHT: Results Section ── */}
         <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
-          {loading && <LoadingAnimation message="Analyzing your image..." />}
+          {loading && <LoadingAnimation message="Analyzing cropped teeth area with MobileNetV3..." />}
 
           <AnimatePresence mode="wait">
             {result && !loading && (
@@ -269,7 +413,7 @@ export default function Detection() {
                   <div className="mb-5 flex items-start justify-between gap-3">
                     <div>
                       <p className="text-xs font-medium uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
-                        Detection Result
+                        AI Detection Result
                       </p>
                       <h2
                         className="mt-1 text-2xl font-bold"
@@ -318,6 +462,9 @@ export default function Detection() {
                     />
                   </div>
 
+                  {/* Class probabilities if available */}
+                  <ProbabilitiesList probabilities={result.prediction.probabilities} />
+
                   {/* Recommendation */}
                   {result.prediction.recommendation && (
                     <div
@@ -331,7 +478,7 @@ export default function Detection() {
                     </div>
                   )}
 
-                  {/* Download */}
+                  {/* Download PDF Report */}
                   <Button onClick={handleDownloadReport} className="mt-5 w-full" variant="secondary">
                     📄 Download PDF Report
                   </Button>
@@ -341,7 +488,7 @@ export default function Detection() {
 
             {!result && !loading && (
               <motion.div
-                key="empty"
+                key="emptyResult"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
@@ -355,7 +502,7 @@ export default function Detection() {
                   </div>
                   <h3 className="text-lg font-semibold" style={{ color: 'var(--heading)' }}>Awaiting Analysis</h3>
                   <p className="mt-2 max-w-xs text-sm" style={{ color: 'var(--muted)' }}>
-                    Upload an oral image and click "Analyze Image" to see your AI-powered results here.
+                    Upload an oral image, crop the teeth area, and click "Start Analysis" to view your AI results here.
                   </p>
                 </Card>
               </motion.div>
@@ -363,6 +510,14 @@ export default function Detection() {
           </AnimatePresence>
         </motion.div>
       </div>
+
+      {/* Manual Teeth Crop Modal */}
+      <TeethCropModal
+        isOpen={isCropModalOpen}
+        imageSrc={rawImageSrc}
+        onConfirmCrop={handleConfirmCrop}
+        onCancel={handleCancelCrop}
+      />
     </Layout>
   );
 }

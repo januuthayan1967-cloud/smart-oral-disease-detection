@@ -11,9 +11,11 @@ backend/src/uploads/*
 backend/src/reports/*
 !backend/src/reports/.gitkeep
 ai-service/__pycache__/
+ai-service/venv/
 ai-service/.venv/
 ai-service/models/*.h5
 ai-service/models/*.keras
+!ai-service/models/mobilenetv3_checkpoint.keras
 *.pyc
 .vite/
 coverage/
