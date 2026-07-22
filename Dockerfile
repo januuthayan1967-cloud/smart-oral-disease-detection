@@ -10,6 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy requirements from ai-service directory
 COPY ai-service/requirements.txt .
+# Upgrade pip to support modern wheel metadata (e.g. Keras 3.x)
+RUN pip install --no-cache-dir --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy all ai-service files into working directory
