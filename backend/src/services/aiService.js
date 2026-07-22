@@ -13,10 +13,15 @@ export const predictDisease = async (imagePath) => {
 
     const response = await axios.post(`${AI_SERVICE_URL}/predict`, formData, {
       headers: formData.getHeaders(),
-      timeout: 30000,
+      timeout: 45000,
     });
 
     const { diseaseName, confidence, probabilities } = response.data;
+
+    if (!diseaseName || confidence === undefined) {
+      throw new AppError('Invalid response format received from AI prediction service.', 502);
+    }
+
     const info = DISEASE_INFO[diseaseName] || DISEASE_INFO['Normal Teeth'];
     const severity = getSeverity(diseaseName, confidence);
     const recommendation = getRecommendation(diseaseName, severity);
@@ -33,12 +38,27 @@ export const predictDisease = async (imagePath) => {
       recommendation,
     };
   } catch (error) {
-    if (error.code === 'ECONNREFUSED') {
-      throw new AppError('AI service is unavailable. Please try again later.', 503);
+    if (error.isAxiosError) {
+      if (
+        error.code === 'ECONNREFUSED' ||
+        error.code === 'ENOTFOUND' ||
+        error.code === 'ETIMEDOUT' ||
+        error.code === 'ECONNABORTED'
+      ) {
+        throw new AppError('AI prediction service is temporarily unavailable. Please try again later.', 503);
+      }
+      const message =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        'AI prediction service is temporarily unavailable. Please try again later.';
+      throw new AppError(message, error.response?.status || 503);
     }
 
-    const message = error.response?.data?.error || 'Prediction failed.';
-    throw new AppError(message, error.response?.status || 500);
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    throw new AppError('AI prediction service is temporarily unavailable. Please try again later.', 503);
   }
 };
 
