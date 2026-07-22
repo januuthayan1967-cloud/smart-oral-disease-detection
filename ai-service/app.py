@@ -40,7 +40,7 @@ MODEL_PATH = os.getenv("MODEL_PATH", os.path.join(BASE_DIR, "models", "mobilenet
 
 
 def load_model():
-    """Load TensorFlow/Keras MobileNetV3 model."""
+    """Load MobileNetV3 model using standalone keras or tensorflow.keras."""
     global MODEL, MODEL_ERROR
 
     resolved_path = MODEL_PATH
@@ -53,12 +53,19 @@ def load_model():
         return False
 
     try:
-        import tensorflow as tf
+        print(f"Attempting to load MobileNetV3 model from {resolved_path}...")
+        # Prefer standalone keras if available (handles Keras 3 format natively without Dense quantization_config issues)
+        try:
+            import keras
+            MODEL = keras.models.load_model(resolved_path)
+            print(f"MobileNetV3 model successfully loaded using Keras {keras.__version__} from {resolved_path}")
+        except Exception as k_err:
+            print(f"Standalone Keras load attempt failed ({k_err}), trying tensorflow.keras...")
+            import tensorflow as tf
+            MODEL = tf.keras.models.load_model(resolved_path)
+            print(f"MobileNetV3 model successfully loaded using tf.keras from {resolved_path}")
 
-        print(f"Attempting to load MobileNetV3 model from {resolved_path} using TensorFlow {tf.__version__}...")
-        MODEL = tf.keras.models.load_model(resolved_path)
         MODEL_ERROR = None
-        print(f"MobileNetV3 model successfully loaded from {resolved_path}")
         return True
     except Exception as exc:
         err_msg = f"Failed to load MobileNetV3 model: {str(exc)}"
@@ -97,7 +104,13 @@ def predict(image_bytes, debug_mode=False):
 
     img_array, meta = preprocess_image(image_bytes)
 
-    raw_preds = MODEL.predict(img_array, verbose=0)[0]
+    # Run inference (supports both keras and tf.keras models)
+    raw_preds = MODEL(img_array, training=False)
+    if hasattr(raw_preds, "numpy"):
+        raw_preds = raw_preds.numpy()[0]
+    else:
+        raw_preds = np.array(raw_preds)[0]
+
     class_idx = int(np.argmax(raw_preds))
     top_disease = CLASSES[class_idx]
     confidence = float(raw_preds[class_idx] * 100)
@@ -119,7 +132,7 @@ def predict(image_bytes, debug_mode=False):
         debug_info = {
             "modelFilePath": MODEL_PATH,
             "modelFileSize": model_size,
-            "modelInputShape": list(MODEL.input_shape),
+            "modelInputShape": list(MODEL.input_shape) if hasattr(MODEL, "input_shape") else None,
             "imageOriginalDimensions": f"{meta['orig_dims'][0]}x{meta['orig_dims'][1]}",
             "imageResizedDimensions": f"{meta['resized_dims'][0]}x{meta['resized_dims'][1]}",
             "imageColorMode": meta["orig_mode"],
@@ -148,7 +161,7 @@ def index():
             "predict": "/predict (POST)",
             "classes": "/classes"
         }
-    })
+    }), (200 if MODEL is not None else 500)
 
 
 @app.route("/health", methods=["GET"])
