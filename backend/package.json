@@ -9,7 +9,6 @@
     "dev": "nodemon src/server.js",
     "seed": "node src/utils/seed.js",
     "reset-passwords": "node src/utils/resetPasswords.js"
-
   },
   "keywords": [
     "oral-health",
@@ -20,6 +19,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

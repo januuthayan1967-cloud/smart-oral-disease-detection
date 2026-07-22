@@ -48,6 +48,17 @@ const DEFAULT_RESPONSE =
 
 export const generateChatResponse = (message) => {
   const lowerMessage = message.toLowerCase();
+  const isTamil = /[\u0B80-\u0BFF]/.test(message);
+
+  if (isTamil) {
+    if (lowerMessage.includes('gingivitis') || lowerMessage.includes('ஈறு')) {
+      return 'ஜிஞ்சிவிடிஸ் (Gingivitis) என்பது ஈறுகளில் வீக்கம் மற்றும் ரத்தப்போக்கை ஏற்படுத்தும் நோயாகும். தினமும் இருமுறை பல் துலக்குதல், ஃபிளாசிங் மற்றும் முறையான வாய் பராமரிப்பு மூலம் இதனை சரிசெய்யலாம். அறிகுறிகள் நீடித்தால் பல் மருத்துவரை அணுகவும்.';
+    }
+    if (lowerMessage.includes('சொத்தை') || lowerMessage.includes('caries') || lowerMessage.includes('cavity') || lowerMessage.includes('தடுப்பது')) {
+      return 'பல் சொத்தையைத் தடுக்க:\n1. தினமும் இருமுறை ஃப்ளோரைடு பற்பசையால் பல் துலக்கவும்.\n2. தினமும் ஃபிளாஸ் செய்யவும்.\n3. இனிப்பு மற்றும் சர்க்கரை உணவுகளைக் குறைக்கவும்.\n4. 6 மாதங்களுக்கு ஒருமுறை பல் மருத்துவரைச் சந்திக்கவும்.';
+    }
+    return 'வணக்கம்! உங்கள் வாய் மற்றும் பல் ஆரோக்கியம் பற்றிய கேள்விகளுக்கு பதிலளிக்க நான் தயார். தினமும் இருவேளை பல் துலக்கி, ஈறுகளைப் பாதுகாத்து, தவறாமல் பல் மருத்துவரை அணுகவும்.';
+  }
 
   for (const faq of FAQ_RESPONSES) {
     if (faq.keywords.some((keyword) => lowerMessage.includes(keyword))) {

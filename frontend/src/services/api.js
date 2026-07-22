@@ -30,7 +30,7 @@ api.interceptors.response.use(
 
     // Skip auth retry for login/refresh routes to prevent infinite loops
     const isAuthRoute = originalRequest?.url?.includes('/auth/login') ||
-                        originalRequest?.url?.includes('/auth/refresh-token');
+      originalRequest?.url?.includes('/auth/refresh-token');
 
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthRoute) {
       originalRequest._retry = true;
@@ -100,7 +100,7 @@ export const reportAPI = {
 };
 
 export const chatAPI = {
-  send: (message) => api.post('/chat', { message }),
+  send: (message, history = []) => api.post('/chat', { message, history }),
   getHistory: () => api.get('/chat/history'),
 };
 
