@@ -54,16 +54,21 @@ def load_model():
 
     try:
         print(f"Attempting to load MobileNetV3 model from {resolved_path}...")
-        # Prefer standalone keras if available (handles Keras 3 format natively without Dense quantization_config issues)
+        # 1. Try standalone Keras 3 (recommended for .keras format)
         try:
             import keras
             MODEL = keras.models.load_model(resolved_path)
             print(f"MobileNetV3 model successfully loaded using Keras {keras.__version__} from {resolved_path}")
         except Exception as k_err:
-            print(f"Standalone Keras load attempt failed ({k_err}), trying tensorflow.keras...")
+            print(f"Standalone Keras load attempt failed ({k_err}), trying tf.keras compile=False...")
             import tensorflow as tf
-            MODEL = tf.keras.models.load_model(resolved_path)
-            print(f"MobileNetV3 model successfully loaded using tf.keras from {resolved_path}")
+            try:
+                MODEL = tf.keras.models.load_model(resolved_path, compile=False)
+                print(f"MobileNetV3 model successfully loaded using tf.keras (compile=False) from {resolved_path}")
+            except Exception as tf_err:
+                print(f"tf.keras compile=False failed ({tf_err}), trying tf.keras standard load...")
+                MODEL = tf.keras.models.load_model(resolved_path)
+                print(f"MobileNetV3 model successfully loaded using tf.keras from {resolved_path}")
 
         MODEL_ERROR = None
         return True
