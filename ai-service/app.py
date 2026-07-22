@@ -136,6 +136,21 @@ def predict(image_bytes, debug_mode=False):
     return top_disease, round(confidence, 2), probabilities, debug_info
 
 
+@app.route("/", methods=["GET"])
+def index():
+    return jsonify({
+        "service": "Smart Oral Disease Detection AI Microservice",
+        "model": "MobileNetV3",
+        "status": "healthy" if MODEL is not None else "unhealthy",
+        "model_loaded": MODEL is not None,
+        "endpoints": {
+            "health": "/health",
+            "predict": "/predict (POST)",
+            "classes": "/classes"
+        }
+    })
+
+
 @app.route("/health", methods=["GET"])
 def health():
     if MODEL is None:
