@@ -1,94 +1,132 @@
 import PDFDocument from 'pdfkit';
 import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const isVercel = process.env.VERCEL === '1';
-const reportsDir = isVercel ? '/tmp/reports' : path.join(__dirname, '../reports');
-
-try {
-  if (!fs.existsSync(reportsDir)) {
-    fs.mkdirSync(reportsDir, { recursive: true });
-  }
-} catch (err) {
-  console.warn(`Could not create reports directory: ${err.message}`);
-}
-
-export const generatePredictionReport = async ({ user, prediction, imagePath }) => {
-  const fileName = `report-${prediction._id}-${Date.now()}.pdf`;
-  const reportPath = path.join(reportsDir, fileName);
-
+/**
+ * Generate PDF report in-memory as a Buffer using PDFKit
+ * Completely Vercel-compatible (no disk storage required)
+ * @param {Object} param0
+ * @param {Object} param0.user Patient user object
+ * @param {Object} param0.prediction Prediction document object
+ * @param {string|Buffer} [param0.imageSource] Optional image path or Buffer
+ * @returns {Promise<Buffer>}
+ */
+export const generatePredictionReportBuffer = async ({ user, prediction, imageSource }) => {
   return new Promise((resolve, reject) => {
-    const doc = new PDFDocument({ margin: 50 });
-    const stream = fs.createWriteStream(reportPath);
+    try {
+      const doc = new PDFDocument({ margin: 50 });
+      const buffers = [];
 
-    doc.pipe(stream);
+      doc.on('data', (chunk) => buffers.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(buffers)));
+      doc.on('error', (err) => reject(err));
 
-    doc.fontSize(22).text('Oral Health Analysis Report', { align: 'center' });
-    doc.moveDown();
-    doc.fontSize(10).text(`Generated: ${new Date().toLocaleString()}`, { align: 'center' });
-    doc.moveDown(2);
+      // Title & Header
+      doc.fillColor('#0F172A').fontSize(22).text('Oral Health Analysis Report', { align: 'center' });
+      doc.fontSize(10).fillColor('#64748B').text(`Generated: ${new Date(prediction.createdAt || Date.now()).toLocaleString()}`, { align: 'center' });
+      doc.moveDown(1.5);
 
-    doc.fontSize(14).text('Patient Information', { underline: true });
-    doc.fontSize(11).text(`Name: ${user.name}`);
-    doc.text(`Email: ${user.email}`);
-    if (user.age) doc.text(`Age: ${user.age}`);
-    if (user.gender) doc.text(`Gender: ${user.gender}`);
-    doc.moveDown();
+      // Prominent Medical Disclaimer Box
+      doc.rect(50, doc.y, 512, 45).fillAndStroke('#FEF2F2', '#FCA5A5');
+      doc.fillColor('#991B1B').fontSize(9).text(
+        'IMPORTANT NOTICE: AI-generated prediction. This result is not a medical diagnosis. Please consult a qualified dental professional for confirmation.',
+        60,
+        doc.y - 35,
+        { width: 492, align: 'center' }
+      );
+      doc.moveDown(2);
 
-    doc.fontSize(14).text('Prediction Result', { underline: true });
-    doc.fontSize(11).text(`Disease: ${prediction.diseaseName}`);
-    doc.text(`Confidence: ${prediction.confidence.toFixed(2)}%`);
-    doc.text(`Severity: ${prediction.severity}`);
-    doc.moveDown();
-
-    if (prediction.description) {
-      doc.fontSize(14).text('Description', { underline: true });
-      doc.fontSize(11).text(prediction.description);
+      // Patient Information
+      doc.fillColor('#0F172A').fontSize(14).text('Patient Information', { underline: true });
+      doc.fontSize(10).fillColor('#334155');
+      doc.text(`Name: ${user.name || 'Patient'}`);
+      doc.text(`Email: ${user.email || 'N/A'}`);
+      if (user.age) doc.text(`Age: ${user.age}`);
+      if (user.gender) doc.text(`Gender: ${user.gender}`);
       doc.moveDown();
-    }
 
-    if (fs.existsSync(imagePath)) {
-      doc.fontSize(14).text('Uploaded Image', { underline: true });
-      doc.moveDown(0.5);
-      try {
-        doc.image(imagePath, { fit: [400, 300], align: 'center' });
-      } catch {
-        doc.fontSize(10).text('Image could not be embedded in report.');
+      // AI Prediction Results
+      doc.fillColor('#0F172A').fontSize(14).text('AI Analysis Summary', { underline: true });
+      doc.fontSize(10).fillColor('#334155');
+      doc.text(`Predicted Condition: ${prediction.displayName || prediction.diseaseName}`);
+      doc.text(`Confidence: ${(prediction.confidence || 0).toFixed(1)}%`);
+
+      const riskLevel = prediction.riskLevel || 'LOW';
+      const riskColor = riskLevel === 'HIGH' ? '#DC2626' : riskLevel === 'MEDIUM' ? '#D97706' : '#16A34A';
+      doc.text('Risk Level: ', { continued: true });
+      doc.fillColor(riskColor).text(riskLevel, { continued: false });
+
+      if (prediction.riskReason) {
+        doc.fillColor('#334155').text(`Risk Notes: ${prediction.riskReason}`);
       }
       doc.moveDown();
+
+      // Description / Explanation
+      if (prediction.description) {
+        doc.fillColor('#0F172A').fontSize(14).text('Condition Overview', { underline: true });
+        doc.fontSize(10).fillColor('#334155').text(prediction.description);
+        doc.moveDown();
+      }
+
+      // Embedded Image (if provided)
+      if (imageSource) {
+        try {
+          let imgBuffer = imageSource;
+          if (typeof imageSource === 'string' && fs.existsSync(imageSource)) {
+            imgBuffer = fs.readFileSync(imageSource);
+          }
+
+          if (Buffer.isBuffer(imgBuffer)) {
+            doc.fillColor('#0F172A').fontSize(14).text('Analyzed Scan', { underline: true });
+            doc.moveDown(0.5);
+            doc.image(imgBuffer, { fit: [350, 220], align: 'center' });
+            doc.moveDown();
+          }
+        } catch {
+          // If image embedding fails, omit image gracefully without breaking PDF stream
+        }
+      }
+
+      // Treatment Suggestions
+      if (prediction.treatmentSuggestions?.length) {
+        doc.fillColor('#0F172A').fontSize(14).text('Treatment Suggestions', { underline: true });
+        doc.fontSize(10).fillColor('#334155');
+        prediction.treatmentSuggestions.forEach((item) => doc.text(`• ${item}`));
+        doc.moveDown();
+      }
+
+      // Prevention Tips
+      if (prediction.preventionTips?.length) {
+        doc.fillColor('#0F172A').fontSize(14).text('Oral Hygiene & Prevention', { underline: true });
+        doc.fontSize(10).fillColor('#334155');
+        prediction.preventionTips.forEach((item) => doc.text(`• ${item}`));
+        doc.moveDown();
+      }
+
+      // Recommendations
+      if (prediction.recommendation) {
+        doc.fillColor('#0F172A').fontSize(14).text('General Recommendation', { underline: true });
+        doc.fontSize(10).fillColor('#334155').text(prediction.recommendation);
+        doc.moveDown();
+      }
+
+      // Footer
+      doc.moveDown(1.5);
+      doc.fontSize(8).fillColor('#94A3B8').text(
+        'Smart Oral Disease Detection System — Powered by MobileNetV3 & AI Medical Assistance',
+        { align: 'center' }
+      );
+
+      doc.end();
+    } catch (err) {
+      reject(err);
     }
-
-    if (prediction.treatmentSuggestions?.length) {
-      doc.fontSize(14).text('Treatment Suggestions', { underline: true });
-      prediction.treatmentSuggestions.forEach((item) => doc.fontSize(11).text(`• ${item}`));
-      doc.moveDown();
-    }
-
-    if (prediction.preventionTips?.length) {
-      doc.fontSize(14).text('Oral Care Tips', { underline: true });
-      prediction.preventionTips.forEach((item) => doc.fontSize(11).text(`• ${item}`));
-      doc.moveDown();
-    }
-
-    if (prediction.recommendation) {
-      doc.fontSize(14).text('Recommendations', { underline: true });
-      doc.fontSize(11).text(prediction.recommendation);
-    }
-
-    doc.moveDown(2);
-    doc.fontSize(9).fillColor('gray').text(
-      'Disclaimer: This report is generated by an AI system and is not a substitute for professional dental diagnosis.',
-      { align: 'center' }
-    );
-
-    doc.end();
-
-    stream.on('finish', () => resolve({ reportPath, fileName }));
-    stream.on('error', reject);
   });
 };
 
-export default { generatePredictionReport };
+// Legacy alias for backwards compatibility
+export const generatePredictionReport = async (data) => {
+  const buffer = await generatePredictionReportBuffer(data);
+  return { buffer, fileName: `ai-prediction-report-${data.prediction._id}.pdf` };
+};
+
+export default { generatePredictionReportBuffer, generatePredictionReport };

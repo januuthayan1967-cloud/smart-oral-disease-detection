@@ -3,6 +3,7 @@ import {
   createPrediction,
   getPredictions,
   getPredictionById,
+  downloadPredictionReport,
   deletePrediction,
 } from '../controllers/predictionController.js';
 import { protect } from '../middleware/auth.js';
@@ -15,6 +16,7 @@ router.use(protect);
 
 router.post('/', upload.single('image'), asyncHandler(createPrediction));
 router.get('/', asyncHandler(getPredictions));
+router.get('/:id/report', asyncHandler(downloadPredictionReport));
 router.get('/:id', asyncHandler(getPredictionById));
 router.delete('/:id', asyncHandler(deletePrediction));
 

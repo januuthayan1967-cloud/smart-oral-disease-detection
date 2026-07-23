@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
@@ -7,11 +8,14 @@ import Input from '../components/Input';
 import { chatAPI } from '../services/api';
 
 export default function ChatAssistant() {
+  const location = useLocation();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [activePredictionContext, setActivePredictionContext] = useState(null);
   const chatEndRef = useRef(null);
+  const hasInitializedState = useRef(false);
 
   useEffect(() => {
     chatAPI
@@ -27,16 +31,68 @@ export default function ChatAssistant() {
           setMessages(history);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        // Handle incoming prediction context state from navigation
+        if (location.state?.initialMessage && !hasInitializedState.current) {
+          hasInitializedState.current = true;
+          const initialMsg = location.state.initialMessage;
+          const predContext = location.state.predictionContext;
+          const predId = location.state.predictionId;
+
+          setActivePredictionContext({
+            predictionId: predId,
+            predictionContext: predContext,
+          });
+
+          // Auto trigger initial context message to AI Assistant
+          triggerInitialContextMessage(initialMsg, predId, predContext);
+        }
+      });
   }, []);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
+  const triggerInitialContextMessage = async (userMsg, predId, predContext) => {
+    setLoading(true);
+    setErrorMsg('');
+
+    setMessages((prev) => [...prev, { type: 'user', text: userMsg, time: new Date() }]);
+
+    try {
+      const { data } = await chatAPI.send(userMsg, [], {
+        predictionId: predId,
+        predictionContext: predContext,
+      });
+
+      const botReply = data?.response || data?.data?.response || 'Response received.';
+      setMessages((prev) => [
+        ...prev,
+        { type: 'bot', text: botReply, time: data?.data?.timestamp || new Date() },
+      ]);
+    } catch (err) {
+      console.error('Gemini chat context error:', err);
+      const errText = err.response?.data?.message || 'Could not retrieve response from AI Assistant.';
+      setErrorMsg(errText);
+      setMessages((prev) => [
+        ...prev,
+        {
+          type: 'bot',
+          text: 'I apologize, but I encountered an error analyzing your prediction context. Please try again.',
+          time: new Date(),
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const clearChat = () => {
     setMessages([]);
     setErrorMsg('');
+    setActivePredictionContext(null);
   };
 
   const sendMessage = async (e) => {
@@ -47,7 +103,6 @@ export default function ChatAssistant() {
     setInput('');
     setErrorMsg('');
 
-    // Prepare active conversation history for Gemini multi-turn context
     const conversationHistory = messages.map((msg) => ({
       role: msg.type === 'user' ? 'user' : 'model',
       text: msg.text,
@@ -57,7 +112,11 @@ export default function ChatAssistant() {
     setLoading(true);
 
     try {
-      const { data } = await chatAPI.send(userMsg, conversationHistory);
+      const { data } = await chatAPI.send(
+        userMsg,
+        conversationHistory,
+        activePredictionContext || {}
+      );
       const botReply = data?.response || data?.data?.response || 'Response received.';
       setMessages((prev) => [
         ...prev,
@@ -87,7 +146,6 @@ export default function ChatAssistant() {
     'What to do if my gums are bleeding?',
   ];
 
-  // Helper to render message text preserving newlines and basic markdown bold tags
   const renderFormattedText = (text) => {
     if (!text) return null;
     return text.split('\n').map((line, idx) => (
@@ -101,7 +159,7 @@ export default function ChatAssistant() {
     <Layout>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-          <h1 className="text-3xl font-bold text-theme-heading flex items-[#00D1FF] items-center gap-2">
+          <h1 className="text-3xl font-bold text-theme-heading flex items-center gap-2">
             <span>✨ Gemini AI Dental Assistant</span>
           </h1>
           <p className="mt-1 text-theme-muted">
@@ -114,6 +172,28 @@ export default function ChatAssistant() {
           </Button>
         )}
       </div>
+
+      {activePredictionContext?.predictionContext && (
+        <motion.div
+          className="mt-4 rounded-xl p-3 text-xs border border-cyan-500/30 bg-cyan-500/10 flex items-center justify-between"
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center gap-2">
+            <span>🔍</span>
+            <span className="font-semibold text-cyan-300">
+              Active Context Attached: {activePredictionContext.predictionContext.displayName} ({activePredictionContext.predictionContext.confidencePercentage}%) — Risk: {activePredictionContext.predictionContext.riskLevel}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setActivePredictionContext(null)}
+            className="text-cyan-400 hover:text-cyan-200 underline font-medium"
+          >
+            Clear Context
+          </button>
+        </motion.div>
+      )}
 
       {errorMsg && (
         <div className="mt-4 rounded-lg bg-red-500/10 border border-red-500/30 p-3 text-sm text-red-400">
@@ -194,4 +274,3 @@ export default function ChatAssistant() {
     </Layout>
   );
 }
-

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import Report from '../models/Report.js';
 import Prediction from '../models/Prediction.js';
 import { AppError } from '../utils/AppError.js';
+import { generatePredictionReportBuffer } from '../services/pdfService.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,26 +40,51 @@ export const getReportById = async (req, res) => {
 };
 
 export const downloadReport = async (req, res) => {
-  const report = await Report.findById(req.params.id);
+  // `id` can be either Report ID or Prediction ID
+  let report = await Report.findById(req.params.id).populate('predictionId');
+  let prediction = null;
 
-  if (!report) {
-    throw new AppError('Report not found.', 404);
+  if (report) {
+    if (
+      req.user.role !== 'admin' &&
+      report.userId.toString() !== req.user._id.toString()
+    ) {
+      throw new AppError('Not authorized to download this report.', 403);
+    }
+    prediction = await Prediction.findById(report.predictionId).populate('userId', 'name email age gender');
+  } else {
+    // Attempt lookup as Prediction ID directly
+    prediction = await Prediction.findById(req.params.id).populate('userId', 'name email age gender');
+    if (!prediction) {
+      throw new AppError('Report not found.', 404);
+    }
+    if (
+      req.user.role !== 'admin' &&
+      prediction.userId._id.toString() !== req.user._id.toString()
+    ) {
+      throw new AppError('Not authorized to download this report.', 403);
+    }
   }
 
-  if (
-    req.user.role !== 'admin' &&
-    report.userId.toString() !== req.user._id.toString()
-  ) {
-    throw new AppError('Not authorized to download this report.', 403);
+  let localImagePath = null;
+  if (prediction && prediction.imageUrl) {
+    const filename = path.basename(prediction.imageUrl);
+    const possiblePath = path.join(__dirname, '..', 'uploads', filename);
+    if (fs.existsSync(possiblePath)) {
+      localImagePath = possiblePath;
+    }
   }
 
-  const filePath = path.join(__dirname, '..', report.reportUrl);
+  const pdfBuffer = await generatePredictionReportBuffer({
+    user: prediction.userId || req.user,
+    prediction,
+    imageSource: localImagePath,
+  });
 
-  if (!fs.existsSync(filePath)) {
-    throw new AppError('Report file not found.', 404);
-  }
-
-  res.download(filePath, report.fileName || 'oral-health-report.pdf');
+  const fileName = report?.fileName || `ai-prediction-report-${prediction._id}.pdf`;
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+  res.send(pdfBuffer);
 };
 
 export default { getReports, getReportById, downloadReport };

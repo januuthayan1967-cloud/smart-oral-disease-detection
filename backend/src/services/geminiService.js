@@ -104,7 +104,7 @@ const normalizeHistory = (rawHistory = []) => {
  * Generates AI chat response via Google Gemini API
  * Reads key ONLY from process.env.GEMINI_API_KEY
  */
-export const generateGeminiResponse = async (message, history = []) => {
+export const generateGeminiResponse = async (message, history = [], predictionContext = null) => {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
@@ -116,7 +116,22 @@ export const generateGeminiResponse = async (message, history = []) => {
 
   // Dynamic language directive based on latest user message
   const langDirective = detectLanguageDirective(message);
-  const fullSystemInstruction = `${BASE_SYSTEM_INSTRUCTION}\n\n${langDirective}`;
+
+  let predContextInstruction = '';
+  if (predictionContext) {
+    predContextInstruction = `\n\n[USER'S AI PREDICTION CONTEXT]:
+Condition: ${predictionContext.displayName || predictionContext.predictedClass}
+Confidence: ${predictionContext.confidencePercentage || Math.round(predictionContext.confidence || 0)}%
+Risk Level: ${predictionContext.riskLevel || 'LOW'}
+Risk Reason: ${predictionContext.riskReason || 'N/A'}
+Description: ${predictionContext.description || 'N/A'}
+
+Provide general educational assistance regarding this condition. Do NOT claim certainty or provide a definitive medical diagnosis. Recommend professional consultation when appropriate.`;
+  }
+
+  const fullSystemInstruction = `${BASE_SYSTEM_INSTRUCTION}${predContextInstruction}\n\n${langDirective}`;
+
+  const finalUserMessage = message;
 
   // Models to attempt in priority order
   const modelCandidates = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
@@ -133,7 +148,7 @@ export const generateGeminiResponse = async (message, history = []) => {
         history: formattedHistory,
       });
 
-      const result = await chat.sendMessage(message);
+      const result = await chat.sendMessage(finalUserMessage);
       const response = await result.response;
       const textText = response.text();
 
@@ -154,8 +169,8 @@ export const generateGeminiResponse = async (message, history = []) => {
       });
 
       const prompt = formattedHistory.length > 0
-        ? `Previous conversation history:\n${formattedHistory.map(h => `${h.role}: ${h.parts[0].text}`).join('\n')}\n\n[Current User Message]: ${message}`
-        : message;
+        ? `Previous conversation history:\n${formattedHistory.map(h => `${h.role}: ${h.parts[0].text}`).join('\n')}\n\n[Current User Message]: ${finalUserMessage}`
+        : finalUserMessage;
 
       const result = await model.generateContent(prompt);
       const response = await result.response;

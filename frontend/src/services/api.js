@@ -90,6 +90,7 @@ export const predictionAPI = {
     api.post('/predict', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
   getAll: () => api.get('/predictions'),
   getById: (id) => api.get(`/predictions/${id}`),
+  downloadReport: (id) => api.get(`/predictions/${id}/report`, { responseType: 'blob' }),
   delete: (id) => api.delete(`/predictions/${id}`),
 };
 
@@ -100,7 +101,13 @@ export const reportAPI = {
 };
 
 export const chatAPI = {
-  send: (message, history = []) => api.post('/chat', { message, history }),
+  send: (message, history = [], predictionOptions = {}) =>
+    api.post('/chat', {
+      message,
+      history,
+      predictionId: predictionOptions.predictionId,
+      predictionContext: predictionOptions.predictionContext,
+    }),
   getHistory: () => api.get('/chat/history'),
 };
 

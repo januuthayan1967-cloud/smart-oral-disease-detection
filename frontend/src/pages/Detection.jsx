@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/Layout';
 import Card from '../components/Card';
@@ -115,12 +116,15 @@ function CameraIcon() {
 }
 
 export default function Detection() {
+  const navigate = useNavigate();
   const [rawImageSrc, setRawImageSrc] = useState(null);
   const [croppedFile, setCroppedFile] = useState(null);
   const [croppedPreview, setCroppedPreview] = useState(null);
   const [isCropModalOpen, setIsCropModalOpen] = useState(false);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [downloadingReport, setDownloadingReport] = useState(false);
+  const [downloadError, setDownloadError] = useState('');
   const [error, setError] = useState('');
   const [dragging, setDragging] = useState(false);
   const fileRef = useRef();
@@ -128,7 +132,6 @@ export default function Detection() {
   const validateAndProcessFile = (selectedFile) => {
     if (!selectedFile) return;
 
-    // File validation
     if (!selectedFile.type.startsWith('image/')) {
       setError('Invalid file type. Please upload an image (JPEG, PNG, WebP).');
       return;
@@ -141,12 +144,11 @@ export default function Detection() {
 
     setError('');
     setResult(null);
+    setDownloadError('');
 
-    // Reset crop state on new upload
     setCroppedFile(null);
     setCroppedPreview(null);
 
-    // Create preview URL for raw image and open crop tool modal automatically
     const rawUrl = URL.createObjectURL(selectedFile);
     setRawImageSrc(rawUrl);
     setIsCropModalOpen(true);
@@ -173,7 +175,6 @@ export default function Detection() {
 
   const handleCancelCrop = () => {
     setIsCropModalOpen(false);
-    // If no confirmed crop exists, reset raw image as well
     if (!croppedFile) {
       setRawImageSrc(null);
     }
@@ -181,7 +182,6 @@ export default function Detection() {
 
   const handleRecrop = () => {
     if (!rawImageSrc) return;
-    // Clear crop state when user chooses to re-crop
     setCroppedFile(null);
     setCroppedPreview(null);
     setResult(null);
@@ -189,7 +189,6 @@ export default function Detection() {
   };
 
   const handlePredict = async () => {
-    // Only proceed if confirmed cropped file exists
     if (!croppedFile) {
       setError('Please crop and confirm the teeth area before starting analysis.');
       return;
@@ -197,6 +196,7 @@ export default function Detection() {
 
     setLoading(true);
     setError('');
+    setDownloadError('');
 
     try {
       const formData = new FormData();
@@ -217,18 +217,77 @@ export default function Detection() {
   };
 
   const handleDownloadReport = async () => {
-    if (!result?.reportId) return;
+    const targetId = result?.predictionId || result?.prediction?._id || result?.reportId;
+    if (!targetId) return;
+
+    setDownloadingReport(true);
+    setDownloadError('');
+
     try {
-      const { data } = await reportAPI.download(result.reportId);
-      const url = window.URL.createObjectURL(new Blob([data]));
+      let blobData;
+      try {
+        const response = await predictionAPI.downloadReport(targetId);
+        blobData = response.data;
+      } catch {
+        const response = await reportAPI.download(result?.reportId || targetId);
+        blobData = response.data;
+      }
+
+      const url = window.URL.createObjectURL(new Blob([blobData], { type: 'application/pdf' }));
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'oral-health-report.pdf';
+      link.download = `ai-prediction-report-${targetId}.pdf`;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(url), 150);
     } catch (err) {
-      alert('Failed to download PDF report. Please try again later.');
+      console.error('Failed to download report:', err);
+      setDownloadError('Failed to generate or download PDF report. Please try again later.');
+    } finally {
+      setDownloadingReport(false);
     }
   };
+
+  const handleAskAIAssistant = (predictionData, currentRiskLevel) => {
+    const diseaseName = predictionData.displayName || predictionData.diseaseName || 'Oral Condition';
+    const confidence = (predictionData.confidence || 0).toFixed(1);
+
+    const contextMessage = `Please help me understand my recent AI oral health prediction.
+
+Predicted condition: ${diseaseName}
+Confidence: ${confidence}%
+Risk level: ${currentRiskLevel}
+
+Please explain:
+• What this condition generally means
+• Common symptoms
+• General oral care recommendations
+• When I should consult a dentist
+
+Do not provide a definitive medical diagnosis.`;
+
+    navigate('/chat', {
+      state: {
+        initialMessage: contextMessage,
+        predictionId: result?.predictionId || predictionData._id,
+        predictionContext: {
+          displayName: diseaseName,
+          predictedClass: predictionData.predictedClass || diseaseName,
+          confidence: predictionData.confidence,
+          confidencePercentage: Math.round(predictionData.confidence || 0),
+          riskLevel: currentRiskLevel,
+          riskReason: predictionData.riskReason || result?.riskReason,
+          description: predictionData.description,
+          recommendation: predictionData.recommendation,
+        },
+      },
+    });
+  };
+
+  const pred = result?.prediction || result || {};
+  const currentRiskLevel = result?.riskLevel || pred.riskLevel || (pred.confidence >= 80 ? 'HIGH' : pred.confidence >= 60 ? 'MEDIUM' : 'LOW');
+  const currentRiskReason = result?.riskReason || pred.riskReason || '';
 
   return (
     <Layout>
@@ -362,7 +421,7 @@ export default function Detection() {
               onChange={handleFileChange}
             />
 
-            {/* Analysis Button - ENABLED ONLY WHEN A VALID CONFIRMED CROPPED FILE EXISTS */}
+            {/* Analysis Button */}
             <Button
               onClick={handlePredict}
               disabled={!croppedFile || loading || isCropModalOpen}
@@ -419,17 +478,17 @@ export default function Detection() {
                         className="mt-1 text-2xl font-bold"
                         style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}
                       >
-                        {result.prediction.diseaseName}
+                        {pred.displayName || pred.diseaseName}
                       </h2>
                     </div>
-                    <SeverityBadge severity={result.prediction.severity} />
+                    <SeverityBadge severity={currentRiskLevel === 'HIGH' ? 'High' : currentRiskLevel === 'MEDIUM' ? 'Moderate' : pred.severity || 'Low'} />
                   </div>
 
                   {/* Confidence bar */}
-                  <ConfidenceBar value={result.prediction.confidence} />
+                  <ConfidenceBar value={pred.confidence || 0} />
 
                   {/* Description */}
-                  {result.prediction.description && (
+                  {pred.description && (
                     <div
                       className="mt-5 rounded-xl p-4"
                       style={{ background: 'color-mix(in srgb, var(--surface-2) 60%, transparent)', border: '1px solid var(--border-soft)' }}
@@ -438,7 +497,7 @@ export default function Detection() {
                         Description
                       </p>
                       <p className="text-sm leading-relaxed" style={{ color: 'var(--text)' }}>
-                        {result.prediction.description}
+                        {pred.description}
                       </p>
                     </div>
                   )}
@@ -448,40 +507,86 @@ export default function Detection() {
                     <ResultSection
                       icon="⚠️"
                       title="Common Causes"
-                      items={result.prediction.causes}
+                      items={pred.causes}
                     />
                     <ResultSection
                       icon="💊"
                       title="Treatment Suggestions"
-                      items={result.prediction.treatmentSuggestions}
+                      items={pred.treatmentSuggestions}
                     />
                     <ResultSection
                       icon="🛡️"
                       title="Prevention Tips"
-                      items={result.prediction.preventionTips}
+                      items={pred.preventionTips}
                     />
                   </div>
 
                   {/* Class probabilities if available */}
-                  <ProbabilitiesList probabilities={result.prediction.probabilities} />
+                  <ProbabilitiesList probabilities={pred.probabilities} />
 
                   {/* Recommendation */}
-                  {result.prediction.recommendation && (
+                  {pred.recommendation && (
                     <div
                       className="mt-4 flex items-start gap-3 rounded-xl p-4"
                       style={{ background: 'var(--accent-dim)', border: '1px solid rgba(6,182,212,0.2)' }}
                     >
                       <span className="text-xl">💡</span>
                       <p className="text-sm leading-relaxed" style={{ color: 'var(--text)' }}>
-                        {result.prediction.recommendation}
+                        {pred.recommendation}
                       </p>
                     </div>
                   )}
 
-                  {/* Download PDF Report */}
-                  <Button onClick={handleDownloadReport} className="mt-5 w-full" variant="secondary">
-                    📄 Download PDF Report
-                  </Button>
+                  {/* ── HIGH RISK DETECTED ALERT SECTION ── */}
+                  {currentRiskLevel === 'HIGH' && (
+                    <div className="mt-5 rounded-2xl border border-red-500/40 bg-red-500/10 p-5 text-left shadow-lg">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">⚠️</span>
+                        <div>
+                          <h3 className="text-lg font-bold text-red-400">High Risk Detected</h3>
+                          <p className="mt-0.5 text-xs text-red-300">
+                            {currentRiskReason || 'This AI prediction indicates a condition that may require prompt professional dental evaluation.'}
+                          </p>
+                        </div>
+                      </div>
+                      <p className="mt-3 text-sm text-gray-200">
+                        Please consult a qualified dentist for proper examination and diagnosis. This AI result is not a confirmed medical diagnosis.
+                      </p>
+                      <Button
+                        onClick={() => navigate('/consultation')}
+                        className="mt-4 w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-xl shadow-lg transition"
+                      >
+                        👨‍⚕️ Book a Doctor Appointment
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* ── ACTION BUTTONS ── */}
+                  <div className="mt-5 space-y-3">
+                    <Button
+                      onClick={() => handleAskAIAssistant(pred, currentRiskLevel)}
+                      className="w-full"
+                      variant="primary"
+                    >
+                      ✨ Ask AI Assistant About This Result
+                    </Button>
+
+                    <Button
+                      onClick={handleDownloadReport}
+                      disabled={downloadingReport}
+                      loading={downloadingReport}
+                      className="w-full"
+                      variant="secondary"
+                    >
+                      {downloadingReport ? 'Generating PDF Report...' : '📄 Download PDF Report'}
+                    </Button>
+
+                    {downloadError && (
+                      <p className="text-center text-xs text-red-400 font-medium">
+                        {downloadError}
+                      </p>
+                    )}
+                  </div>
                 </Card>
               </motion.div>
             )}
