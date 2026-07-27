@@ -36,6 +36,11 @@ const prescriptionSchema = new mongoose.Schema(
       default: '',
       trim: true,
     },
+    caseDiagnosis: {
+      type: String,
+      default: '',
+      trim: true,
+    },
     date: {
       type: Date,
       default: Date.now,

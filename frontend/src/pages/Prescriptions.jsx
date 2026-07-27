@@ -307,7 +307,10 @@ export default function Prescriptions() {
                       )}
                     </div>
                     <p className="text-sm text-theme-muted">{rx.dentistId?.specialization}</p>
-                    <p className="mt-1 text-xs text-theme-muted">{new Date(rx.date || rx.createdAt).toLocaleDateString()}</p>
+                    <p className="mt-1 text-xs text-theme-muted">
+                      <strong>Case / Diagnosis:</strong> <span className="text-theme-heading font-medium">{rx.caseDiagnosis || 'Not specified'}</span>
+                    </p>
+                    <p className="mt-0.5 text-xs text-theme-muted">{new Date(rx.date || rx.createdAt).toLocaleDateString()}</p>
                   </div>
 
                   {/* Action Buttons */}

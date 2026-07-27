@@ -20,6 +20,7 @@ export const createPrescription = async (req, res) => {
     dentistId: dentistProfile._id,
     medicines: req.body.medicines,
     notes: req.body.notes || '',
+    caseDiagnosis: req.body.caseDiagnosis || '',
     date: req.body.date || new Date(),
     prescriptionFee: req.body.prescriptionFee !== undefined ? Number(req.body.prescriptionFee) : 500,
   });
@@ -162,6 +163,7 @@ export const downloadPrescription = async (req, res) => {
   if (prescription.patientId?.age) doc.text(`Age: ${prescription.patientId.age}`);
   if (prescription.patientId?.gender) doc.text(`Gender: ${prescription.patientId.gender}`);
   doc.text(`Date: ${new Date(prescription.date || prescription.createdAt).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })}`);
+  doc.text(`Case / Diagnosis: ${prescription.caseDiagnosis || 'Not specified'}`);
   doc.moveDown(1);
 
   // ----- Medicines -----

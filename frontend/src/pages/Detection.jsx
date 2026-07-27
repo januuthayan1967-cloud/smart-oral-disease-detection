@@ -7,6 +7,7 @@ import Button from '../components/Button';
 import SeverityBadge from '../components/SeverityBadge';
 import LoadingAnimation from '../components/LoadingAnimation';
 import TeethCropModal from '../components/TeethCropModal';
+import FirstAidTips from '../components/FirstAidTips';
 import { predictionAPI, reportAPI } from '../services/api';
 
 /* ── Animated confidence bar ─────────────────────────────────────── */
@@ -536,6 +537,9 @@ Do not provide a definitive medical diagnosis.`;
                       </p>
                     </div>
                   )}
+
+                  {/* First Aid Tips */}
+                  <FirstAidTips predictedClass={pred.predictedClass || pred.rawClass || pred.displayName || pred.diseaseName} />
 
                   {/* ── HIGH RISK DETECTED ALERT SECTION ── */}
                   {currentRiskLevel === 'HIGH' && (

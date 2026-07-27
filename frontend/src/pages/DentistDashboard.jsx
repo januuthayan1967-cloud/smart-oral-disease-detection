@@ -17,6 +17,8 @@ export default function DentistDashboard() {
   const [payments, setPayments] = useState([]);
   const [prescriptionForm, setPrescriptionForm] = useState({
     patientId: '',
+    caseDiagnosisSelect: '',
+    customCaseDiagnosis: '',
     medicines: [{ medicineName: '', dosage: '', duration: '', quantity: 1, instructions: '', notes: '' }],
     notes: '',
     prescriptionFee: 500,
@@ -75,16 +77,31 @@ export default function DentistDashboard() {
 
   const handleCreatePrescription = async (e) => {
     e.preventDefault();
+
+    let finalDiagnosis = prescriptionForm.caseDiagnosisSelect;
+    if (prescriptionForm.caseDiagnosisSelect === 'Other') {
+      if (!prescriptionForm.customCaseDiagnosis || !prescriptionForm.customCaseDiagnosis.trim()) {
+        alert('Please enter the custom case or diagnosis.');
+        return;
+      }
+      finalDiagnosis = prescriptionForm.customCaseDiagnosis.trim();
+    }
+
     await prescriptionAPI.create({
-      ...prescriptionForm,
+      patientId: prescriptionForm.patientId,
+      caseDiagnosis: finalDiagnosis,
       medicines: prescriptionForm.medicines.map((m) => ({
         ...m,
         quantity: parseInt(m.quantity, 10),
       })),
+      notes: prescriptionForm.notes,
       prescriptionFee: parseFloat(prescriptionForm.prescriptionFee),
     });
+
     setPrescriptionForm({
       patientId: '',
+      caseDiagnosisSelect: '',
+      customCaseDiagnosis: '',
       medicines: [{ medicineName: '', dosage: '', duration: '', quantity: 1, instructions: '', notes: '' }],
       notes: '',
       prescriptionFee: 500,
@@ -303,6 +320,9 @@ export default function DentistDashboard() {
                         <div key={rx._id} className="flex items-center justify-between p-3 rounded-xl bg-theme-surface-2/40 border border-theme-border/30">
                           <div>
                             <p className="text-sm font-semibold text-theme-heading">{new Date(rx.createdAt).toLocaleDateString()}</p>
+                            <p className="text-xs text-theme-muted mt-0.5">
+                              Case / Diagnosis: <strong className="text-theme-heading">{rx.caseDiagnosis || 'Not specified'}</strong>
+                            </p>
                             <p className="text-xs text-theme-muted mt-0.5">{rx.medicines?.length || 0} medicines prescribed</p>
                           </div>
                           <span
@@ -339,21 +359,60 @@ export default function DentistDashboard() {
             <p className="text-sm text-theme-muted mt-0.5">Diagnose and prescribe medications to active patients.</p>
           </div>
 
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-theme-heading">Select Patient</label>
-            <select
-              className="w-full rounded-xl border border-theme-border bg-theme-surface/60 px-4 py-3 text-theme-text transition focus:border-theme-accent focus:outline-none focus:ring-2 focus:ring-theme-accent/25"
-              value={prescriptionForm.patientId}
-              onChange={(e) => setPrescriptionForm({ ...prescriptionForm, patientId: e.target.value })}
-              required
-              style={{ color: 'var(--text)', backgroundColor: 'var(--surface)' }}
-            >
-              <option value="" className="bg-theme-surface text-theme-muted">Choose a patient...</option>
-              {patients.map((p) => (
-                <option key={p._id} value={p._id} className="bg-theme-surface text-theme-text">{p.name}</option>
-              ))}
-            </select>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-theme-heading">Select Patient</label>
+              <select
+                className="w-full rounded-xl border border-theme-border bg-theme-surface/60 px-4 py-3 text-theme-text transition focus:border-theme-accent focus:outline-none focus:ring-2 focus:ring-theme-accent/25"
+                value={prescriptionForm.patientId}
+                onChange={(e) => setPrescriptionForm({ ...prescriptionForm, patientId: e.target.value })}
+                required
+                style={{ color: 'var(--text)', backgroundColor: 'var(--surface)' }}
+              >
+                <option value="" className="bg-theme-surface text-theme-muted">Choose a patient...</option>
+                {patients.map((p) => (
+                  <option key={p._id} value={p._id} className="bg-theme-surface text-theme-text">{p.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-theme-heading">Case / Diagnosis</label>
+              <select
+                className="w-full rounded-xl border border-theme-border bg-theme-surface/60 px-4 py-3 text-theme-text transition focus:border-theme-accent focus:outline-none focus:ring-2 focus:ring-theme-accent/25"
+                value={prescriptionForm.caseDiagnosisSelect}
+                onChange={(e) =>
+                  setPrescriptionForm({
+                    ...prescriptionForm,
+                    caseDiagnosisSelect: e.target.value,
+                    customCaseDiagnosis: e.target.value === 'Other' ? prescriptionForm.customCaseDiagnosis : '',
+                  })
+                }
+                style={{ color: 'var(--text)', backgroundColor: 'var(--surface)' }}
+              >
+                <option value="" className="bg-theme-surface text-theme-muted">Select case / diagnosis...</option>
+                {['Calculus', 'Caries', 'Gingivitis', 'Healthy Teeth', 'Mouth Ulcer', 'Tooth Discoloration', 'Other'].map((opt) => (
+                  <option key={opt} value={opt} className="bg-theme-surface text-theme-text">{opt}</option>
+                ))}
+              </select>
+            </div>
           </div>
+
+          {prescriptionForm.caseDiagnosisSelect === 'Other' && (
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-theme-heading">
+                Specify Other Case / Diagnosis <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                className="w-full rounded-xl border border-theme-border bg-theme-surface/60 px-4 py-3 text-theme-text placeholder:text-theme-muted transition focus:border-theme-accent focus:outline-none"
+                placeholder="Enter custom case or diagnosis"
+                value={prescriptionForm.customCaseDiagnosis}
+                onChange={(e) => setPrescriptionForm({ ...prescriptionForm, customCaseDiagnosis: e.target.value })}
+                required
+              />
+            </div>
+          )}
 
           <div className="space-y-4">
             <label className="block text-sm font-semibold text-theme-heading">Prescribed Medicines</label>

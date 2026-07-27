@@ -75,6 +75,7 @@ export const prescriptionValidation = [
   body('medicines.*.duration').trim().notEmpty().withMessage('Duration is required'),
   body('medicines.*.quantity').isInt({ min: 1 }).withMessage('Quantity must be at least 1'),
   body('prescriptionFee').optional().isFloat({ min: 0 }).withMessage('Prescription fee must be a non-negative number'),
+  body('caseDiagnosis').optional().trim(),
 ];
 
 export const orderValidation = [
