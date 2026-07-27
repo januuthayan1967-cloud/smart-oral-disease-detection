@@ -35,9 +35,19 @@ export default function DentistDashboard() {
         dentistDashboardAPI.getProfile(),
         dentistDashboardAPI.getPayments(),
       ]);
+      const rawAvail = profileRes.data.data.availability || [];
+      const normalizedAvail = rawAvail.map((a) => {
+        const titleDay = a.day ? a.day.charAt(0).toUpperCase() + a.day.slice(1).toLowerCase() : a.day;
+        return {
+          day: titleDay,
+          startTime: a.startTime || '09:00',
+          endTime: a.endTime || '13:00',
+          slots: a.slots || [],
+        };
+      });
       setPatients(patientsRes.data.data);
       setConsultations(consultRes.data.data);
-      setAvailability(profileRes.data.data.availability || []);
+      setAvailability(normalizedAvail);
       setPayments(paymentsRes.data.data || []);
     } catch {
       /* ignore */
@@ -128,26 +138,38 @@ export default function DentistDashboard() {
   };
 
   const updateDayTimes = (day, field, value) => {
-    setAvailability((prev) =>
-      prev.map((a) => (a.day === day ? { ...a, [field]: value } : a))
-    );
+    setAvailability((prev) => {
+      const exists = prev.find((a) => a.day && a.day.toLowerCase() === day.toLowerCase());
+      if (exists) {
+        return prev.map((a) =>
+          a.day && a.day.toLowerCase() === day.toLowerCase() ? { ...a, [field]: value, day } : a
+        );
+      }
+      return [...prev, { day, startTime: '09:00', endTime: '13:00', [field]: value }];
+    });
   };
 
   const toggleDay = (day) => {
-    const exists = availability.find((a) => a.day === day);
+    const exists = availability.find((a) => a.day && a.day.toLowerCase() === day.toLowerCase());
     if (exists) {
-      setAvailability(availability.filter((a) => a.day !== day));
+      setAvailability(availability.filter((a) => a.day && a.day.toLowerCase() !== day.toLowerCase()));
     } else {
       setAvailability([...availability, { day, startTime: '09:00', endTime: '13:00' }]);
     }
   };
 
   const saveAvailability = async () => {
-    for (const item of availability) {
-      if (!item.startTime || !item.endTime) {
-        alert(`Please specify start time and end time for ${item.day}.`);
-        return;
-      }
+    const payload = availability.map((item) => {
+      const titleDay = item.day ? item.day.charAt(0).toUpperCase() + item.day.slice(1).toLowerCase() : item.day;
+      return {
+        day: titleDay,
+        startTime: item.startTime || '09:00',
+        endTime: item.endTime || '13:00',
+        slots: item.slots || [],
+      };
+    });
+
+    for (const item of payload) {
       const [startH, startM] = item.startTime.split(':').map(Number);
       const [endH, endM] = item.endTime.split(':').map(Number);
       const startMins = startH * 60 + startM;
@@ -157,8 +179,16 @@ export default function DentistDashboard() {
         return;
       }
     }
+
     try {
-      await dentistDashboardAPI.updateAvailability(availability);
+      const res = await dentistDashboardAPI.updateAvailability(payload);
+      const savedAvail = (res.data.data.availability || []).map((a) => ({
+        day: a.day ? a.day.charAt(0).toUpperCase() + a.day.slice(1).toLowerCase() : a.day,
+        startTime: a.startTime || '09:00',
+        endTime: a.endTime || '13:00',
+        slots: a.slots || [],
+      }));
+      setAvailability(savedAvail);
       alert('Availability schedule saved successfully!');
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to update availability.');
@@ -886,7 +916,7 @@ export default function DentistDashboard() {
 
           <div className="space-y-4">
             {DAYS.map((day) => {
-              const dayItem = availability.find((a) => a.day === day);
+              const dayItem = availability.find((a) => a.day && a.day.toLowerCase() === day.toLowerCase());
               const isAvailable = Boolean(dayItem);
               const startTime = dayItem?.startTime || '09:00';
               const endTime = dayItem?.endTime || '13:00';
