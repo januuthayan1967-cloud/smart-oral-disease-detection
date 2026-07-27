@@ -7,9 +7,11 @@ import Button from '../components/Button';
 import SeverityBadge from '../components/SeverityBadge';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { predictionAPI, reportAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function History() {
   const navigate = useNavigate();
+  const { isAdmin } = useAuth();
   const [predictions, setPredictions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState(null);
@@ -166,14 +168,16 @@ Do not provide a definitive medical diagnosis.`;
                   </div>
 
                   <div className="flex flex-wrap gap-2 md:flex-col shrink-0">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => handleAskAIAssistant(p)}
-                      className="text-xs"
-                    >
-                      ✨ Discuss AI
-                    </Button>
+                    {!isAdmin && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => handleAskAIAssistant(p)}
+                        className="text-xs"
+                      >
+                        ✨ Discuss AI
+                      </Button>
+                    )}
 
                     <Button
                       variant="secondary"
@@ -185,7 +189,7 @@ Do not provide a definitive medical diagnosis.`;
                       {downloadingId === p._id ? 'Generating...' : '📄 PDF'}
                     </Button>
 
-                    {riskLevel === 'HIGH' && (
+                    {!isAdmin && riskLevel === 'HIGH' && (
                       <Button
                         size="sm"
                         onClick={() => navigate('/consultation')}
@@ -195,9 +199,11 @@ Do not provide a definitive medical diagnosis.`;
                       </Button>
                     )}
 
-                    <Button variant="ghost" size="sm" onClick={() => handleDelete(p._id)} className="text-xs text-red-400">
-                      Delete
-                    </Button>
+                    {!isAdmin && (
+                      <Button variant="ghost" size="sm" onClick={() => handleDelete(p._id)} className="text-xs text-red-400">
+                        Delete
+                      </Button>
+                    )}
                   </div>
                 </Card>
               </motion.div>

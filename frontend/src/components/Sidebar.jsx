@@ -63,7 +63,7 @@ const Icons = {
 
 const userLinks = [
   { to: '/dashboard', label: 'Dashboard', Icon: Icons.Dashboard },
-  { to: '/history', label: 'Patients', Icon: Icons.Patients },
+  { to: '/history', label: 'History', Icon: Icons.Patients },
   { to: '/detect', label: 'AI Detection', Icon: Icons.Detect },
   { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
   { to: '/consultation', label: 'Appointments', Icon: Icons.Appointments },
@@ -84,7 +84,11 @@ const pharmacyLinks = [
 
 const adminLinks = [
   { to: '/admin', label: 'Admin', Icon: Icons.Admin },
-  ...userLinks,
+  { to: '/admin?tab=users', label: 'Patients', Icon: Icons.Patients },
+  { to: '/detect', label: 'AI Detection', Icon: Icons.Detect },
+  { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
+  { to: '/consultation', label: 'Appointments', Icon: Icons.Appointments },
+  { to: '/profile', label: 'Settings', Icon: Icons.Settings },
 ];
 
 export default function Sidebar({ isOpen, onClose }) {

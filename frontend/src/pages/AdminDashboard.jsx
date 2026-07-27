@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
 import { Doughnut, Bar } from 'react-chartjs-2';
@@ -41,9 +42,17 @@ function AnimatedCounter({ value }) {
 }
 
 export default function AdminDashboard() {
+  const [searchParams] = useSearchParams();
+  const tabQuery = searchParams.get('tab');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState(tabQuery || 'overview');
+
+  useEffect(() => {
+    if (tabQuery) {
+      setActiveTab(tabQuery);
+    }
+  }, [tabQuery]);
   const [users, setUsers] = useState([]);
   const [pharmacies, setPharmacies] = useState([]);
   const [dentists, setDentists] = useState([]);
