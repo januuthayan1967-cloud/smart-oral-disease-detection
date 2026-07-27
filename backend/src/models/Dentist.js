@@ -39,6 +39,14 @@ const dentistSchema = new mongoose.Schema(
           type: String,
           enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
         },
+        startTime: {
+          type: String,
+          trim: true,
+        },
+        endTime: {
+          type: String,
+          trim: true,
+        },
         slots: [String],
       },
     ],

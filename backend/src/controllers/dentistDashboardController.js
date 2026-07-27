@@ -17,14 +17,20 @@ const getDentistProfile = async (userId) => {
 export const getMyPatients = async (req, res) => {
   const dentist = await getDentistProfile(req.user._id);
 
-  const appointments = await Appointment.find({ dentistId: dentist._id })
-    .populate('patientId', 'name email phone age gender')
-    .sort({ appointmentDate: -1 });
+  const [appointments, prescriptions] = await Promise.all([
+    Appointment.find({ dentistId: dentist._id }).populate('patientId', 'name email phone age gender'),
+    Prescription.find({ dentistId: dentist._id }).populate('patientId', 'name email phone age gender'),
+  ]);
 
   const patientMap = new Map();
   appointments.forEach((appt) => {
     if (appt.patientId) {
       patientMap.set(appt.patientId._id.toString(), appt.patientId);
+    }
+  });
+  prescriptions.forEach((rx) => {
+    if (rx.patientId) {
+      patientMap.set(rx.patientId._id.toString(), rx.patientId);
     }
   });
 
@@ -45,12 +51,12 @@ export const getPatientHistory = async (req, res) => {
   const dentist = await getDentistProfile(req.user._id);
   const { patientId } = req.params;
 
-  const hasAppointment = await Appointment.findOne({
-    dentistId: dentist._id,
-    patientId,
-  });
+  const [hasAppointment, hasPrescription] = await Promise.all([
+    Appointment.findOne({ dentistId: dentist._id, patientId }),
+    Prescription.findOne({ dentistId: dentist._id, patientId }),
+  ]);
 
-  if (!hasAppointment) {
+  if (!hasAppointment && !hasPrescription) {
     throw new AppError('Not authorized to view this patient history.', 403);
   }
 
@@ -65,13 +71,63 @@ export const getPatientHistory = async (req, res) => {
 
   res.json({
     success: true,
-    data: { patient, predictions, appointments, prescriptions },
+    data: {
+      patient,
+      predictions,
+      aiPredictions: predictions,
+      appointments,
+      consultations: appointments,
+      prescriptions,
+    },
   });
+};
+
+const generateSlotsFromTimes = (startTime, endTime) => {
+  if (!startTime || !endTime) return [];
+  const [startH, startM] = startTime.split(':').map(Number);
+  const [endH, endM] = endTime.split(':').map(Number);
+  const startMins = startH * 60 + startM;
+  const endMins = endH * 60 + endM;
+  if (endMins <= startMins) return [];
+  const slots = [];
+  for (let cur = startMins; cur < endMins; cur += 30) {
+    const h = Math.floor(cur / 60).toString().padStart(2, '0');
+    const m = (cur % 60).toString().padStart(2, '0');
+    slots.push(`${h}:${m}`);
+  }
+  return slots;
 };
 
 export const updateAvailability = async (req, res) => {
   const dentist = await getDentistProfile(req.user._id);
-  dentist.availability = req.body.availability || [];
+  const rawAvailability = req.body.availability || [];
+
+  const processedAvailability = rawAvailability.map((item) => {
+    if (item.startTime && item.endTime) {
+      const [startH, startM] = item.startTime.split(':').map(Number);
+      const [endH, endM] = item.endTime.split(':').map(Number);
+      const startMins = startH * 60 + startM;
+      const endMins = endH * 60 + endM;
+      if (endMins <= startMins) {
+        throw new AppError(`End time must be later than start time for ${item.day}.`, 400);
+      }
+      const slots = generateSlotsFromTimes(item.startTime, item.endTime);
+      return {
+        day: item.day,
+        startTime: item.startTime,
+        endTime: item.endTime,
+        slots,
+      };
+    }
+    return {
+      day: item.day,
+      startTime: item.startTime || '',
+      endTime: item.endTime || '',
+      slots: item.slots || [],
+    };
+  });
+
+  dentist.availability = processedAvailability;
   await dentist.save();
 
   res.json({ success: true, data: dentist });

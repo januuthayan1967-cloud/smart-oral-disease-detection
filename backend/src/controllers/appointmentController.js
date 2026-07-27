@@ -8,12 +8,69 @@ const generateMeetingLink = (appointmentId) => {
   return `https://${domain}/${roomName}`;
 };
 
+const parseTimeToMins = (timeStr) => {
+  if (!timeStr) return -1;
+  const clean = timeStr.trim().toUpperCase();
+  const isPM = clean.includes('PM');
+  const isAM = clean.includes('AM');
+  const numPart = clean.replace(/(AM|PM)/g, '').trim();
+  let [h, m] = numPart.split(':').map(Number);
+  if (isNaN(h)) return -1;
+  if (m === undefined) m = 0;
+  if (isPM && h < 12) h += 12;
+  if (isAM && h === 12) h = 0;
+  return h * 60 + m;
+};
+
 export const createAppointment = async (req, res) => {
   const { dentistId, appointmentDate, appointmentTime, notes } = req.body;
 
   const dentist = await Dentist.findById(dentistId);
   if (!dentist || !dentist.isActive) {
     throw new AppError('Dentist not found or unavailable.', 404);
+  }
+
+  const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const apptDateObj = new Date(appointmentDate);
+  const dayName = daysOfWeek[apptDateObj.getUTCDay() !== undefined ? new Date(appointmentDate + 'T00:00:00').getDay() : apptDateObj.getDay()];
+
+  const dayAvail = (dentist.availability || []).find(
+    (a) => a.day && a.day.toLowerCase() === dayName.toLowerCase()
+  );
+
+  if (!dentist.availability || dentist.availability.length === 0 || !dayAvail || !dayAvail.startTime || !dayAvail.endTime) {
+    throw new AppError(
+      'This dentist has not configured available appointment times. Please select another dentist or wait until the dentist updates their availability.',
+      400
+    );
+  }
+
+  const apptMins = parseTimeToMins(appointmentTime);
+  const startMins = parseTimeToMins(dayAvail.startTime);
+  const endMins = parseTimeToMins(dayAvail.endTime);
+
+  if (apptMins < startMins || apptMins >= endMins) {
+    throw new AppError(
+      "The selected appointment time is outside the dentist's available hours. Please choose a time within the available schedule.",
+      400
+    );
+  }
+
+  // Double Booking Protection
+  const dateStart = new Date(appointmentDate);
+  dateStart.setHours(0, 0, 0, 0);
+  const dateEnd = new Date(appointmentDate);
+  dateEnd.setHours(23, 59, 59, 999);
+
+  const existingAppt = await Appointment.findOne({
+    dentistId,
+    appointmentDate: { $gte: dateStart, $lte: dateEnd },
+    appointmentTime,
+    status: { $ne: 'cancelled' },
+  });
+
+  if (existingAppt) {
+    throw new AppError('This time slot has already been booked. Please select another available time.', 409);
   }
 
   const appointment = await Appointment.create({
