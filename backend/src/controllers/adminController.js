@@ -365,6 +365,8 @@ export const rejectPharmacyUser = async (req, res) => {
   }
 
   res.json({ success: true, message: 'Pharmacy user rejected.', data: pharmacyUser });
+};
+
 export const getPatientHistory = async (req, res) => {
   const { patientId } = req.params;
   const patient = await User.findById(patientId).select('name email phone age gender role createdAt');
