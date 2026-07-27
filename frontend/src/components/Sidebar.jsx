@@ -85,9 +85,9 @@ const pharmacyLinks = [
 const adminLinks = [
   { to: '/admin', label: 'Admin', Icon: Icons.Admin },
   { to: '/admin?tab=users', label: 'Patients', Icon: Icons.Patients },
+  { to: '/admin?tab=appointments', label: 'Appointments', Icon: Icons.Appointments },
   { to: '/detect', label: 'AI Detection', Icon: Icons.Detect },
   { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
-  { to: '/consultation', label: 'Appointments', Icon: Icons.Appointments },
   { to: '/profile', label: 'Settings', Icon: Icons.Settings },
 ];
 

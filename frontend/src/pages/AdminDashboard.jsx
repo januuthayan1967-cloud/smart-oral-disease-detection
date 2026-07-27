@@ -6,7 +6,7 @@ import { Doughnut, Bar } from 'react-chartjs-2';
 import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SeverityBadge from '../components/SeverityBadge';
-import { adminAPI, predictionAPI, reportAPI } from '../services/api';
+import { adminAPI, predictionAPI, reportAPI, appointmentAPI } from '../services/api';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -57,6 +57,7 @@ export default function AdminDashboard() {
   const [pharmacies, setPharmacies] = useState([]);
   const [dentists, setDentists] = useState([]);
   const [pendingDentists, setPendingDentists] = useState([]);
+  const [appointments, setAppointments] = useState([]);
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patientHistory, setPatientHistory] = useState(null);
   const [historyLoading, setHistoryLoading] = useState(false);
@@ -135,6 +136,9 @@ export default function AdminDashboard() {
     } else if (tab === 'dentist-approvals') {
       const { data: res } = await adminAPI.getPendingDentists();
       setPendingDentists(res.data);
+    } else if (tab === 'appointments') {
+      const { data: res } = await appointmentAPI.getAll();
+      setAppointments(res.data);
     }
   };
 
@@ -196,6 +200,7 @@ export default function AdminDashboard() {
     { id: 'dentists', label: 'Dentists' },
     { id: 'pharmacies', label: 'Pharmacy Applications' },
     { id: 'dentist-approvals', label: 'Dentist Approvals' },
+    { id: 'appointments', label: 'Appointments' },
   ];
 
   if (loading && activeTab === 'overview') return <Layout><LoadingSpinner /></Layout>;
@@ -951,6 +956,94 @@ export default function AdminDashboard() {
                 </div>
               </motion.div>
             ))}
+          </motion.div>
+        )}
+
+        {activeTab === 'appointments' && (
+          <motion.div
+            key="appointments"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="mt-6 space-y-4"
+          >
+            <div className="flex items-center justify-between border-b border-theme-border/20 pb-3">
+              <div>
+                <h2 className="text-lg font-bold text-theme-heading font-heading">System Appointments ({appointments.length})</h2>
+                <p className="text-xs text-theme-muted mt-0.5">System-wide appointment records across all patients and dentists</p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-400">
+                🔒 Read-Only Record View
+              </span>
+            </div>
+
+            <div className="grid gap-4">
+              {appointments.map((appt, i) => {
+                const dateStr = new Date(appt.appointmentDate).toLocaleDateString(undefined, {
+                  weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+                });
+                const patientName = appt.patientId?.name || 'Patient';
+                const patientEmail = appt.patientId?.email ? ` (${appt.patientId.email})` : '';
+                const dentistName = appt.dentistId?.name ? `Dr. ${appt.dentistId.name}` : 'Dentist';
+                const statusColors = {
+                  pending: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/30',
+                  confirmed: 'bg-green-500/15 text-green-400 border-green-500/30',
+                  completed: 'bg-blue-500/15 text-blue-400 border-blue-500/30',
+                  cancelled: 'bg-red-500/15 text-red-400 border-red-500/30',
+                };
+
+                return (
+                  <motion.div
+                    key={appt._id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                  >
+                    <div className="card border border-theme-border/40 bg-theme-surface/50 p-5 rounded-2xl">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <span className="text-xs font-bold uppercase tracking-wider text-theme-accent">Patient Appointment</span>
+                          <h3 className="font-bold text-theme-heading text-lg mt-1">
+                            Patient: <span className="text-theme-text font-semibold">{patientName}</span>
+                            <span className="text-xs text-theme-muted font-normal">{patientEmail}</span>
+                          </h3>
+                          <p className="text-sm font-semibold text-theme-accent mt-0.5">
+                            Dentist: {dentistName} {appt.dentistId?.specialization && `· ${appt.dentistId.specialization}`}
+                          </p>
+                        </div>
+
+                        <span className={`rounded-full border px-3 py-1 text-xs font-bold capitalize ${statusColors[appt.status] || ''}`}>
+                          {appt.status}
+                        </span>
+                      </div>
+
+                      <div className="mt-3 flex flex-wrap gap-4 text-xs text-theme-muted pt-2.5 border-t border-theme-border/10">
+                        <span>📅 Date: <strong className="text-theme-text">{dateStr}</strong></span>
+                        <span>⏰ Time: <strong className="text-theme-text">{appt.appointmentTime}</strong></span>
+                        {appt.meetingLink && appt.status !== 'cancelled' && (
+                          <span className="text-theme-muted flex items-center gap-1 font-medium">
+                            <span>🎥</span> Video Room Configured
+                          </span>
+                        )}
+                      </div>
+
+                      {appt.notes && (
+                        <p className="mt-2 text-xs text-theme-text italic bg-theme-surface/40 p-2.5 rounded-xl border border-theme-border/20">
+                          <strong>Notes:</strong> {appt.notes}
+                        </p>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+
+              {appointments.length === 0 && (
+                <div className="card text-center py-10 text-theme-muted border border-theme-border/30 bg-theme-surface/30">
+                  <p className="text-4xl mb-2">📅</p>
+                  <p className="font-semibold text-theme-heading text-base">No system appointments found.</p>
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

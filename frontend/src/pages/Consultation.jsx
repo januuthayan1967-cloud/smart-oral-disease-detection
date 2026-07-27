@@ -6,6 +6,7 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import LoadingAnimation from '../components/LoadingAnimation';
 import { dentistAPI, appointmentAPI } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 function DentistBookingCard({ dentist, allAppointments, onBookSuccess }) {
   const [selectedDate, setSelectedDate] = useState('');
@@ -237,6 +238,7 @@ function DentistBookingCard({ dentist, allAppointments, onBookSuccess }) {
 }
 
 export default function Consultation() {
+  const { user, isAdmin, isDentist } = useAuth();
   const [dentists, setDentists] = useState([]);
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -246,12 +248,15 @@ export default function Consultation() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [dentistRes, apptRes] = await Promise.all([
-        dentistAPI.getAll({ search }),
-        appointmentAPI.getAll(),
-      ]);
-      setDentists(dentistRes.data.data);
+      const promises = [appointmentAPI.getAll()];
+      if (!isAdmin) {
+        promises.push(dentistAPI.getAll({ search }));
+      }
+      const [apptRes, dentistRes] = await Promise.all(promises);
       setAppointments(apptRes.data.data);
+      if (dentistRes) {
+        setDentists(dentistRes.data.data);
+      }
     } catch {
       /* ignore */
     } finally {
@@ -270,11 +275,29 @@ export default function Consultation() {
     cancelled: 'bg-red-500/15 text-red-400 border-red-500/30',
   };
 
+  const filteredAppointments = appointments.filter((appt) => {
+    if (!search) return true;
+    const term = search.toLowerCase();
+    const patientName = appt.patientId?.name?.toLowerCase() || '';
+    const patientEmail = appt.patientId?.email?.toLowerCase() || '';
+    const dentistName = appt.dentistId?.name?.toLowerCase() || '';
+    const status = appt.status?.toLowerCase() || '';
+    return patientName.includes(term) || patientEmail.includes(term) || dentistName.includes(term) || status.includes(term);
+  });
+
   return (
     <Layout>
       <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="text-3xl font-bold text-theme-heading font-heading">Appointments</h1>
-        <p className="mt-1 text-theme-muted">Find dentists and book video consultations during available hours</p>
+        <h1 className="text-3xl font-bold text-theme-heading font-heading">
+          {isAdmin ? 'System Appointments' : isDentist ? 'My Consultations' : 'Appointments'}
+        </h1>
+        <p className="mt-1 text-theme-muted">
+          {isAdmin
+            ? 'Overview of system-wide patient and dentist consultation records'
+            : isDentist
+            ? 'View and manage consultations with your patients'
+            : 'Find dentists and book video consultations during available hours'}
+        </p>
       </motion.div>
 
       {message && (
@@ -290,7 +313,7 @@ export default function Consultation() {
 
       <div className="mt-6">
         <Input
-          placeholder="Search dentists by name or specialization..."
+          placeholder={isAdmin ? 'Search appointments by patient, dentist, or status...' : 'Search dentists by name or specialization...'}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="max-w-md"
@@ -298,40 +321,124 @@ export default function Consultation() {
       </div>
 
       {loading ? (
-        <LoadingAnimation message="Loading dentists and appointments..." />
-      ) : (
-        <div className="mt-8 grid gap-8 lg:grid-cols-2">
-          <div>
-            <h2 className="text-lg font-bold text-theme-heading font-heading mb-4">Available Dentists</h2>
-            <div className="space-y-4">
-              {dentists.map((dentist, i) => (
-                <motion.div
-                  key={dentist._id}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                >
-                  <DentistBookingCard
-                    dentist={dentist}
-                    allAppointments={appointments}
-                    onBookSuccess={(msg) => {
-                      setMessage(msg);
-                      loadData();
-                    }}
-                  />
-                </motion.div>
-              ))}
-              {dentists.length === 0 && (
-                <div className="card text-center py-12 text-theme-muted border border-theme-border/30 bg-theme-surface/30">
-                  <p className="text-3xl mb-2">👨‍⚕️</p>
-                  <p className="font-semibold text-theme-heading">No dentists found.</p>
-                </div>
-              )}
-            </div>
+        <LoadingAnimation message="Loading appointments..." />
+      ) : isAdmin ? (
+        /* ── ADMIN SYSTEM APPOINTMENTS VIEW ──────────────────────────────── */
+        <div className="mt-8 space-y-4">
+          <div className="flex items-center justify-between border-b border-theme-border/20 pb-3">
+            <h2 className="text-lg font-bold text-theme-heading font-heading">
+              System Appointments ({filteredAppointments.length})
+            </h2>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-400">
+              🔒 Read-Only Record View
+            </span>
           </div>
 
-          <div>
-            <h2 className="text-lg font-bold text-theme-heading font-heading mb-4">Your Appointments</h2>
+          <div className="grid gap-4">
+            {filteredAppointments.map((appt, i) => {
+              const dateStr = new Date(appt.appointmentDate).toLocaleDateString(undefined, {
+                weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
+              });
+              const patientName = appt.patientId?.name || 'Patient';
+              const patientEmail = appt.patientId?.email ? ` (${appt.patientId.email})` : '';
+              const dentistName = appt.dentistId?.name ? `Dr. ${appt.dentistId.name}` : 'Dentist';
+
+              return (
+                <motion.div
+                  key={appt._id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.03 }}
+                >
+                  <Card className="border border-theme-border/40 bg-theme-surface/50 p-5 rounded-2xl">
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold uppercase tracking-wider text-theme-accent">Patient Appointment</span>
+                        </div>
+                        <h3 className="font-bold text-theme-heading text-lg mt-1">
+                          Patient: <span className="text-theme-text font-semibold">{patientName}</span>
+                          <span className="text-xs text-theme-muted font-normal">{patientEmail}</span>
+                        </h3>
+                        <p className="text-sm font-semibold text-theme-accent mt-0.5">
+                          Dentist: {dentistName} {appt.dentistId?.specialization && `· ${appt.dentistId.specialization}`}
+                        </p>
+                      </div>
+
+                      <span className={`rounded-full border px-3 py-1 text-xs font-bold capitalize ${statusColors[appt.status] || ''}`}>
+                        {appt.status}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 flex flex-wrap gap-4 text-xs text-theme-muted pt-2.5 border-t border-theme-border/10">
+                      <span>📅 Date: <strong className="text-theme-text">{dateStr}</strong></span>
+                      <span>⏰ Time: <strong className="text-theme-text">{appt.appointmentTime}</strong></span>
+                      {appt.meetingLink && appt.status !== 'cancelled' && (
+                        <span className="text-theme-muted flex items-center gap-1 font-medium">
+                          <span>🎥</span> Video Room Configured
+                        </span>
+                      )}
+                    </div>
+
+                    {appt.notes && (
+                      <p className="mt-2 text-xs text-theme-text italic bg-theme-surface/40 p-2.5 rounded-xl border border-theme-border/20">
+                        <strong>Notes:</strong> {appt.notes}
+                      </p>
+                    )}
+                  </Card>
+                </motion.div>
+              );
+            })}
+
+            {filteredAppointments.length === 0 && (
+              <Card hover={false}>
+                <div className="text-center py-10 text-theme-muted">
+                  <p className="text-4xl mb-2">📅</p>
+                  <p className="font-semibold text-theme-heading text-base">No system appointments found.</p>
+                  <p className="text-xs mt-1">No appointment records match your search criteria.</p>
+                </div>
+              </Card>
+            )}
+          </div>
+        </div>
+      ) : (
+        /* ── PATIENT & DENTIST VIEW ───────────────────────────────────────── */
+        <div className="mt-8 grid gap-8 lg:grid-cols-2">
+          {!isDentist && (
+            <div>
+              <h2 className="text-lg font-bold text-theme-heading font-heading mb-4">Available Dentists</h2>
+              <div className="space-y-4">
+                {dentists.map((dentist, i) => (
+                  <motion.div
+                    key={dentist._id}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <DentistBookingCard
+                      dentist={dentist}
+                      allAppointments={appointments}
+                      onBookSuccess={(msg) => {
+                        setMessage(msg);
+                        loadData();
+                      }}
+                    />
+                  </motion.div>
+                ))}
+                {dentists.length === 0 && (
+                  <div className="card text-center py-12 text-theme-muted border border-theme-border/30 bg-theme-surface/30">
+                    <p className="text-3xl mb-2">👨‍⚕️</p>
+                    <p className="font-semibold text-theme-heading">No dentists found.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className={isDentist ? 'lg:col-span-2' : ''}>
+            <h2 className="text-lg font-bold text-theme-heading font-heading mb-4">
+              {isDentist ? 'My Consultations' : 'My Appointments'}
+            </h2>
             <div className="space-y-4">
               {appointments.map((appt, i) => {
                 const dateStr = new Date(appt.appointmentDate).toLocaleDateString(undefined, {
@@ -346,7 +453,11 @@ export default function Consultation() {
                   >
                     <Card>
                       <div className="flex items-center justify-between">
-                        <h3 className="font-bold text-theme-heading text-base">{appt.dentistId?.name || 'Dentist'}</h3>
+                        <h3 className="font-bold text-theme-heading text-base">
+                          {isDentist
+                            ? `Patient: ${appt.patientId?.name || 'Patient'}`
+                            : appt.dentistId?.name || 'Dentist'}
+                        </h3>
                         <span className={`rounded-full border px-2.5 py-0.5 text-xs font-bold capitalize ${statusColors[appt.status] || ''}`}>
                           {appt.status}
                         </span>
@@ -380,7 +491,9 @@ export default function Consultation() {
                   <div className="text-center py-8 text-theme-muted">
                     <p className="text-3xl mb-2">📅</p>
                     <p className="font-semibold text-theme-heading text-base">No appointments yet.</p>
-                    <p className="text-xs mt-1">Book a consultation with an available dentist!</p>
+                    <p className="text-xs mt-1">
+                      {isDentist ? 'Patient bookings will appear here.' : 'Book a consultation with an available dentist!'}
+                    </p>
                   </div>
                 </Card>
               )}
