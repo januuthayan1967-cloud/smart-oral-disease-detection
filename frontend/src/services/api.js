@@ -217,6 +217,7 @@ export const notificationAPI = {
 export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
   getUsers: () => api.get('/admin/users'),
+  getPatientHistory: (patientId) => api.get(`/admin/patients/${patientId}/history`),
   updateUserRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),
   deleteUser: (id) => api.delete(`/admin/users/${id}`),
   getPharmacyApplications: (params) => api.get('/admin/pharmacy-applications', { params }),

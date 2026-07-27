@@ -18,6 +18,7 @@ import {
   getPendingPharmacyUsers,
   approvePharmacyUser,
   rejectPharmacyUser,
+  getPatientHistory,
 } from '../controllers/adminController.js';
 import { protect, authorize } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
@@ -30,6 +31,7 @@ router.use(protect, authorize('admin'));
 
 router.get('/dashboard', asyncHandler(getDashboard));
 router.get('/users', asyncHandler(getUsers));
+router.get('/patients/:patientId/history', asyncHandler(getPatientHistory));
 router.put('/users/:id/role', asyncHandler(updateUserRole));
 router.delete('/users/:id', asyncHandler(deleteUser));
 

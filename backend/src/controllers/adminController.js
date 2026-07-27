@@ -365,6 +365,30 @@ export const rejectPharmacyUser = async (req, res) => {
   }
 
   res.json({ success: true, message: 'Pharmacy user rejected.', data: pharmacyUser });
+export const getPatientHistory = async (req, res) => {
+  const { patientId } = req.params;
+  const patient = await User.findById(patientId).select('name email phone age gender role createdAt');
+  if (!patient) {
+    throw new AppError('Patient user not found.', 404);
+  }
+
+  const [predictions, appointments, prescriptions] = await Promise.all([
+    Prediction.find({ userId: patientId }).sort({ createdAt: -1 }),
+    Appointment.find({ patientId }).sort({ appointmentDate: -1 }).populate('dentistId', 'name specialization qualification'),
+    Prescription.find({ patientId }).sort({ createdAt: -1 }).populate('dentistId', 'name specialization'),
+  ]);
+
+  res.json({
+    success: true,
+    data: {
+      patient,
+      predictions,
+      aiPredictions: predictions,
+      appointments,
+      consultations: appointments,
+      prescriptions,
+    },
+  });
 };
 
 export default {
@@ -386,4 +410,5 @@ export default {
   getPendingPharmacyUsers,
   approvePharmacyUser,
   rejectPharmacyUser,
+  getPatientHistory,
 };

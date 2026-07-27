@@ -4,7 +4,8 @@ import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, T
 import { Doughnut, Bar } from 'react-chartjs-2';
 import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { adminAPI } from '../services/api';
+import SeverityBadge from '../components/SeverityBadge';
+import { adminAPI, predictionAPI, reportAPI } from '../services/api';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -47,9 +48,63 @@ export default function AdminDashboard() {
   const [pharmacies, setPharmacies] = useState([]);
   const [dentists, setDentists] = useState([]);
   const [pendingDentists, setPendingDentists] = useState([]);
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [patientHistory, setPatientHistory] = useState(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState(null);
   const [dentistForm, setDentistForm] = useState({
     name: '', email: '', password: '', qualification: '', specialization: '', experience: '', contact: '', professionalLicenseNumber: '',
   });
+
+  const viewPatientHistory = async (patientId) => {
+    setSelectedPatient(patientId);
+    setHistoryLoading(true);
+    setHistoryError(null);
+    setPatientHistory(null);
+    try {
+      const { data: res } = await adminAPI.getPatientHistory(patientId);
+      setPatientHistory(res.data);
+    } catch (err) {
+      setHistoryError(err.response?.data?.message || 'Unable to load patient history.');
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  const clearSelectedPatient = () => {
+    setSelectedPatient(null);
+    setPatientHistory(null);
+    setHistoryError(null);
+  };
+
+  const handleDownloadReport = async (p) => {
+    setDownloadingId(p._id);
+    try {
+      let blobData;
+      try {
+        const response = await predictionAPI.downloadReport(p._id);
+        blobData = response.data;
+      } catch {
+        const response = await reportAPI.download(p.reportId || p._id);
+        blobData = response.data;
+      }
+      const url = window.URL.createObjectURL(new Blob([blobData], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `patient-prediction-report-${p._id}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(url), 150);
+    } catch (err) {
+      console.error('Failed to download report:', err);
+      alert('Failed to download PDF report. Please try again later.');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   const loadDashboard = () => {
     adminAPI.getDashboard()
@@ -381,33 +436,320 @@ export default function AdminDashboard() {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -15 }}
-            className="mt-6 space-y-3"
+            className="mt-6 space-y-6"
           >
-            {users.map((u, i) => (
-              <motion.div
-                key={u._id}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.03 }}
-                className="card flex items-center justify-between border border-theme-border/40 bg-theme-surface/50 p-4 hover:border-theme-accent/25 transition duration-150"
-              >
-                <div>
-                  <p className="font-bold text-theme-heading text-base">{u.name}</p>
-                  <p className="text-xs text-theme-muted mt-0.5">{u.email}</p>
+            {selectedPatient ? (
+              <div className="space-y-6">
+                <div className="flex flex-wrap items-center justify-between gap-4 border-b border-theme-border/30 pb-4">
+                  <button
+                    onClick={clearSelectedPatient}
+                    className="inline-flex items-center gap-2 text-sm font-bold text-theme-accent hover:underline"
+                  >
+                    <span>←</span> Back to Users List
+                  </button>
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/10 px-3 py-1 text-xs font-semibold text-amber-400">
+                    <span>🔒</span> Read-Only Admin Patient History
+                  </span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span className="rounded-full border border-theme-border/50 bg-theme-surface/60 px-3 py-1 text-xs capitalize font-bold text-theme-accent">{u.role}</span>
-                  {u.role !== 'admin' && (
+
+                {historyLoading ? (
+                  <LoadingSpinner />
+                ) : historyError ? (
+                  <div className="card border border-red-500/30 bg-red-500/10 p-6 text-center text-red-400">
+                    <p className="font-bold text-base">⚠️ {historyError}</p>
                     <button
-                      onClick={() => handleDeleteUser(u._id)}
-                      className="text-xs font-semibold text-red-400 hover:text-red-300 hover:underline transition"
+                      onClick={() => viewPatientHistory(selectedPatient)}
+                      className="mt-4 btn-primary text-xs py-2 px-4"
                     >
-                      Delete User
+                      Retry Loading
                     </button>
-                  )}
-                </div>
-              </motion.div>
-            ))}
+                  </div>
+                ) : patientHistory ? (
+                  <div className="space-y-8">
+                    {/* Patient Info Header */}
+                    <div className="card border border-theme-border/50 bg-theme-surface/40 p-5 rounded-2xl">
+                      <div className="flex flex-wrap items-center justify-between gap-4">
+                        <div>
+                          <h2 className="text-xl font-bold text-theme-heading font-heading">
+                            {patientHistory.patient?.name || 'Patient Details'}
+                          </h2>
+                          <p className="text-xs text-theme-muted mt-1">
+                            Email: <span className="text-theme-text font-medium">{patientHistory.patient?.email}</span>
+                            {patientHistory.patient?.phone && (
+                              <span> · Phone: <span className="text-theme-text font-medium">{patientHistory.patient.phone}</span></span>
+                            )}
+                            {patientHistory.patient?.gender && (
+                              <span> · Gender: <span className="text-theme-text font-medium">{patientHistory.patient.gender}</span></span>
+                            )}
+                            {patientHistory.patient?.age && (
+                              <span> · Age: <span className="text-theme-text font-medium">{patientHistory.patient.age}</span></span>
+                            )}
+                          </p>
+                        </div>
+                        <span className="rounded-full border border-theme-border/50 bg-theme-surface/60 px-3.5 py-1 text-xs capitalize font-bold text-theme-accent">
+                          Role: {patientHistory.patient?.role || 'user'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 🧠 Section 1: AI Predictions */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between border-b border-theme-border/20 pb-2">
+                        <h3 className="text-lg font-bold text-theme-heading flex items-center gap-2">
+                          <span>🧠</span> AI Predictions ({patientHistory.predictions?.length || patientHistory.aiPredictions?.length || 0})
+                        </h3>
+                      </div>
+
+                      {(!patientHistory.predictions?.length && !patientHistory.aiPredictions?.length) ? (
+                        <div className="card border border-theme-border/30 bg-theme-surface/20 p-6 text-center text-theme-muted rounded-2xl">
+                          <p className="text-3xl mb-1">📋</p>
+                          <p className="text-sm font-semibold">No AI prediction history recorded for this patient.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {(patientHistory.predictions || patientHistory.aiPredictions || []).map((p) => {
+                            const riskLevel = p.riskLevel || (p.confidence >= 80 ? 'HIGH' : p.confidence >= 60 ? 'MEDIUM' : 'LOW');
+                            const displayName = p.displayName || p.diseaseName || 'Oral Condition';
+
+                            return (
+                              <div
+                                key={p._id}
+                                className="card flex flex-col gap-4 md:flex-row md:items-center p-5 border border-theme-border/40 bg-theme-surface/40 hover:border-theme-accent/25 transition duration-150 rounded-2xl"
+                              >
+                                {p.imageUrl && (
+                                  <img
+                                    src={p.imageUrl}
+                                    alt="Oral scan"
+                                    className="h-24 w-24 rounded-xl object-cover border border-theme-border/40 shrink-0"
+                                    onError={(e) => { e.target.style.display = 'none'; }}
+                                  />
+                                )}
+                                <div className="flex-1 min-w-0 space-y-1.5">
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <h4 className="font-bold text-base text-theme-heading">{displayName}</h4>
+                                    <SeverityBadge severity={riskLevel === 'HIGH' ? 'High' : riskLevel === 'MEDIUM' ? 'Moderate' : 'Low'} />
+                                    <span
+                                      className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                                        riskLevel === 'HIGH'
+                                          ? 'bg-red-500/20 text-red-400 border border-red-500/40'
+                                          : riskLevel === 'MEDIUM'
+                                          ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                                          : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                                      }`}
+                                    >
+                                      Risk: {riskLevel}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-theme-muted">
+                                    Confidence: <strong className="text-theme-text">{(p.confidence || 0).toFixed(1)}%</strong> · {new Date(p.createdAt).toLocaleString()}
+                                  </p>
+                                  {p.riskReason && (
+                                    <p className="text-xs text-amber-400 font-medium">
+                                      ⚠️ {p.riskReason}
+                                    </p>
+                                  )}
+                                  <p className="text-xs text-theme-text leading-relaxed">{p.recommendation || p.description}</p>
+                                </div>
+
+                                <div className="flex shrink-0">
+                                  <button
+                                    disabled={downloadingId === p._id}
+                                    onClick={() => handleDownloadReport(p)}
+                                    className="rounded-xl border border-theme-border/50 bg-theme-surface/80 px-3.5 py-2 text-xs font-bold text-theme-accent hover:border-theme-accent hover:bg-theme-accent/10 transition disabled:opacity-50"
+                                  >
+                                    {downloadingId === p._id ? 'Generating PDF...' : '📄 Download PDF'}
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 📅 Section 2: Consultations */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between border-b border-theme-border/20 pb-2">
+                        <h3 className="text-lg font-bold text-theme-heading flex items-center gap-2">
+                          <span>📅</span> Consultations ({patientHistory.consultations?.length || patientHistory.appointments?.length || 0})
+                        </h3>
+                      </div>
+
+                      {(!patientHistory.consultations?.length && !patientHistory.appointments?.length) ? (
+                        <div className="card border border-theme-border/30 bg-theme-surface/20 p-6 text-center text-theme-muted rounded-2xl">
+                          <p className="text-3xl mb-1">👨‍⚕️</p>
+                          <p className="text-sm font-semibold">No consultation history recorded for this patient.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {(patientHistory.consultations || patientHistory.appointments || []).map((c) => {
+                            const statusColors = {
+                              completed: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
+                              confirmed: 'bg-sky-500/15 text-sky-400 border-sky-500/30',
+                              pending: 'bg-amber-500/15 text-amber-400 border-amber-500/30',
+                              cancelled: 'bg-red-500/15 text-red-400 border-red-500/30',
+                            };
+
+                            return (
+                              <div
+                                key={c._id}
+                                className="card border border-theme-border/40 bg-theme-surface/40 p-4 rounded-2xl space-y-2"
+                              >
+                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                  <div>
+                                    <p className="font-bold text-theme-heading text-sm">
+                                      Dr. {c.dentistId?.name || 'Assigned Dentist'}
+                                    </p>
+                                    <p className="text-xs text-theme-muted">
+                                      {c.dentistId?.specialization || 'General Dentistry'}
+                                      {c.dentistId?.qualification && ` · ${c.dentistId.qualification}`}
+                                    </p>
+                                  </div>
+                                  <span
+                                    className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${
+                                      statusColors[c.status] || 'bg-theme-surface text-theme-muted border-theme-border/40'
+                                    }`}
+                                  >
+                                    {c.status}
+                                  </span>
+                                </div>
+                                <div className="text-xs text-theme-muted flex flex-wrap gap-4 pt-1 border-t border-theme-border/10">
+                                  <span>📅 Date: <strong className="text-theme-text">{c.appointmentDate ? new Date(c.appointmentDate).toLocaleDateString() : 'N/A'}</strong></span>
+                                  <span>⏰ Time: <strong className="text-theme-text">{c.appointmentTime || 'N/A'}</strong></span>
+                                </div>
+                                {c.notes && (
+                                  <p className="text-xs text-theme-text bg-theme-surface/50 p-2.5 rounded-xl border border-theme-border/20 mt-1">
+                                    <strong>Notes:</strong> {c.notes}
+                                  </p>
+                                )}
+                                {(c.meetingUrl || c.videoUrl) && (
+                                  <a
+                                    href={c.meetingUrl || c.videoUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 text-xs font-semibold text-theme-accent hover:underline pt-1"
+                                  >
+                                    <span>🔗</span> Video Meeting Info Link
+                                  </a>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* 💊 Section 3: Prescriptions */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between border-b border-theme-border/20 pb-2">
+                        <h3 className="text-lg font-bold text-theme-heading flex items-center gap-2">
+                          <span>💊</span> Prescriptions ({patientHistory.prescriptions?.length || 0})
+                        </h3>
+                      </div>
+
+                      {!patientHistory.prescriptions?.length ? (
+                        <div className="card border border-theme-border/30 bg-theme-surface/20 p-6 text-center text-theme-muted rounded-2xl">
+                          <p className="text-3xl mb-1">📝</p>
+                          <p className="text-sm font-semibold">No prescription history recorded for this patient.</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {patientHistory.prescriptions.map((rx) => {
+                            const caseDiag = rx.caseDiagnosis === 'Other' && rx.customCaseDiagnosis
+                              ? rx.customCaseDiagnosis
+                              : rx.caseDiagnosis || 'Not specified';
+
+                            return (
+                              <div
+                                key={rx._id}
+                                className="card border border-theme-border/40 bg-theme-surface/40 p-5 rounded-2xl space-y-3"
+                              >
+                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                  <div>
+                                    <p className="font-bold text-theme-heading text-sm">
+                                      Diagnosis: <span className="text-theme-accent font-semibold">{caseDiag}</span>
+                                    </p>
+                                    <p className="text-xs text-theme-muted mt-0.5">
+                                      Prescribed by Dr. {rx.dentistId?.name || 'Dentist'} · {new Date(rx.createdAt).toLocaleDateString()}
+                                    </p>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span
+                                      className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border ${
+                                        rx.paymentStatus === 'paid'
+                                          ? 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30'
+                                          : 'bg-amber-500/15 text-amber-400 border-amber-500/30'
+                                      }`}
+                                    >
+                                      Fee: LKR {rx.prescriptionFee || 500} ({rx.paymentStatus || 'pending'})
+                                    </span>
+                                  </div>
+                                </div>
+
+                                {rx.medicines?.length > 0 && (
+                                  <div className="border-t border-theme-border/10 pt-2.5 space-y-2">
+                                    <p className="text-xs font-bold text-theme-heading uppercase tracking-wider">Prescribed Medicines:</p>
+                                    <div className="grid gap-2 sm:grid-cols-2">
+                                      {rx.medicines.map((m, idx) => (
+                                        <div
+                                          key={idx}
+                                          className="rounded-xl border border-theme-border/30 bg-theme-surface/50 p-2.5 text-xs space-y-0.5"
+                                        >
+                                          <p className="font-bold text-theme-heading text-xs">💊 {m.medicineName}</p>
+                                          <p className="text-theme-muted text-[11px]">Dosage: {m.dosage} · Duration: {m.duration}</p>
+                                          {m.quantity && <p className="text-theme-muted text-[11px]">Qty: {m.quantity}</p>}
+                                          {m.instructions && <p className="text-theme-text text-[11px] italic mt-1">"{m.instructions}"</p>}
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {users.map((u, i) => (
+                  <motion.div
+                    key={u._id}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.03 }}
+                    className="card flex flex-wrap items-center justify-between gap-3 border border-theme-border/40 bg-theme-surface/50 p-4 hover:border-theme-accent/25 transition duration-150"
+                  >
+                    <div>
+                      <p className="font-bold text-theme-heading text-base">{u.name}</p>
+                      <p className="text-xs text-theme-muted mt-0.5">{u.email}</p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="rounded-full border border-theme-border/50 bg-theme-surface/60 px-3 py-1 text-xs capitalize font-bold text-theme-accent">
+                        {u.role}
+                      </span>
+                      <button
+                        onClick={() => viewPatientHistory(u._id)}
+                        className="rounded-xl border border-theme-accent/40 bg-theme-accent/15 px-3 py-1.5 text-xs font-bold text-theme-accent hover:bg-theme-accent/25 transition"
+                      >
+                        👁️ View Patient History
+                      </button>
+                      {u.role !== 'admin' && (
+                        <button
+                          onClick={() => handleDeleteUser(u._id)}
+                          className="text-xs font-semibold text-red-400 hover:text-red-300 hover:underline transition ml-1"
+                        >
+                          Delete User
+                        </button>
+                      )}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </motion.div>
         )}
 
