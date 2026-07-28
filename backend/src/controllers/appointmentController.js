@@ -56,6 +56,38 @@ export const createAppointment = async (req, res) => {
     );
   }
 
+  // Past Time Validation for Today's Date
+  const now = new Date();
+  const todayYear = now.getFullYear();
+  const todayMonth = String(now.getMonth() + 1).padStart(2, '0');
+  const todayDay = String(now.getDate()).padStart(2, '0');
+  const todayStr = `${todayYear}-${todayMonth}-${todayDay}`;
+
+  const reqDateStr = typeof appointmentDate === 'string'
+    ? appointmentDate.split('T')[0]
+    : `${new Date(appointmentDate).getFullYear()}-${String(new Date(appointmentDate).getMonth() + 1).padStart(2, '0')}-${String(new Date(appointmentDate).getDate()).padStart(2, '0')}`;
+
+  if (reqDateStr < todayStr) {
+    throw new AppError(
+      'The selected appointment time has already passed. Please select a future time.',
+      400
+    );
+  }
+
+  if (reqDateStr === todayStr) {
+    const [year, month, day] = reqDateStr.split('-').map(Number);
+    const hours = Math.floor(apptMins / 60);
+    const minutes = apptMins % 60;
+    const apptDateTime = new Date(year, month - 1, day, hours, minutes, 0, 0);
+
+    if (apptDateTime <= now) {
+      throw new AppError(
+        'The selected appointment time has already passed. Please select a future time.',
+        400
+      );
+    }
+  }
+
   // Double Booking Protection
   const dateStart = new Date(appointmentDate);
   dateStart.setHours(0, 0, 0, 0);

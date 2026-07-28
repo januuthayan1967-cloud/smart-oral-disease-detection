@@ -60,6 +60,27 @@ function DentistBookingCard({ dentist, allAppointments, onBookSuccess }) {
     ? generateSlots(selectedDayAvail.startTime, selectedDayAvail.endTime)
     : [];
 
+  const getTodayStr = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const isSlotPast = (slot) => {
+    if (!selectedDate) return false;
+    const todayStr = getTodayStr();
+    if (selectedDate !== todayStr) return false;
+
+    const [year, month, day] = selectedDate.split('-').map(Number);
+    const [sh, sm] = slot.split(':').map(Number);
+    const slotDateTime = new Date(year, month - 1, day, sh, sm, 0, 0);
+    const now = new Date();
+
+    return slotDateTime <= now;
+  };
+
   const isSlotBooked = (slot) => {
     if (!selectedDate) return false;
     return allAppointments.some((appt) => {
@@ -93,6 +114,10 @@ function DentistBookingCard({ dentist, allAppointments, onBookSuccess }) {
     }
     if (!selectedTime) {
       setBookingError('Please select an available time slot.');
+      return;
+    }
+    if (selectedDate === getTodayStr() && isSlotPast(selectedTime)) {
+      setBookingError('The selected appointment time has already passed. Please select a future time.');
       return;
     }
     if (isSlotBooked(selectedTime)) {
@@ -158,7 +183,7 @@ function DentistBookingCard({ dentist, allAppointments, onBookSuccess }) {
             <label className="block text-xs font-semibold text-theme-heading mb-1">Select Date</label>
             <input
               type="date"
-              min={new Date().toISOString().slice(0, 10)}
+              min={getTodayStr()}
               value={selectedDate}
               onChange={(e) => {
                 setSelectedDate(e.target.value);
@@ -185,25 +210,27 @@ function DentistBookingCard({ dentist, allAppointments, onBookSuccess }) {
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-40 overflow-y-auto p-1 border border-theme-border/20 rounded-xl bg-theme-surface/20">
                 {availableSlots.map((slot) => {
                   const booked = isSlotBooked(slot);
+                  const past = isSlotPast(slot);
+                  const isDisabled = booked || past;
                   const isSelected = selectedTime === slot;
                   return (
                     <button
                       key={slot}
                       type="button"
-                      disabled={booked}
+                      disabled={isDisabled}
                       onClick={() => {
                         setSelectedTime(slot);
                         setBookingError('');
                       }}
                       className={`rounded-lg py-1.5 px-2 text-xs font-bold transition border text-center ${
-                        booked
-                          ? 'bg-theme-surface-2/40 text-theme-muted border-theme-border/20 cursor-not-allowed line-through'
+                        isDisabled
+                          ? 'bg-theme-surface-2/40 text-theme-muted border-theme-border/20 cursor-not-allowed line-through opacity-60'
                           : isSelected
                           ? 'bg-theme-accent text-white border-theme-accent shadow-glow-sm'
                           : 'bg-theme-surface text-theme-text border-theme-border/40 hover:border-theme-accent/50'
                       }`}
                     >
-                      {slot} {booked && '(Booked)'}
+                      {slot} {booked ? '(Booked)' : past ? '(Passed)' : ''}
                     </button>
                   );
                 })}
