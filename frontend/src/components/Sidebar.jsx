@@ -59,12 +59,19 @@ const Icons = {
       <path d="M7 10l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   ),
+  Education: () => (
+    <svg viewBox="0 0 20 20" fill="none" style={{ width: 18, height: 18 }} xmlns="http://www.w3.org/2000/svg">
+      <path d="M3 4h5a3 3 0 0 1 3 3v10a2.5 2.5 0 0 0-2.5-2.5H3V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M17 4h-5a3 3 0 0 0-3 3v10a2.5 2.5 0 0 1 2.5-2.5H17V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
 };
 
 const userLinks = [
   { to: '/dashboard', label: 'Dashboard', Icon: Icons.Dashboard },
   { to: '/history', label: 'History', Icon: Icons.Patients },
   { to: '/detect', label: 'AI Detection', Icon: Icons.Detect },
+  { to: '/education', label: 'Patient Education', Icon: Icons.Education },
   { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
   { to: '/consultation', label: 'Appointments', Icon: Icons.Appointments },
   { to: '/profile', label: 'Settings', Icon: Icons.Settings },
@@ -72,6 +79,7 @@ const userLinks = [
 
 const dentistLinks = [
   { to: '/dentist', label: 'Dashboard', Icon: Icons.Dashboard },
+  { to: '/education', label: 'Patient Education', Icon: Icons.Education },
   { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
   { to: '/consultation', label: 'Appointments', Icon: Icons.Appointments },
   { to: '/profile', label: 'Settings', Icon: Icons.Settings },
@@ -87,6 +95,7 @@ const adminLinks = [
   { to: '/admin?tab=users', label: 'Patients', Icon: Icons.Patients },
   { to: '/admin?tab=appointments', label: 'Appointments', Icon: Icons.Appointments },
   { to: '/detect', label: 'AI Detection', Icon: Icons.Detect },
+  { to: '/education', label: 'Patient Education', Icon: Icons.Education },
   { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
   { to: '/profile', label: 'Settings', Icon: Icons.Settings },
 ];

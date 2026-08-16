@@ -126,8 +126,8 @@ const quickActions = [
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
       </svg>
     ),
-    title: 'Learn',
-    desc: 'Educational content and tutorials',
+    title: 'Patient Education',
+    desc: 'Clinical hygiene guides & oral health resources',
     color: 'rgba(167,139,250,0.12)'
   },
   {

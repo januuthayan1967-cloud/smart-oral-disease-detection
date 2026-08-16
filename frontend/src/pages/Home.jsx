@@ -158,9 +158,9 @@ export default function Home() {
               <Button
                 variant="secondary"
                 size="lg"
-                onClick={() => navigate(isAuthenticated ? getDashboardPath() : '/register')}
+                onClick={() => navigate(isAuthenticated ? '/education' : '/register')}
               >
-                Learn More →
+                Explore Patient Education →
               </Button>
             </div>
           </motion.div>
