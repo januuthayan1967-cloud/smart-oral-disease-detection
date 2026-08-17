@@ -19,3 +19,7 @@ ai-service/models/*.keras
 *.pyc
 .vite/
 coverage/
+
+# Local Assignment & Thesis Preparation (NEVER push to GitHub)
+my assignments/
+my assignment/
