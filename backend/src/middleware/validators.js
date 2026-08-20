@@ -21,8 +21,12 @@ export const forgotPasswordValidation = [
   body('email').isEmail().withMessage('Valid email is required'),
 ];
 
+export const verifyOtpValidation = [
+  body('email').isEmail().withMessage('Valid email is required'),
+  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
+];
+
 export const resetPasswordValidation = [
-  body('token').notEmpty().withMessage('Reset token is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 ];
 

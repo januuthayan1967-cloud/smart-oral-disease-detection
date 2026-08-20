@@ -11,6 +11,7 @@ import {
   getProfile,
   updateProfile,
   forgotPassword,
+  verifyOtp,
   resetPassword,
   verifyEmail,
 } from '../controllers/authController.js';
@@ -22,6 +23,7 @@ import {
   registerValidation,
   loginValidation,
   forgotPasswordValidation,
+  verifyOtpValidation,
   resetPasswordValidation,
   pharmacyRegisterValidation,
   dentistRegisterValidation,
@@ -43,6 +45,7 @@ router.post('/register', registerValidation, validate, asyncHandler(register));
 router.post('/login', loginValidation, validate, asyncHandler(login));
 router.post('/refresh-token', asyncHandler(refreshToken));
 router.post('/forgot-password', forgotPasswordValidation, validate, asyncHandler(forgotPassword));
+router.post('/verify-otp', verifyOtpValidation, validate, asyncHandler(verifyOtp));
 router.post('/reset-password', resetPasswordValidation, validate, asyncHandler(resetPassword));
 router.get('/verify-email', asyncHandler(verifyEmail));
 router.get('/profile', protect, asyncHandler(getProfile));

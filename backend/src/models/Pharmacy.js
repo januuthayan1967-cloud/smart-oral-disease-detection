@@ -90,6 +90,10 @@ const pharmacySchema = new mongoose.Schema(
       default: '',
     },
     inventory: [inventoryItemSchema],
+    resetPasswordToken: String,
+    resetPasswordExpires: Date,
+    resetPasswordOtp: String,
+    resetPasswordOtpExpires: Date,
     refreshToken: {
       type: String,
       select: false,

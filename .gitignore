@@ -21,5 +21,11 @@ ai-service/models/*.keras
 coverage/
 
 # Local Assignment & Thesis Preparation (NEVER push to GitHub)
-my assignments/
 my assignment/
+my assignments/
+my assignment structure/
+thesis_report.md
+*.docx
+/diagrams/
+diagrams/
+

@@ -305,45 +305,118 @@ export const updateProfile = async (req, res) => {
 
 export const forgotPassword = async (req, res) => {
   const normalizedEmail = req.body.email ? req.body.email.trim().toLowerCase() : '';
-  const user = await User.findOne({ email: normalizedEmail });
+  let account = await User.findOne({ email: normalizedEmail });
+  let accountType = 'user';
 
-  if (!user) {
-    return res.json({
-      success: true,
-      message: 'If that email exists, a reset link has been sent.',
-    });
+  if (!account) {
+    account = await Pharmacy.findOne({ email: normalizedEmail });
+    accountType = 'pharmacy';
   }
 
-  const resetToken = generateToken();
-  user.resetPasswordToken = hashToken(resetToken);
-  user.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
-  await user.save({ validateBeforeSave: false });
+  if (!account) {
+    throw new AppError('No account found with this email address.', 404);
+  }
 
-  await sendPasswordResetEmail(user, resetToken);
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedOtp = hashToken(otp);
+
+  account.resetPasswordOtp = hashedOtp;
+  account.resetPasswordOtpExpires = Date.now() + 10 * 60 * 1000;
+  await account.save({ validateBeforeSave: false });
+
+  await sendPasswordResetEmail(account, otp);
 
   res.json({
     success: true,
-    message: 'If that email exists, a reset link has been sent.',
+    message: 'An OTP verification code has been sent to your email.',
+  });
+};
+
+export const verifyOtp = async (req, res) => {
+  const normalizedEmail = req.body.email ? req.body.email.trim().toLowerCase() : '';
+  const { otp } = req.body;
+
+  if (!otp || otp.length !== 6) {
+    throw new AppError('A valid 6-digit OTP is required.', 400);
+  }
+
+  const hashedOtp = hashToken(otp);
+
+  let account = await User.findOne({
+    email: normalizedEmail,
+    resetPasswordOtp: hashedOtp,
+    resetPasswordOtpExpires: { $gt: Date.now() },
+  });
+
+  if (!account) {
+    account = await Pharmacy.findOne({
+      email: normalizedEmail,
+      resetPasswordOtp: hashedOtp,
+      resetPasswordOtpExpires: { $gt: Date.now() },
+    });
+  }
+
+  if (!account) {
+    throw new AppError('Invalid or expired OTP code.', 400);
+  }
+
+  res.json({
+    success: true,
+    message: 'OTP verified successfully.',
   });
 };
 
 export const resetPassword = async (req, res) => {
-  const hashedToken = hashToken(req.body.token);
-  const user = await User.findOne({
-    resetPasswordToken: hashedToken,
-    resetPasswordExpires: { $gt: Date.now() },
-  });
+  const normalizedEmail = req.body.email ? req.body.email.trim().toLowerCase() : '';
+  const { otp, password, token } = req.body;
 
-  if (!user) {
-    throw new AppError('Invalid or expired reset token.', 400);
+  let account;
+  let isPharmacy = false;
+
+  if (otp) {
+    const hashedOtp = hashToken(otp);
+    account = await User.findOne({
+      email: normalizedEmail,
+      resetPasswordOtp: hashedOtp,
+      resetPasswordOtpExpires: { $gt: Date.now() },
+    });
+
+    if (!account) {
+      account = await Pharmacy.findOne({
+        email: normalizedEmail,
+        resetPasswordOtp: hashedOtp,
+        resetPasswordOtpExpires: { $gt: Date.now() },
+      });
+      if (account) isPharmacy = true;
+    }
+  } else if (token) {
+    const hashedToken = hashToken(token);
+    account = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    if (!account) {
+      account = await Pharmacy.findOne({
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires: { $gt: Date.now() },
+      });
+      if (account) isPharmacy = true;
+    }
   }
 
-  user.password = req.body.password;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpires = undefined;
-  await user.save();
+  if (!account) {
+    throw new AppError('Invalid or expired reset credentials.', 400);
+  }
 
-  sendAuthResponse(user, res);
+  account.password = password;
+  account.resetPasswordOtp = undefined;
+  account.resetPasswordOtpExpires = undefined;
+  account.resetPasswordToken = undefined;
+  account.resetPasswordExpires = undefined;
+  await account.save();
+
+  sendAuthResponse(account, res, 200, isPharmacy);
 };
 
 export const verifyEmail = async (req, res) => {
@@ -377,6 +450,7 @@ export default {
   getProfile,
   updateProfile,
   forgotPassword,
+  verifyOtp,
   resetPassword,
   verifyEmail,
 };
