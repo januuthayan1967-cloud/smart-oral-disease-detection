@@ -118,6 +118,7 @@ if (isVercel) {
 }
 
 import mongoose from 'mongoose';
+import { getSmtpStatus } from './services/emailService.js';
 
 app.get('/api/health', (_req, res) => {
   res.json({
@@ -127,10 +128,7 @@ app.get('/api/health', (_req, res) => {
     dbState: mongoose.connection.readyState,
     hasMongoUri: !!process.env.MONGODB_URI,
     mongoUriLength: process.env.MONGODB_URI ? process.env.MONGODB_URI.length : 0,
-    hasSmtpUser: !!process.env.SMTP_USER,
-    hasSmtpPass: !!process.env.SMTP_PASS,
-    smtpHost: process.env.SMTP_HOST || 'smtp.gmail.com',
-    smtpPort: Number(process.env.SMTP_PORT) || 587,
+    smtp: getSmtpStatus(),
     envKeys: Object.keys(process.env).filter(k => 
       !k.toLowerCase().includes('secret') && 
       !k.toLowerCase().includes('pass') && 

@@ -1,8 +1,37 @@
 import nodemailer from 'nodemailer';
 
-const createTransporter = () => {
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
+export const getSmtpStatus = () => {
+  const rawUser = process.env.SMTP_USER || '';
+  const rawPass = process.env.SMTP_PASS || '';
+  const user = rawUser.replace(/^["']|["']$/g, '').trim();
+  const pass = rawPass.replace(/^["']|["']$/g, '').trim();
+
+  const isConfigured = Boolean(
+    user &&
+    pass &&
+    user !== 'your_email@gmail.com' &&
+    pass !== 'your_app_password'
+  );
+
+  return {
+    configured: isConfigured,
+    userLength: rawUser.length,
+    userCleanLength: user.length,
+    userMasked: user ? `${user.slice(0, 3)}***${user.includes('@') ? '@' + user.split('@')[1] : ''}` : null,
+    passLength: rawPass.length,
+    passCleanLength: pass.length,
+    isDummyUser: user === 'your_email@gmail.com',
+    isDummyPass: pass === 'your_app_password',
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: Number(process.env.SMTP_PORT) || 587,
+  };
+};
+
+export const createTransporter = () => {
+  const rawUser = process.env.SMTP_USER || '';
+  const rawPass = process.env.SMTP_PASS || '';
+  const user = rawUser.replace(/^["']|["']$/g, '').trim();
+  const pass = rawPass.replace(/^["']|["']$/g, '').trim();
 
   if (
     !user ||
@@ -21,8 +50,8 @@ const createTransporter = () => {
     port,
     secure: isSecure,
     auth: {
-      user: user.trim(),
-      pass: pass.trim(),
+      user,
+      pass,
     },
     tls: {
       rejectUnauthorized: false,

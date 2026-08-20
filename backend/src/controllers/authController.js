@@ -330,10 +330,14 @@ export const forgotPassword = async (req, res) => {
     throw new AppError(`Failed to send OTP email: ${emailResult.message || 'SMTP service error'}`, 500);
   }
 
+  if (emailResult?.mocked && (process.env.NODE_ENV === 'production' || process.env.VERCEL === '1')) {
+    throw new AppError('Email service is not configured on the production server. Please check SMTP_USER and SMTP_PASS environment variables in Vercel settings.', 500);
+  }
+
   res.json({
     success: true,
     message: emailResult?.mocked
-      ? 'An OTP verification code was generated (mock email mode enabled).'
+      ? 'An OTP verification code was generated (mock email mode enabled for local dev).'
       : 'An OTP verification code has been sent to your email.',
   });
 };
