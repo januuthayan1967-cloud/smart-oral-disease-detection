@@ -324,11 +324,17 @@ export const forgotPassword = async (req, res) => {
   account.resetPasswordOtpExpires = Date.now() + 10 * 60 * 1000;
   await account.save({ validateBeforeSave: false });
 
-  await sendPasswordResetEmail(account, otp);
+  const emailResult = await sendPasswordResetEmail(account, otp);
+
+  if (emailResult?.error) {
+    throw new AppError(`Failed to send OTP email: ${emailResult.message || 'SMTP service error'}`, 500);
+  }
 
   res.json({
     success: true,
-    message: 'An OTP verification code has been sent to your email.',
+    message: emailResult?.mocked
+      ? 'An OTP verification code was generated (mock email mode enabled).'
+      : 'An OTP verification code has been sent to your email.',
   });
 };
 

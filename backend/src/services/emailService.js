@@ -1,23 +1,35 @@
 import nodemailer from 'nodemailer';
 
 const createTransporter = () => {
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
   if (
-    !process.env.SMTP_USER ||
-    !process.env.SMTP_PASS ||
-    process.env.SMTP_USER === 'your_email@gmail.com' ||
-    process.env.SMTP_PASS === 'your_app_password'
+    !user ||
+    !pass ||
+    user === 'your_email@gmail.com' ||
+    pass === 'your_app_password'
   ) {
     return null;
   }
 
+  const port = Number(process.env.SMTP_PORT) || 587;
+  const isSecure = port === 465 || process.env.SMTP_SECURE === 'true';
+
   return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: false,
+    port,
+    secure: isSecure,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: user.trim(),
+      pass: pass.trim(),
     },
+    tls: {
+      rejectUnauthorized: false,
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
   });
 };
 
@@ -25,20 +37,21 @@ export const sendEmail = async ({ to, subject, html }) => {
   const transporter = createTransporter();
 
   if (!transporter) {
-    console.log(`[Email Mock] To: ${to} | Subject: ${subject}`);
+    console.warn(`[Email Mock] SMTP not configured. Mocking email To: ${to} | Subject: ${subject}`);
     return { mocked: true };
   }
 
   try {
-    await transporter.sendMail({
-      from: process.env.EMAIL_FROM || process.env.SMTP_USER,
+    const info = await transporter.sendMail({
+      from: process.env.EMAIL_FROM || `Oral Health AI <${process.env.SMTP_USER}>`,
       to,
       subject,
       html,
     });
-    return { sent: true };
+    console.log(`[Email Sent] Message sent to ${to} (MessageId: ${info.messageId})`);
+    return { sent: true, messageId: info.messageId };
   } catch (error) {
-    console.error(`Failed to send email to ${to}: ${error.message}`);
+    console.error(`[Email Error] Failed to send email to ${to}: ${error.message}`);
     return { error: true, message: error.message };
   }
 };

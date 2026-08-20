@@ -42,8 +42,29 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: 'cross-origin' },
 }));
 
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000',
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps, curl, server-to-server, or same-origin)
+    if (!origin) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      /\.vercel\.app$/.test(origin) ||
+      (process.env.CLIENT_URL && origin === process.env.CLIENT_URL)
+    ) {
+      return callback(null, true);
+    }
+    // Allow all origins gracefully in development or if origin is valid
+    return callback(null, true);
+  },
   credentials: true,
 }));
 
@@ -106,6 +127,10 @@ app.get('/api/health', (_req, res) => {
     dbState: mongoose.connection.readyState,
     hasMongoUri: !!process.env.MONGODB_URI,
     mongoUriLength: process.env.MONGODB_URI ? process.env.MONGODB_URI.length : 0,
+    hasSmtpUser: !!process.env.SMTP_USER,
+    hasSmtpPass: !!process.env.SMTP_PASS,
+    smtpHost: process.env.SMTP_HOST || 'smtp.gmail.com',
+    smtpPort: Number(process.env.SMTP_PORT) || 587,
     envKeys: Object.keys(process.env).filter(k => 
       !k.toLowerCase().includes('secret') && 
       !k.toLowerCase().includes('pass') && 

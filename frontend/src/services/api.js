@@ -1,11 +1,28 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const getBaseApiUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  // If running in production or on a deployed domain (like Vercel), fallback to relative /api if envUrl points to localhost
+  if (
+    import.meta.env.PROD ||
+    (typeof window !== 'undefined' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1')
+  ) {
+    if (envUrl && !envUrl.includes('localhost') && !envUrl.includes('127.0.0.1')) {
+      return envUrl;
+    }
+    return '/api';
+  }
+  return envUrl || '/api';
+};
+
+export const API_URL = getBaseApiUrl();
 
 export const getApiErrorMessage = (err, fallback) => {
   if (err.response?.data?.message) return err.response.data.message;
   if (!err.response) {
-    return 'Cannot reach the server. Start the backend with "npm run dev" in the backend folder (port 5000).';
+    return 'Cannot reach the server. Please check your network connection or verify the backend is running.';
   }
   return fallback;
 };
