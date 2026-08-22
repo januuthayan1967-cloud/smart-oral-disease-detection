@@ -5,6 +5,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import Input from '../components/Input';
 import { cartAPI, directOrderAPI, paymentAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { getImageUrl } from '../utils/imageUrl';
 
 // ──────────────────────────────────────────────────────────────
 // Reusable Card Payment Form
@@ -336,7 +337,7 @@ export default function Cart() {
                       <div className="flex items-center gap-4">
                         <div className="h-16 w-16 shrink-0 rounded-lg overflow-hidden border border-theme-border/30 bg-theme-background">
                           <img
-                            src={item.image ? `${import.meta.env.VITE_API_URL || ''}${item.image}` : 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100'}
+                            src={getImageUrl(item.image, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100')}
                             alt={item.medicineName}
                             className="h-full w-full object-cover"
                             onError={(e) => {

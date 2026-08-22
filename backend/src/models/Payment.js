@@ -14,7 +14,7 @@ const paymentSchema = new mongoose.Schema(
     },
     orderType: {
       type: String,
-      enum: ['pharmacy_order', 'prescription'],
+      enum: ['pharmacy_order', 'prescription', 'medicine_order'],
       required: true,
     },
     amount: {

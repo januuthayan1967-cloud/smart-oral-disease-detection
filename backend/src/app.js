@@ -109,12 +109,20 @@ if (isVercel) {
   app.use('/uploads', express.static('/tmp/uploads'));
   app.use('/uploads/medicines', express.static('/tmp/uploads/medicines'));
   app.use('/uploads/pharmacy', express.static('/tmp/uploads/pharmacy'));
+  app.use('/api/uploads', express.static('/tmp/uploads'));
+  app.use('/api/uploads/medicines', express.static('/tmp/uploads/medicines'));
+  app.use('/api/uploads/pharmacy', express.static('/tmp/uploads/pharmacy'));
   app.use('/reports', express.static('/tmp/reports'));
+  app.use('/api/reports', express.static('/tmp/reports'));
 } else {
   app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
   app.use('/uploads/medicines', express.static(path.join(__dirname, 'uploads/medicines')));
   app.use('/uploads/pharmacy', express.static(path.join(__dirname, 'uploads/pharmacy')));
+  app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
+  app.use('/api/uploads/medicines', express.static(path.join(__dirname, 'uploads/medicines')));
+  app.use('/api/uploads/pharmacy', express.static(path.join(__dirname, 'uploads/pharmacy')));
   app.use('/reports', express.static(path.join(__dirname, 'reports')));
+  app.use('/api/reports', express.static(path.join(__dirname, 'reports')));
 }
 
 import mongoose from 'mongoose';

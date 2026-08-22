@@ -41,6 +41,7 @@ export default function PharmacyDashboard() {
   const [directOrders, setDirectOrders] = useState([]);
   const [directOrdersFilter, setDirectOrdersFilter] = useState('All');
   const [directOrdersSearch, setDirectOrdersSearch] = useState('');
+  const [ordersPaymentsTypeFilter, setOrdersPaymentsTypeFilter] = useState('All');
 
   // Inventory (new)
   const [inventory, setInventory] = useState([]);
@@ -100,6 +101,16 @@ export default function PharmacyDashboard() {
   const handlePrescriptionStatusUpdate = async (id, status) => {
     await pharmacyAPI.updateOrderStatus(id, { status });
     loadData();
+  };
+
+  const handleUpdatePrescriptionPaymentStatus = async (id, paymentStatus) => {
+    if (!window.confirm(`Mark this prescription order as ${paymentStatus === 'paid' ? 'Paid' : paymentStatus}?`)) return;
+    try {
+      await pharmacyAPI.updatePrescriptionOrderPaymentStatus(id, paymentStatus);
+      loadData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update payment status.');
+    }
   };
 
   // ─── Direct Orders handlers (new) ──────────────────────────────────────────
@@ -175,8 +186,15 @@ export default function PharmacyDashboard() {
     return matchesSearch && matchesCategory;
   });
 
-  // Extract unique categories from inventory
-  const inventoryCategories = ['All', ...new Set(inventory.map((item) => item.category || 'General'))];
+  // Extract unique categories from inventory merged with all standard categories (Fix BUG 3)
+  const STANDARD_CATEGORIES = [
+    'General', 'Antibiotics', 'Pain Relief', 'Antiseptic', 'Anti-inflammatory',
+    'Vitamins & Supplements', 'Dental', 'Antifungal', 'Prescription', 'Other',
+  ];
+  const inventoryCategories = [
+    'All',
+    ...new Set([...STANDARD_CATEGORIES, ...inventory.map((item) => item.category).filter(Boolean)]),
+  ];
 
   const tabs = [
     { id: 'direct-orders', label: 'Marketplace Orders', count: directOrders.filter((o) => o.status === 'pending').length },
@@ -392,7 +410,7 @@ export default function PharmacyDashboard() {
           </motion.div>
         )}
 
-        {/* ─── NEW PAGE: Orders & Payments (COD / Card status management) ───────── */}
+        {/* ─── Orders & Payments (COD / Card status management for all orders) ─── */}
         {activeTab === 'orders-payments' && (
           <motion.div
             key="orders-payments"
@@ -401,13 +419,47 @@ export default function PharmacyDashboard() {
             exit={{ opacity: 0, y: -15 }}
             className="mt-6 space-y-4"
           >
+            {/* Filter Pills */}
+            <div className="flex flex-wrap gap-2 items-center justify-between card p-3 border border-theme-border/40 bg-theme-surface/40">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-theme-muted uppercase tracking-wider">Filter By Type:</span>
+                {['All', 'Marketplace', 'Prescription'].map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setOrdersPaymentsTypeFilter(type)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                      ordersPaymentsTypeFilter === type
+                        ? 'bg-theme-accent text-theme-primary font-bold shadow-glow-sm'
+                        : 'bg-theme-surface/50 text-theme-muted hover:bg-theme-surface hover:text-theme-text border border-theme-border/20'
+                    }`}
+                  >
+                    {type} Orders
+                  </button>
+                ))}
+              </div>
+              <span className="text-xs text-theme-muted">
+                Showing {
+                  [
+                    ...directOrders.map((o) => ({ ...o, isDirect: true })),
+                    ...prescriptionOrders.map((o) => ({ ...o, isDirect: false })),
+                  ].filter((o) => {
+                    if (ordersPaymentsTypeFilter === 'Marketplace') return o.isDirect;
+                    if (ordersPaymentsTypeFilter === 'Prescription') return !o.isDirect;
+                    return true;
+                  }).length
+                } orders
+              </span>
+            </div>
+
             <div className="overflow-x-auto rounded-2xl border border-theme-border/40 bg-theme-surface/30 shadow-theme">
               <table className="w-full border-collapse text-left text-sm text-theme-text font-normal">
                 <thead>
                   <tr className="border-b border-theme-border/40 bg-theme-surface/50 text-xs font-bold uppercase tracking-wider text-theme-muted">
                     <th className="px-6 py-4">Customer Name</th>
+                    <th className="px-6 py-4">Type</th>
                     <th className="px-6 py-4">Order ID</th>
-                    <th className="px-6 py-4">Ordered Products</th>
+                    <th className="px-6 py-4">Ordered Products / Rx</th>
                     <th className="px-6 py-4">Payment Method</th>
                     <th className="px-6 py-4">Payment Status</th>
                     <th className="px-6 py-4">Order Status</th>
@@ -416,66 +468,109 @@ export default function PharmacyDashboard() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-theme-border/20">
-                  {directOrders.map((order) => (
-                    <tr key={order._id} className="hover:bg-theme-surface/20 transition duration-150">
-                      <td className="px-6 py-4 font-semibold text-theme-heading">
-                        {order.customerName}
-                      </td>
-                      <td className="px-6 py-4 font-mono text-xs text-theme-muted font-semibold">
-                        #{order._id.slice(-8)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="max-w-xs truncate font-medium" title={order.items?.map(item => `${item.medicineName} (${item.quantity})`).join(', ')}>
-                          {order.items?.map(item => `${item.medicineName} (${item.quantity})`).join(', ') || 'N/A'}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 font-bold uppercase text-xs">
-                        {order.paymentMethod === 'card' ? '💳 Card' : '💵 COD'}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span
-                          className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
-                            order.paymentStatus === 'paid'
-                              ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400'
-                              : 'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400'
-                          }`}
-                        >
-                          {order.paymentStatus === 'paid' ? '✓ Paid' : '⏳ Pending'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${STATUS_BADGES[order.status]}`}>
-                          {STATUS_LABELS[order.status]}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-theme-muted text-xs">
-                        {new Date(order.createdAt).toLocaleString()}
-                      </td>
-                      <td className="px-6 py-4">
-                        {order.paymentStatus === 'pending' && order.paymentMethod === 'cod' && (
-                          <button
-                            onClick={async () => {
-                              if (window.confirm('Mark this COD order as Paid?')) {
-                                try {
-                                  await pharmacyAPI.updateDirectOrderPaymentStatus(order._id, 'paid');
-                                  loadData();
-                                } catch (err) {
-                                  alert(err.response?.data?.message || 'Failed to update payment status.');
-                                }
-                              }
-                            }}
-                            className="rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 text-xs font-bold transition cursor-pointer"
+                  {[
+                    ...directOrders.map((o) => ({
+                      _id: o._id,
+                      customerName: o.customerName || o.userId?.name || 'Customer',
+                      orderType: 'Marketplace',
+                      itemsSummary: o.items?.map((item) => `${item.medicineName} (${item.quantity})`).join(', ') || 'N/A',
+                      paymentMethod: o.paymentMethod || 'cod',
+                      paymentStatus: o.paymentStatus || 'pending',
+                      orderStatus: o.status,
+                      createdAt: o.createdAt,
+                      isDirect: true,
+                    })),
+                    ...prescriptionOrders.map((o) => ({
+                      _id: o._id,
+                      customerName: o.userId?.name || 'Patient',
+                      orderType: 'Prescription',
+                      itemsSummary: o.prescriptionId?.medicines?.map((item) => `${item.medicineName} (${item.quantity})`).join(', ') || 'Prescription Medicines',
+                      paymentMethod: o.paymentMethod || 'cod',
+                      paymentStatus: o.paymentStatus || 'pending',
+                      orderStatus: o.status,
+                      createdAt: o.createdAt,
+                      isDirect: false,
+                    })),
+                  ]
+                    .filter((order) => {
+                      if (ordersPaymentsTypeFilter === 'Marketplace') return order.isDirect;
+                      if (ordersPaymentsTypeFilter === 'Prescription') return !order.isDirect;
+                      return true;
+                    })
+                    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                    .map((order) => (
+                      <tr key={order._id} className="hover:bg-theme-surface/20 transition duration-150">
+                        <td className="px-6 py-4 font-semibold text-theme-heading">
+                          {order.customerName}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            order.isDirect
+                              ? 'bg-blue-500/15 text-blue-500 border border-blue-500/30'
+                              : 'bg-purple-500/15 text-purple-400 border border-purple-500/30'
+                          }`}>
+                            {order.orderType}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 font-mono text-xs text-theme-muted font-semibold">
+                          #{order._id.slice(-8)}
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="max-w-xs truncate font-medium" title={order.itemsSummary}>
+                            {order.itemsSummary}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 font-bold uppercase text-xs">
+                          {order.paymentMethod === 'card' ? '💳 Card' : '💵 COD'}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
+                              order.paymentStatus === 'paid'
+                                ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400'
+                                : 'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400'
+                            }`}
                           >
-                            Mark as Paid
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                            {order.paymentStatus === 'paid' ? '✓ Paid' : '⏳ Pending'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${STATUS_BADGES[order.orderStatus]}`}>
+                            {STATUS_LABELS[order.orderStatus] || order.orderStatus}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-theme-muted text-xs">
+                          {new Date(order.createdAt).toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4">
+                          {order.paymentStatus === 'pending' && order.paymentMethod === 'cod' && (
+                            <button
+                              onClick={async () => {
+                                if (window.confirm('Mark this COD order as Paid?')) {
+                                  try {
+                                    if (order.isDirect) {
+                                      await pharmacyAPI.updateDirectOrderPaymentStatus(order._id, 'paid');
+                                    } else {
+                                      await pharmacyAPI.updatePrescriptionOrderPaymentStatus(order._id, 'paid');
+                                    }
+                                    loadData();
+                                  } catch (err) {
+                                    alert(err.response?.data?.message || 'Failed to update payment status.');
+                                  }
+                                }
+                              }}
+                              className="rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-3 py-1.5 text-xs font-bold transition cursor-pointer"
+                            >
+                              Mark as Paid
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>
-            {directOrders.length === 0 && (
+            {directOrders.length === 0 && prescriptionOrders.length === 0 && (
               <div className="text-center py-12 text-theme-muted bg-theme-surface/10 rounded-2xl border border-theme-border/20 shadow-inner">
                 <p className="text-4xl mb-2">💵</p>
                 <p className="font-semibold text-theme-heading text-lg">No orders placed yet</p>
@@ -585,6 +680,29 @@ export default function PharmacyDashboard() {
                       <div className="mt-3 text-sm space-y-1 text-theme-text bg-theme-background/30 p-3 rounded-xl border border-theme-border/20">
                         <p><span className="font-bold text-theme-heading text-xs uppercase tracking-wider block mb-1">Delivery Address</span> {order.deliveryAddress}</p>
                         <p className="mt-2"><span className="font-bold text-theme-heading text-xs uppercase tracking-wider block mb-1">Total Bill</span> <span className="text-theme-accent font-bold">Rs. {order.totalAmount?.toFixed(2) || '0.00'}</span></p>
+                        <div className="mt-2 pt-2 border-t border-theme-border/20 flex flex-wrap items-center gap-2">
+                          <span className="text-xs font-bold text-theme-heading">Payment:</span>
+                          <span className="text-xs font-semibold text-theme-text">
+                            {order.paymentMethod === 'card' ? '💳 Card (Paid Online)' : '💵 Cash on Delivery'}
+                          </span>
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold border ${
+                              order.paymentStatus === 'paid'
+                                ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400'
+                                : 'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400'
+                            }`}
+                          >
+                            {order.paymentStatus === 'paid' ? '✓ Paid' : '⏳ Payment Pending'}
+                          </span>
+                          {order.paymentStatus === 'pending' && order.paymentMethod === 'cod' && (
+                            <button
+                              onClick={() => handleUpdatePrescriptionPaymentStatus(order._id, 'paid')}
+                              className="rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 text-[10px] font-bold transition cursor-pointer"
+                            >
+                              Mark as Paid
+                            </button>
+                          )}
+                        </div>
                       </div>
                       {order.prescriptionId?.medicines && (
                         <div className="mt-4">
@@ -641,10 +759,27 @@ export default function PharmacyDashboard() {
                       <div>
                         <p className="font-bold text-theme-heading text-lg">{order.userId?.name}</p>
                         <p className="text-xs text-theme-muted mt-0.5">{order.deliveryAddress}</p>
-                        <div className="mt-3">
+                        <div className="mt-3 flex flex-wrap items-center gap-2">
                           <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold capitalize ${STATUS_BADGES[order.status]}`}>
                             {STATUS_LABELS[order.status]}
                           </span>
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
+                              order.paymentStatus === 'paid'
+                                ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400'
+                                : 'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400'
+                            }`}
+                          >
+                            {order.paymentMethod === 'card' ? '💳 Card' : '💵 COD'} · {order.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                          </span>
+                          {order.paymentStatus === 'pending' && order.paymentMethod === 'cod' && (
+                            <button
+                              onClick={() => handleUpdatePrescriptionPaymentStatus(order._id, 'paid')}
+                              className="rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 text-[10px] font-bold transition cursor-pointer"
+                            >
+                              Mark as Paid
+                            </button>
+                          )}
                         </div>
                       </div>
                       {nextStatus && (

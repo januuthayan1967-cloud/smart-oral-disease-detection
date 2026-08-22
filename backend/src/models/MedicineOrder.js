@@ -40,6 +40,21 @@ const medicineOrderSchema = new mongoose.Schema(
       type: String,
       default: '',
     },
+    paymentMethod: {
+      type: String,
+      enum: ['cod', 'card'],
+      default: 'cod',
+    },
+    paymentStatus: {
+      type: String,
+      enum: ['pending', 'paid', 'failed', 'cancelled'],
+      default: 'pending',
+    },
+    paymentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Payment',
+      default: null,
+    },
   },
   {
     timestamps: true,

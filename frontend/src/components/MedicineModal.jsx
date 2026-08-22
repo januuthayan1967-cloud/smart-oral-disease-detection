@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Modal from './Modal';
 import Input from './Input';
+import { getImageUrl } from '../utils/imageUrl';
 
 const CATEGORIES = [
   'General', 'Antibiotics', 'Pain Relief', 'Antiseptic', 'Anti-inflammatory',
@@ -33,7 +34,7 @@ export default function MedicineModal({ isOpen, onClose, onSubmit, medicine = nu
         quantity: medicine.quantity || '',
         expiryDate: medicine.expiryDate ? new Date(medicine.expiryDate).toISOString().split('T')[0] : '',
       });
-      setImagePreview(medicine.image ? `${import.meta.env.VITE_API_URL || ''}${medicine.image}` : '');
+      setImagePreview(medicine.image ? getImageUrl(medicine.image, '') : '');
       setImageFile(null);
     } else {
       setFormData({

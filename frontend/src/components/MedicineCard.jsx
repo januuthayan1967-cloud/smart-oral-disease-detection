@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { getImageUrl } from '../utils/imageUrl';
 
 export default function MedicineCard({
   medicine,
@@ -31,10 +32,8 @@ export default function MedicineCard({
     badgeColor = 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/30';
   }
 
-  // Handle fallback image
-  const imageUrl = image
-    ? (image.startsWith('http') ? image : `${import.meta.env.VITE_API_URL || ''}${image}`)
-    : 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=300&auto=format&fit=crop&q=60&ixlib=rb-4.0.3';
+  // Handle image URL resolution
+  const imageUrl = getImageUrl(image);
 
   const formattedDate = expiryDate
     ? new Date(expiryDate).toLocaleDateString('en-US', {

@@ -188,15 +188,16 @@ export const pharmacyAPI = {
   getInventory: () => api.get('/pharmacy/inventory'),
   updateInventory: (inventory) => api.put('/pharmacy/inventory', { inventory }),
   addInventoryItem: (formData) => api.post('/pharmacy/inventory', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+    headers: { 'Content-Type': undefined },
   }),
   updateInventoryItem: (itemId, formData) => api.put(`/pharmacy/inventory/${itemId}`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
+    headers: { 'Content-Type': undefined },
   }),
   deleteInventoryItem: (itemId) => api.delete(`/pharmacy/inventory/${itemId}`),
   getDirectOrders: (params) => api.get('/pharmacy/direct-orders', { params }),
   updateDirectOrderStatus: (id, status, rejectionReason) => api.patch(`/pharmacy/direct-orders/${id}/status`, { status, rejectionReason }),
   updateDirectOrderPaymentStatus: (id, paymentStatus) => api.patch(`/pharmacy/direct-orders/${id}/payment-status`, { paymentStatus }),
+  updatePrescriptionOrderPaymentStatus: (id, paymentStatus) => api.patch(`/pharmacy/orders/${id}/payment-status`, { paymentStatus }),
 };
 
 export const medicineMarketAPI = {

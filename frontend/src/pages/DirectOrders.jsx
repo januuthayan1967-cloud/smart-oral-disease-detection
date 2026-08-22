@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { directOrderAPI } from '../services/api';
+import { getImageUrl } from '../utils/imageUrl';
 
 const STATUS_BADGES = {
   pending: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/30',
@@ -213,7 +214,7 @@ export default function DirectOrders() {
                             <div className="flex items-center gap-3">
                               <div className="h-10 w-10 shrink-0 rounded overflow-hidden border border-theme-border/25 bg-theme-background">
                                 <img
-                                  src={item.image ? `${import.meta.env.VITE_API_URL || ''}${item.image}` : 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=50'}
+                                  src={getImageUrl(item.image, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=50')}
                                   alt={item.medicineName}
                                   className="h-full w-full object-cover"
                                   onError={(e) => {

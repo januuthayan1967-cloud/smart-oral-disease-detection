@@ -1,7 +1,50 @@
+import { randomUUID } from 'crypto';
 import Pharmacy from '../models/Pharmacy.js';
 import MedicineOrder from '../models/MedicineOrder.js';
 import Prescription from '../models/Prescription.js';
+import Payment from '../models/Payment.js';
+import Notification from '../models/Notification.js';
 import { AppError } from '../utils/AppError.js';
+
+/**
+ * Validate card fields from request body.
+ * Returns sanitised safe data or throws AppError.
+ */
+function validateCardInput({ cardHolderName, cardNumber, cardExpiry, cvv }) {
+  if (!cardHolderName || !cardNumber || !cardExpiry || !cvv) {
+    throw new AppError('All card fields are required: cardHolderName, cardNumber, cardExpiry, cvv.', 400);
+  }
+
+  const rawNumber = String(cardNumber).replace(/[\s\-]/g, '');
+  if (!/^\d{13,19}$/.test(rawNumber)) {
+    throw new AppError('Invalid card number. Must be 13–19 digits.', 400);
+  }
+
+  if (!/^\d{2}\/\d{2,4}$/.test(cardExpiry.trim())) {
+    throw new AppError('Invalid expiry date format. Use MM/YY.', 400);
+  }
+
+  const [mm, yy] = cardExpiry.trim().split('/');
+  const month = parseInt(mm, 10);
+  const year = parseInt(yy, 10) + (yy.length === 2 ? 2000 : 0);
+  const now = new Date();
+  const expDate = new Date(year, month - 1, 1);
+  if (month < 1 || month > 12 || expDate < new Date(now.getFullYear(), now.getMonth(), 1)) {
+    throw new AppError('Card has expired or expiry date is invalid.', 400);
+  }
+
+  if (!/^\d{3,4}$/.test(String(cvv).trim())) {
+    throw new AppError('Invalid CVV. Must be 3 or 4 digits.', 400);
+  }
+
+  const cardLastFour = rawNumber.slice(-4);
+
+  return {
+    cardHolderName: String(cardHolderName).trim(),
+    cardLastFour,
+    cardExpiry: cardExpiry.trim(),
+  };
+}
 
 const RADIUS_OPTIONS = {
   5: 5000,
@@ -62,7 +105,20 @@ export const getNearbyPharmacies = async (req, res) => {
 };
 
 export const sendPrescriptionToPharmacy = async (req, res) => {
-  const { prescriptionId, pharmacyId, deliveryAddress } = req.body;
+  const {
+    prescriptionId,
+    pharmacyId,
+    deliveryAddress,
+    paymentMethod = 'cod',
+    cardHolderName,
+    cardNumber,
+    cardExpiry,
+    cvv,
+  } = req.body;
+
+  if (!['cod', 'card'].includes(paymentMethod)) {
+    throw new AppError('Invalid payment method. Must be "cod" or "card".', 400);
+  }
 
   const prescription = await Prescription.findById(prescriptionId);
   if (!prescription) {
@@ -107,6 +163,11 @@ export const sendPrescriptionToPharmacy = async (req, res) => {
   // Save the updated pharmacy inventory
   await pharmacy.save();
 
+  let safeCard = {};
+  if (paymentMethod === 'card') {
+    safeCard = validateCardInput({ cardHolderName, cardNumber, cardExpiry, cvv });
+  }
+
   const order = await MedicineOrder.create({
     prescriptionId,
     pharmacyId,
@@ -114,12 +175,47 @@ export const sendPrescriptionToPharmacy = async (req, res) => {
     deliveryAddress,
     totalAmount,
     status: 'pending',
+    paymentMethod,
+    paymentStatus: paymentMethod === 'card' ? 'paid' : 'pending',
   });
+
+  if (paymentMethod === 'card') {
+    const payment = await Payment.create({
+      userId: req.user._id,
+      orderId: order._id,
+      orderType: 'medicine_order',
+      amount: totalAmount,
+      method: 'card',
+      status: 'paid',
+      cardHolderName: safeCard.cardHolderName || '',
+      cardLastFour: safeCard.cardLastFour || '',
+      cardExpiry: safeCard.cardExpiry || '',
+      transactionId: randomUUID(),
+      paidAt: new Date(),
+    });
+    order.paymentId = payment._id;
+    await order.save();
+  }
+
+  // Notify pharmacy about new prescription order
+  try {
+    await Notification.create({
+      recipientId: pharmacy._id,
+      recipientRole: 'pharmacy',
+      title: paymentMethod === 'card' ? 'New Prescription Order (Paid)' : 'New Prescription Order (COD)',
+      message: paymentMethod === 'card'
+        ? `New prescription order #${order._id.toString().slice(-8)} placed. Payment of Rs. ${totalAmount.toFixed(2)} received.`
+        : `New prescription order #${order._id.toString().slice(-8)} placed with Cash on Delivery.`,
+      type: 'order_placed',
+      orderId: order._id,
+    });
+  } catch (_) { /* non-critical */ }
 
   await order.populate([
     { path: 'prescriptionId', populate: { path: 'dentistId', select: 'name specialization' } },
     { path: 'pharmacyId', select: 'pharmacyName phone address city district' },
     { path: 'userId', select: 'name email phone' },
+    { path: 'paymentId' },
   ]);
 
   res.status(201).json({ success: true, data: order });
@@ -132,7 +228,8 @@ export const getOrderHistory = async (req, res) => {
       path: 'prescriptionId',
       populate: { path: 'dentistId', select: 'name specialization' },
     })
-    .populate('pharmacyId', 'pharmacyName phone address city district');
+    .populate('pharmacyId', 'pharmacyName phone address city district')
+    .populate('paymentId');
 
   res.json({ success: true, count: orders.length, data: orders });
 };
@@ -147,7 +244,8 @@ export const getOrderById = async (req, res) => {
       ],
     })
     .populate('pharmacyId', 'pharmacyName phone address city district')
-    .populate('userId', 'name email phone');
+    .populate('userId', 'name email phone')
+    .populate('paymentId');
 
   if (!order) {
     throw new AppError('Order not found.', 404);

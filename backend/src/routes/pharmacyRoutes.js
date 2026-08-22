@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   getPharmacyOrders,
   updateOrderStatus,
+  updatePrescriptionOrderPaymentStatus,
   acceptOrder,
   rejectOrder,
   getOrderHistory,
@@ -27,6 +28,7 @@ router.use(protect, authorize('pharmacy'));
 // ─── Prescription-based Orders ─────────────────────────────────────────────
 router.get('/orders', asyncHandler(getPharmacyOrders));
 router.put('/order-status/:id', asyncHandler(updateOrderStatus));
+router.patch('/orders/:id/payment-status', asyncHandler(updatePrescriptionOrderPaymentStatus));
 router.put('/orders/:id/accept', asyncHandler(acceptOrder));
 router.put('/orders/:id/reject', asyncHandler(rejectOrder));
 router.get('/orders/history', asyncHandler(getOrderHistory));

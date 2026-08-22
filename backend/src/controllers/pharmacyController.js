@@ -27,7 +27,8 @@ export const getPharmacyOrders = async (req, res) => {
       path: 'prescriptionId',
       populate: { path: 'dentistId', select: 'name specialization' },
     })
-    .populate('userId', 'name email phone');
+    .populate('userId', 'name email phone')
+    .populate('paymentId');
 
   res.json({ success: true, count: orders.length, data: orders });
 };
@@ -67,6 +68,7 @@ export const updateOrderStatus = async (req, res) => {
       populate: { path: 'dentistId', select: 'name specialization' },
     },
     { path: 'userId', select: 'name email phone' },
+    { path: 'paymentId' },
   ]);
 
   // Notify user about status change
@@ -91,6 +93,44 @@ export const updateOrderStatus = async (req, res) => {
   res.json({ success: true, data: order });
 };
 
+export const updatePrescriptionOrderPaymentStatus = async (req, res) => {
+  const { paymentStatus } = req.body;
+  const validPaymentStatuses = ['pending', 'paid', 'failed', 'cancelled'];
+
+  if (!validPaymentStatuses.includes(paymentStatus)) {
+    throw new AppError('Invalid payment status.', 400);
+  }
+
+  const order = await MedicineOrder.findById(req.params.id);
+  if (!order) throw new AppError('Order not found.', 404);
+  if (order.pharmacyId.toString() !== req.user._id.toString()) {
+    throw new AppError('Not authorized.', 403);
+  }
+
+  order.paymentStatus = paymentStatus;
+
+  if (paymentStatus === 'paid' && order.paymentId) {
+    const payment = await Payment.findById(order.paymentId);
+    if (payment) {
+      payment.status = 'paid';
+      payment.paidAt = new Date();
+      await payment.save();
+    }
+  }
+
+  await order.save();
+  await order.populate([
+    {
+      path: 'prescriptionId',
+      populate: { path: 'dentistId', select: 'name specialization' },
+    },
+    { path: 'userId', select: 'name email phone' },
+    { path: 'paymentId' },
+  ]);
+
+  res.json({ success: true, data: order });
+};
+
 export const acceptOrder = async (req, res) => {
   req.body.status = 'accepted';
   return updateOrderStatus(req, res);
@@ -108,7 +148,8 @@ export const getOrderHistory = async (req, res) => {
       path: 'prescriptionId',
       populate: { path: 'dentistId', select: 'name specialization' },
     })
-    .populate('userId', 'name email phone');
+    .populate('userId', 'name email phone')
+    .populate('paymentId');
 
   res.json({ success: true, count: orders.length, data: orders });
 };
@@ -285,6 +326,9 @@ export const addInventoryItem = async (req, res) => {
   res.status(201).json({ success: true, data: pharmacy.inventory });
 };
 
+const isVercel = process.env.VERCEL === '1';
+const medicineUploadDir = isVercel ? '/tmp/uploads/medicines' : path.join(__dirname, '../uploads/medicines');
+
 export const updateInventoryItem = async (req, res) => {
   const { itemId } = req.params;
   const pharmacy = await Pharmacy.findById(req.user._id);
@@ -304,9 +348,12 @@ export const updateInventoryItem = async (req, res) => {
   // Handle image update
   if (req.file) {
     // Delete old image if it exists on disk
-    if (item.image && item.image.startsWith('/uploads/medicines/')) {
-      const oldPath = path.join(__dirname, '..', item.image);
-      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    if (item.image && item.image.includes('/uploads/medicines/')) {
+      const oldFilename = path.basename(item.image);
+      const oldPath = path.join(medicineUploadDir, oldFilename);
+      if (fs.existsSync(oldPath)) {
+        try { fs.unlinkSync(oldPath); } catch (_) {}
+      }
     }
     item.image = `/uploads/medicines/${req.file.filename}`;
   } else if (req.body.image !== undefined) {
@@ -325,9 +372,12 @@ export const deleteInventoryItem = async (req, res) => {
   if (!item) throw new AppError('Inventory item not found.', 404);
 
   // Delete image file from disk
-  if (item.image && item.image.startsWith('/uploads/medicines/')) {
-    const imgPath = path.join(__dirname, '..', item.image);
-    if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+  if (item.image && item.image.includes('/uploads/medicines/')) {
+    const filename = path.basename(item.image);
+    const imgPath = path.join(medicineUploadDir, filename);
+    if (fs.existsSync(imgPath)) {
+      try { fs.unlinkSync(imgPath); } catch (_) {}
+    }
   }
 
   pharmacy.inventory.pull(itemId);
@@ -339,6 +389,7 @@ export const deleteInventoryItem = async (req, res) => {
 export default {
   getPharmacyOrders,
   updateOrderStatus,
+  updatePrescriptionOrderPaymentStatus,
   acceptOrder,
   rejectOrder,
   getOrderHistory,

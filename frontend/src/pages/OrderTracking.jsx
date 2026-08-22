@@ -102,11 +102,22 @@ export default function OrderTracking() {
                     <p className="text-xs text-theme-muted">{new Date(order.createdAt).toLocaleString()}</p>
                   </div>
                   <div className="text-right">
-                    <span className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_COLORS[order.status]}`}>
-                      {STATUS_LABELS[order.status]}
-                    </span>
+                    <div className="flex flex-col items-end gap-1.5">
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_COLORS[order.status]}`}>
+                        {STATUS_LABELS[order.status]}
+                      </span>
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold border ${
+                          order.paymentStatus === 'paid'
+                            ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400'
+                            : 'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400'
+                        }`}
+                      >
+                        {order.paymentMethod === 'card' ? '💳 Card' : '💵 COD'} · {order.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                      </span>
+                    </div>
                     {order.totalAmount > 0 && (
-                      <p className="mt-1 text-sm font-medium text-theme-text">${order.totalAmount.toFixed(2)}</p>
+                      <p className="mt-2 text-base font-bold text-theme-accent">Rs. {order.totalAmount.toFixed(2)}</p>
                     )}
                   </div>
                 </div>
