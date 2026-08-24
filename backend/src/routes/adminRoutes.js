@@ -12,6 +12,8 @@ import {
   createDentist,
   deleteDentist,
   deletePharmacy,
+  getMarketplaceOrders,
+  updateMarketplaceOrderStatus,
   getPendingDentists,
   approveDentist,
   rejectDentist,
@@ -40,6 +42,10 @@ router.put('/pharmacy-approve/:id', asyncHandler(approvePharmacy));
 router.put('/pharmacy-reject/:id', asyncHandler(rejectPharmacy));
 router.get('/pharmacies', asyncHandler(getPharmacies));
 router.delete('/pharmacies/:id', asyncHandler(deletePharmacy));
+
+// ── Marketplace Orders (DirectOrder model) ──────────────────────────────────
+router.get('/marketplace-orders', asyncHandler(getMarketplaceOrders));
+router.put('/marketplace-orders/:id/status', asyncHandler(updateMarketplaceOrderStatus));
 
 router.get('/dentists', asyncHandler(getDentists));
 router.post('/dentists', adminDentistValidation, validate, asyncHandler(createDentist));

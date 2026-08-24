@@ -7,6 +7,9 @@ import Education from '../models/Education.js';
 import Pharmacy from '../models/Pharmacy.js';
 import Prescription from '../models/Prescription.js';
 import MedicineOrder from '../models/MedicineOrder.js';
+import DirectOrder from '../models/DirectOrder.js';
+import Cart from '../models/Cart.js';
+import Notification from '../models/Notification.js';
 import { AppError } from '../utils/AppError.js';
 
 export const getDashboard = async (_req, res) => {
@@ -19,12 +22,14 @@ export const getDashboard = async (_req, res) => {
     totalReports,
     totalAppointments,
     totalContent,
-    totalOrders,
+    totalMedicineOrders,
+    totalDirectOrders,
     diseaseStats,
     monthlyPredictions,
     userGrowth,
     consultationStats,
-    orderStats,
+    medicineOrderStats,
+    directOrderStats,
   ] = await Promise.all([
     User.countDocuments({ role: 'user' }),
     Dentist.countDocuments({ isActive: true }),
@@ -35,6 +40,7 @@ export const getDashboard = async (_req, res) => {
     Appointment.countDocuments(),
     Education.countDocuments(),
     MedicineOrder.countDocuments(),
+    DirectOrder.countDocuments(),
     Prediction.aggregate([
       { $group: { _id: '$diseaseName', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
@@ -71,7 +77,29 @@ export const getDashboard = async (_req, res) => {
     MedicineOrder.aggregate([
       { $group: { _id: '$status', count: { $sum: 1 } } },
     ]),
+    DirectOrder.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]),
   ]);
+
+  // Merge status counts from MedicineOrder and DirectOrder without double-counting
+  const combinedOrderMap = {};
+  medicineOrderStats.forEach((o) => {
+    if (o._id) {
+      combinedOrderMap[o._id] = (combinedOrderMap[o._id] || 0) + o.count;
+    }
+  });
+  directOrderStats.forEach((o) => {
+    if (o._id) {
+      combinedOrderMap[o._id] = (combinedOrderMap[o._id] || 0) + o.count;
+    }
+  });
+  const orderStats = Object.entries(combinedOrderMap).map(([status, count]) => ({
+    status,
+    count,
+  }));
+
+  const totalOrders = totalMedicineOrders + totalDirectOrders;
 
   const recentUsers = await User.find().sort({ createdAt: -1 }).limit(5).select('name email role createdAt');
   const recentPredictions = await Prediction.find()
@@ -110,10 +138,7 @@ export const getDashboard = async (_req, res) => {
           status: c._id,
           count: c.count,
         })),
-        orderStats: orderStats.map((o) => ({
-          status: o._id,
-          count: o.count,
-        })),
+        orderStats,
       },
       recent: {
         users: recentUsers,
@@ -270,12 +295,130 @@ export const deleteDentist = async (req, res) => {
 };
 
 export const deletePharmacy = async (req, res) => {
-  const pharmacy = await Pharmacy.findByIdAndDelete(req.params.id);
+  const { id } = req.params;
+  const pharmacy = await Pharmacy.findById(id);
   if (!pharmacy) {
     throw new AppError('Pharmacy not found.', 404);
   }
 
+  // Only block deletion if there are genuinely active / in-progress orders
+  const activeStatuses = ['pending', 'accepted', 'preparing', 'out_for_delivery'];
+  const [activeDirectOrders, activeMedicineOrders] = await Promise.all([
+    DirectOrder.countDocuments({
+      pharmacyId: id,
+      status: { $in: activeStatuses },
+    }),
+    MedicineOrder.countDocuments({
+      pharmacyId: id,
+      status: { $in: activeStatuses },
+    }),
+  ]);
+
+  if (activeDirectOrders > 0 || activeMedicineOrders > 0) {
+    throw new AppError(
+      `Cannot delete pharmacy. There are ${activeDirectOrders + activeMedicineOrders} active order(s) in progress. Please resolve or cancel all active orders first.`,
+      400
+    );
+  }
+
+  // Clean up any remaining cart items referencing this pharmacy to prevent invalid cart state
+  await Cart.updateMany(
+    {},
+    { $pull: { items: { pharmacyId: id } } }
+  );
+
+  // Safely delete only the Pharmacy record; preserve User accounts and historical/completed orders
+  await Pharmacy.findByIdAndDelete(id);
+
   res.json({ success: true, message: 'Pharmacy deleted successfully.' });
+};
+
+// ── Marketplace Orders Management (DirectOrder model) ─────────────────────────
+
+export const getMarketplaceOrders = async (req, res) => {
+  const { status, search, page = 1, limit = 50 } = req.query;
+  const filter = {};
+
+  if (status && status !== 'all') {
+    filter.status = status;
+  }
+
+  if (search) {
+    filter.$or = [
+      { customerName: { $regex: search, $options: 'i' } },
+      { contactNumber: { $regex: search, $options: 'i' } },
+      { deliveryAddress: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  const pageNum = parseInt(page, 10) || 1;
+  const limitNum = parseInt(limit, 10) || 50;
+  const skip = (pageNum - 1) * limitNum;
+
+  const [orders, total] = await Promise.all([
+    DirectOrder.find(filter)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limitNum)
+      .populate('userId', 'name email phone')
+      .populate('pharmacyId', 'pharmacyName phone address city district')
+      .populate('paymentId'),
+    DirectOrder.countDocuments(filter),
+  ]);
+
+  res.json({
+    success: true,
+    count: orders.length,
+    total,
+    data: orders,
+  });
+};
+
+export const updateMarketplaceOrderStatus = async (req, res) => {
+  const { status, rejectionReason } = req.body;
+  const validStatuses = ['pending', 'accepted', 'preparing', 'out_for_delivery', 'delivered', 'completed', 'cancelled'];
+
+  if (!validStatuses.includes(status)) {
+    throw new AppError('Invalid order status.', 400);
+  }
+
+  const order = await DirectOrder.findById(req.params.id);
+  if (!order) {
+    throw new AppError('Order not found.', 404);
+  }
+
+  if (status === 'cancelled') {
+    order.rejectionReason = rejectionReason || 'Cancelled by admin';
+  }
+
+  order.status = status;
+  if (status === 'completed' || status === 'delivered') {
+    order.deliveryConfirmed = true;
+  }
+
+  await order.save();
+  await order.populate('userId', 'name email phone');
+  await order.populate('pharmacyId', 'pharmacyName phone address city district');
+
+  // Notify customer if notification service is available
+  try {
+    if (order.userId) {
+      await Notification.create({
+        recipientId: order.userId._id || order.userId,
+        recipientRole: 'user',
+        title: 'Order Status Updated',
+        message: `Your medicine order #${order._id.toString().slice(-8)} status has been updated to ${status.replace(/_/g, ' ')}.`,
+        type: 'status_updated',
+        orderId: order._id,
+      });
+    }
+  } catch (_) { /* non-critical */ }
+
+  res.json({
+    success: true,
+    message: `Order status updated to ${status}.`,
+    data: order,
+  });
 };
 
 // ── Dentist approval workflow (User model, role = 'dentist') ──────────────────
@@ -402,10 +545,12 @@ export default {
   approvePharmacy,
   rejectPharmacy,
   getPharmacies,
+  deletePharmacy,
+  getMarketplaceOrders,
+  updateMarketplaceOrderStatus,
   getDentists,
   createDentist,
   deleteDentist,
-  deletePharmacy,
   getPendingDentists,
   approveDentist,
   rejectDentist,

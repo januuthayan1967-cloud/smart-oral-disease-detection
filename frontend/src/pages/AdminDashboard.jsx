@@ -55,6 +55,13 @@ export default function AdminDashboard() {
   }, [tabQuery]);
   const [users, setUsers] = useState([]);
   const [pharmacies, setPharmacies] = useState([]);
+  const [pharmacyActionLoading, setPharmacyActionLoading] = useState(null);
+  const [marketplaceOrders, setMarketplaceOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState(null);
+  const [orderStatusFilter, setOrderStatusFilter] = useState('all');
+  const [orderSearchQuery, setOrderSearchQuery] = useState('');
+  const [updatingOrderId, setUpdatingOrderId] = useState(null);
   const [dentists, setDentists] = useState([]);
   const [pendingDentists, setPendingDentists] = useState([]);
   const [appointments, setAppointments] = useState([]);
@@ -130,6 +137,17 @@ export default function AdminDashboard() {
     } else if (tab === 'pharmacies') {
       const { data: res } = await adminAPI.getPharmacyApplications();
       setPharmacies(res.data);
+    } else if (tab === 'marketplace-orders') {
+      setOrdersLoading(true);
+      setOrdersError(null);
+      try {
+        const { data: res } = await adminAPI.getMarketplaceOrders();
+        setMarketplaceOrders(res.data || []);
+      } catch (err) {
+        setOrdersError(err.response?.data?.message || 'Failed to load marketplace orders. Please try again.');
+      } finally {
+        setOrdersLoading(false);
+      }
     } else if (tab === 'dentists') {
       const { data: res } = await adminAPI.getDentists();
       setDentists(res.data);
@@ -159,6 +177,36 @@ export default function AdminDashboard() {
     if (reason !== null) {
       await adminAPI.rejectPharmacy(id, reason);
       loadTabData('pharmacies');
+    }
+  };
+
+  const handleDeletePharmacy = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this pharmacy?')) return;
+    setPharmacyActionLoading(id);
+    try {
+      const { data: res } = await adminAPI.deletePharmacy(id);
+      setPharmacies((prev) => prev.filter((p) => p._id !== id));
+      alert(res.message || 'Pharmacy deleted successfully.');
+      loadDashboard();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to delete pharmacy.');
+    } finally {
+      setPharmacyActionLoading(null);
+    }
+  };
+
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    setUpdatingOrderId(orderId);
+    try {
+      await adminAPI.updateMarketplaceOrderStatus(orderId, { status: newStatus });
+      setMarketplaceOrders((prev) =>
+        prev.map((o) => (o._id === orderId ? { ...o, status: newStatus } : o))
+      );
+      loadDashboard();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update order status.');
+    } finally {
+      setUpdatingOrderId(null);
     }
   };
 
@@ -199,6 +247,7 @@ export default function AdminDashboard() {
     { id: 'users', label: 'Users' },
     { id: 'dentists', label: 'Dentists' },
     { id: 'pharmacies', label: 'Pharmacy Applications' },
+    { id: 'marketplace-orders', label: 'Marketplace Orders' },
     { id: 'dentist-approvals', label: 'Dentist Approvals' },
     { id: 'appointments', label: 'Appointments' },
   ];
@@ -336,6 +385,9 @@ export default function AdminDashboard() {
           } else if (tab.id === 'dentist-approvals') {
             countVal = pendingDentists.length || 0;
             countColor = 'bg-amber-500 text-white';
+          } else if (tab.id === 'marketplace-orders') {
+            countVal = marketplaceOrders.filter((o) => o.status === 'pending').length;
+            countColor = 'bg-blue-500 text-white';
           }
 
           return (
@@ -858,12 +910,21 @@ export default function AdminDashboard() {
                         </span>
                       </div>
                     </div>
-                    {p.status === 'pending' && (
-                      <div className="flex gap-2">
-                        <button onClick={() => handleApprovePharmacy(p._id)} className="btn-primary text-xs py-2 px-4 shadow-glow">Approve</button>
-                        <button onClick={() => handleRejectPharmacy(p._id)} className="btn-secondary text-xs py-2 px-4 font-semibold text-red-400 hover:text-red-300">Reject</button>
-                      </div>
-                    )}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {p.status === 'pending' && (
+                        <>
+                          <button onClick={() => handleApprovePharmacy(p._id)} className="btn-primary text-xs py-2 px-4 shadow-glow">Approve</button>
+                          <button onClick={() => handleRejectPharmacy(p._id)} className="btn-secondary text-xs py-2 px-4 font-semibold text-red-400 hover:text-red-300">Reject</button>
+                        </>
+                      )}
+                      <button
+                        disabled={pharmacyActionLoading === p._id}
+                        onClick={() => handleDeletePharmacy(p._id)}
+                        className="text-xs font-semibold text-red-400 hover:text-red-300 hover:underline transition px-2 py-1.5 disabled:opacity-50"
+                      >
+                        {pharmacyActionLoading === p._id ? 'Deleting...' : 'Delete Pharmacy'}
+                      </button>
+                    </div>
                   </div>
                   {p.documents && (
                     <div className="mt-4 flex flex-wrap gap-3 border-t border-theme-border/10 pt-3">
@@ -884,6 +945,250 @@ export default function AdminDashboard() {
                 <p className="font-semibold text-theme-heading text-lg">No pharmacy applications</p>
               </div>
             )}
+          </motion.div>
+        )}
+
+        {/* ── Marketplace Orders (DirectOrder model) ─────────────────────────── */}
+        {activeTab === 'marketplace-orders' && (
+          <motion.div
+            key="marketplace-orders"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="mt-6 space-y-4"
+          >
+            {/* Search & Status Filters */}
+            <div className="card border border-theme-border/40 bg-theme-surface/40 p-4 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex-1 min-w-[240px]">
+                  <input
+                    type="text"
+                    placeholder="Search by customer, phone, or address..."
+                    value={orderSearchQuery}
+                    onChange={(e) => setOrderSearchQuery(e.target.value)}
+                    className="w-full rounded-xl border border-theme-border bg-theme-surface/60 px-3.5 py-2 text-xs text-theme-text placeholder:text-theme-muted transition focus:border-theme-accent focus:outline-none"
+                  />
+                </div>
+                <button
+                  onClick={() => loadTabData('marketplace-orders')}
+                  disabled={ordersLoading}
+                  className="rounded-xl border border-theme-border/50 bg-theme-surface/60 px-3 py-2 text-xs font-semibold text-theme-muted hover:text-theme-text transition flex items-center gap-1.5"
+                >
+                  <span>🔄</span> Refresh Orders
+                </button>
+              </div>
+
+              {/* Status Filter Pills */}
+              <div className="flex flex-wrap gap-1.5 items-center pt-1 border-t border-theme-border/20">
+                <span className="text-xs font-bold text-theme-muted uppercase tracking-wider mr-1">Status:</span>
+                {['all', 'pending', 'accepted', 'preparing', 'out_for_delivery', 'delivered', 'completed', 'cancelled'].map((st) => (
+                  <button
+                    key={st}
+                    onClick={() => setOrderStatusFilter(st)}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold capitalize transition ${
+                      orderStatusFilter === st
+                        ? 'bg-theme-accent text-theme-primary font-bold shadow-glow-sm'
+                        : 'bg-theme-surface/40 text-theme-muted hover:bg-theme-surface hover:text-theme-text border border-theme-border/20'
+                    }`}
+                  >
+                    {st.replace(/_/g, ' ')}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {ordersLoading ? (
+              <LoadingSpinner />
+            ) : ordersError ? (
+              <div className="card border border-red-500/30 bg-red-500/10 p-6 text-center text-red-400">
+                <p className="font-bold text-base">⚠️ {ordersError}</p>
+                <button
+                  onClick={() => loadTabData('marketplace-orders')}
+                  className="mt-4 btn-primary text-xs py-2 px-4"
+                >
+                  Retry Loading
+                </button>
+              </div>
+            ) : (() => {
+              const filteredOrders = marketplaceOrders.filter((order) => {
+                const matchesStatus = orderStatusFilter === 'all' || order.status === orderStatusFilter;
+                const matchesSearch =
+                  !orderSearchQuery.trim() ||
+                  order.customerName?.toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
+                  order.contactNumber?.includes(orderSearchQuery) ||
+                  order.deliveryAddress?.toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
+                  order.pharmacyId?.pharmacyName?.toLowerCase().includes(orderSearchQuery.toLowerCase()) ||
+                  order._id?.toString().includes(orderSearchQuery);
+                return matchesStatus && matchesSearch;
+              });
+
+              if (filteredOrders.length === 0) {
+                return (
+                  <div className="text-center py-12 text-theme-muted bg-theme-surface/10 rounded-2xl border border-theme-border/20 shadow-inner">
+                    <p className="text-4xl mb-2">🛍️</p>
+                    <p className="font-semibold text-theme-heading text-lg">No marketplace orders found.</p>
+                    <p className="text-xs text-theme-muted mt-1">
+                      {marketplaceOrders.length === 0
+                        ? 'Customer orders placed through the Medicine Marketplace will appear here.'
+                        : 'No orders match your selected filters.'}
+                    </p>
+                  </div>
+                );
+              }
+
+              const statusBadgeStyles = {
+                pending: 'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400',
+                accepted: 'bg-sky-500/15 text-sky-600 border-sky-500/30 dark:text-sky-400',
+                preparing: 'bg-indigo-500/15 text-indigo-600 border-indigo-500/30 dark:text-indigo-400',
+                out_for_delivery: 'bg-orange-500/15 text-orange-600 border-orange-500/30 dark:text-orange-400',
+                delivered: 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400',
+                completed: 'bg-teal-500/15 text-teal-600 border-teal-500/30 dark:text-teal-400',
+                cancelled: 'bg-red-500/15 text-red-600 border-red-500/30 dark:text-red-400',
+              };
+
+              return (
+                <div className="space-y-4">
+                  {filteredOrders.map((order, i) => (
+                    <motion.div
+                      key={order._id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.03 }}
+                      className="card border border-theme-border/40 bg-theme-surface/50 p-5 hover:border-theme-accent/25 transition duration-150 rounded-2xl space-y-4"
+                    >
+                      {/* Order Header */}
+                      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-theme-border/20 pb-3">
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-mono font-bold text-theme-accent">
+                              #{order._id.toString().slice(-8).toUpperCase()}
+                            </span>
+                            <span className="rounded-full bg-blue-500/15 text-blue-500 border border-blue-500/30 px-2 py-0.5 text-[10px] font-bold">
+                              Marketplace Direct Order
+                            </span>
+                          </div>
+                          <p className="text-xs text-theme-muted">
+                            Placed on: <strong className="text-theme-text">{new Date(order.createdAt).toLocaleString()}</strong>
+                          </p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider border ${
+                              statusBadgeStyles[order.status] || 'bg-theme-surface text-theme-muted border-theme-border/40'
+                            }`}
+                          >
+                            {order.status?.replace(/_/g, ' ')}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Customer & Pharmacy Information Grid */}
+                      <div className="grid gap-4 sm:grid-cols-2 bg-theme-surface/30 p-3.5 rounded-xl border border-theme-border/20 text-xs">
+                        <div className="space-y-1">
+                          <p className="font-bold text-theme-heading text-xs uppercase tracking-wider">👤 Customer Details</p>
+                          <p className="text-theme-text font-semibold text-sm">{order.customerName}</p>
+                          <p className="text-theme-muted">📞 {order.contactNumber}</p>
+                          {order.userId?.email && <p className="text-theme-muted">✉️ {order.userId.email}</p>}
+                          <p className="text-theme-text mt-1">📍 <span className="text-theme-muted">Delivery Address:</span> {order.deliveryAddress}</p>
+                          {order.notes && (
+                            <p className="text-theme-text italic bg-theme-surface/50 p-1.5 rounded border border-theme-border/20 mt-1">
+                              <strong>Notes:</strong> "{order.notes}"
+                            </p>
+                          )}
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="font-bold text-theme-heading text-xs uppercase tracking-wider">🏥 Pharmacy Fulfillment</p>
+                          <p className="text-theme-text font-semibold text-sm">
+                            {order.pharmacyId?.pharmacyName || 'Pharmacy Details Unavailable'}
+                          </p>
+                          {order.pharmacyId?.phone && <p className="text-theme-muted">📞 {order.pharmacyId.phone}</p>}
+                          {order.pharmacyId?.address && (
+                            <p className="text-theme-muted">
+                              📍 {order.pharmacyId.address}, {order.pharmacyId.city || ''}
+                            </p>
+                          )}
+                          <div className="pt-2 flex flex-wrap gap-2">
+                            <span className="inline-flex items-center gap-1 rounded-md border border-theme-border/50 bg-theme-background/30 px-2 py-0.5 font-bold uppercase text-[10px]">
+                              {order.paymentMethod === 'card' ? '💳 Card Payment' : '💵 Cash On Delivery (COD)'}
+                            </span>
+                            <span
+                              className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-bold uppercase text-[10px] border ${
+                                order.paymentStatus === 'paid'
+                                  ? 'bg-emerald-500/15 text-emerald-600 border-emerald-500/30 dark:text-emerald-400'
+                                  : 'bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400'
+                              }`}
+                            >
+                              Payment: {order.paymentStatus || 'pending'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Items Ordered Table / List */}
+                      <div className="space-y-2">
+                        <p className="text-xs font-bold text-theme-heading uppercase tracking-wider">📦 Items Ordered ({order.items?.length || 0})</p>
+                        <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
+                          {order.items?.map((item, idx) => (
+                            <div
+                              key={idx}
+                              className="rounded-xl border border-theme-border/30 bg-theme-surface/40 p-3 text-xs flex items-center gap-3"
+                            >
+                              {item.image ? (
+                                <img
+                                  src={item.image}
+                                  alt={item.medicineName}
+                                  className="h-12 w-12 rounded-lg object-cover border border-theme-border/40 shrink-0"
+                                  onError={(e) => { e.target.style.display = 'none'; }}
+                                />
+                              ) : (
+                                <div className="h-12 w-12 rounded-lg bg-theme-surface-2 border border-theme-border/40 flex items-center justify-center text-lg shrink-0">
+                                  💊
+                                </div>
+                              )}
+                              <div className="min-w-0 flex-1">
+                                <p className="font-bold text-theme-heading truncate">{item.medicineName}</p>
+                                <p className="text-[11px] text-theme-muted">{item.category || 'General'}</p>
+                                <p className="text-[11px] text-theme-text mt-0.5">
+                                  Qty: <strong>{item.quantity}</strong> × LKR {item.unitPrice?.toFixed(2)} = <strong>LKR {item.totalPrice?.toFixed(2)}</strong>
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Order Footer & Actions */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-theme-border/20">
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-xs text-theme-muted font-bold uppercase tracking-wider">Total Order Amount:</span>
+                          <span className="text-lg font-extrabold text-theme-heading">
+                            LKR {order.totalAmount?.toFixed(2)}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <label className="text-xs font-bold text-theme-muted">Update Status:</label>
+                          <select
+                            disabled={updatingOrderId === order._id}
+                            value={order.status}
+                            onChange={(e) => handleUpdateOrderStatus(order._id, e.target.value)}
+                            className="rounded-xl border border-theme-border bg-theme-surface/70 px-3 py-1.5 text-xs font-semibold text-theme-text focus:border-theme-accent focus:outline-none capitalize disabled:opacity-50"
+                          >
+                            {['pending', 'accepted', 'preparing', 'out_for_delivery', 'delivered', 'completed', 'cancelled'].map((st) => (
+                              <option key={st} value={st}>
+                                {st.replace(/_/g, ' ')}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              );
+            })()}
           </motion.div>
         )}
 
