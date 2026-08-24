@@ -48,10 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     const { data } = await authAPI.register(userData);
-    localStorage.setItem('accessToken', data.data.accessToken);
-    localStorage.setItem('refreshToken', data.data.refreshToken);
-    setUser(data.data.user);
-    return data.data.user;
+    return data;
   };
 
   const registerPharmacy = async (formData) => {

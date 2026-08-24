@@ -57,7 +57,11 @@ export const registerUser = async (req, res) => {
   });
 
   await sendVerificationEmail(user, verificationToken);
-  sendAuthResponse(user, res, 201);
+  res.status(201).json({
+    success: true,
+    message: 'Registration successful! Please login to continue.',
+    data: user.toPublicJSON(),
+  });
 };
 
 export const registerPharmacy = async (req, res) => {

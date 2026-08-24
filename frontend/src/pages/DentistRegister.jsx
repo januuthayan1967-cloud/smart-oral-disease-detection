@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { getApiErrorMessage } from '../services/api';
 import AuthLayout from '../components/AuthLayout';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -12,17 +13,26 @@ export default function DentistRegister() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const { register, handleSubmit, formState: { isSubmitting } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm();
+
+  const password = watch('password', '');
 
   const onSubmit = async (data) => {
     try {
       setError('');
       setSuccess('');
-      const result = await registerDentist(data);
-      setSuccess(result.message || 'Registration submitted! Awaiting admin approval.');
-      setTimeout(() => navigate('/login'), 4000);
+      const { confirmPassword, ...dentistData } = data;
+      const result = await registerDentist(dentistData);
+      const msg = result?.message || 'Registration submitted! Awaiting admin approval.';
+      setSuccess(msg);
+      setTimeout(() => navigate('/login', { state: { message: msg } }), 3000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      setError(getApiErrorMessage(err, 'Registration failed. Please try again.'));
     }
   };
 
@@ -38,7 +48,7 @@ export default function DentistRegister() {
 
       {error && (
         <motion.div
-          className="mt-4 rounded-xl p-3 text-sm"
+          className="mt-4 rounded-xl p-3 text-sm font-medium"
           style={{ background: 'var(--error-bg)', color: 'var(--error)' }}
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -49,7 +59,7 @@ export default function DentistRegister() {
       
       {success && (
         <motion.div
-          className="mt-4 rounded-xl p-3 text-sm"
+          className="mt-4 rounded-xl p-3 text-sm font-medium"
           style={{ background: 'var(--success-bg)', color: 'var(--success)' }}
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -64,7 +74,8 @@ export default function DentistRegister() {
           <Input
             label="Full Name"
             placeholder="Dr. John Smith"
-            {...register('name', { required: true })}
+            error={errors.name?.message}
+            {...register('name', { required: 'Full name is required' })}
           />
         </div>
 
@@ -73,28 +84,69 @@ export default function DentistRegister() {
             label="Email Address"
             type="email"
             placeholder="dentist@example.com"
-            {...register('email', { required: true })}
+            autoComplete="email"
+            error={errors.email?.message}
+            {...register('email', {
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Please enter a valid email address',
+              },
+            })}
           />
         </div>
 
-        <Input
-          label="Password"
-          type="password"
-          placeholder="Min. 6 characters"
-          {...register('password', { required: true, minLength: 6 })}
-        />
+        <div>
+          <Input
+            label="Password"
+            type="password"
+            placeholder="Min. 6 characters"
+            autoComplete="new-password"
+            error={errors.password?.message}
+            {...register('password', {
+              required: 'Password is required',
+              minLength: {
+                value: 6,
+                message: 'Password must be at least 6 characters.',
+              },
+            })}
+          />
+        </div>
 
-        <Input
-          label="Phone Number"
-          placeholder="+1 234 567 8900"
-          {...register('phone')}
-        />
+        <div>
+          <Input
+            label="Confirm Password"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="new-password"
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword', {
+              required: 'Please confirm your password',
+              validate: (val) => val === password || 'Passwords do not match',
+            })}
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <Input
+            label="Phone Number"
+            placeholder="+1 234 567 8900"
+            error={errors.phone?.message}
+            {...register('phone', {
+              validate: (val) =>
+                !val || /^[+]?[\d\s().-]{7,20}$/.test(val) || 'Please enter a valid phone number',
+            })}
+          />
+        </div>
 
         <div className="md:col-span-2">
           <Input
             label="Professional License Number"
             placeholder="e.g. DDS-2024-001234"
-            {...register('professionalLicenseNumber', { required: true })}
+            error={errors.professionalLicenseNumber?.message}
+            {...register('professionalLicenseNumber', {
+              required: 'Professional license number is required',
+            })}
           />
           <p className="mt-1 text-xs text-theme-muted">
             Your official dental council license / registration number.

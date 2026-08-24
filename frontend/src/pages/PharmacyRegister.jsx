@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { getApiErrorMessage } from '../services/api';
 import AuthLayout from '../components/AuthLayout';
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -17,7 +18,14 @@ export default function PharmacyRegister() {
     businessRegistration: null,
     pharmacistQualification: null,
   });
-  const { register, handleSubmit, formState: { isSubmitting } } = useForm();
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm();
+
+  const password = watch('password', '');
 
   const handleDocChange = (field, file) => {
     setDocs((prev) => ({ ...prev, [field]: file }));
@@ -43,21 +51,26 @@ export default function PharmacyRegister() {
       setSuccess('');
 
       if (!docs.pharmacyLicense || !docs.businessRegistration || !docs.pharmacistQualification) {
-        setError('All three documents are required.');
+        setError('All three documents are required: Pharmacy License, Business Registration, and Pharmacist Qualification.');
         return;
       }
 
       const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => formData.append(key, value));
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== 'confirmPassword') {
+          formData.append(key, value);
+        }
+      });
       formData.append('pharmacyLicense', docs.pharmacyLicense);
       formData.append('businessRegistration', docs.businessRegistration);
       formData.append('pharmacistQualification', docs.pharmacistQualification);
 
       const result = await registerPharmacy(formData);
-      setSuccess(result.message || 'Registration submitted successfully!');
-      setTimeout(() => navigate('/login'), 3000);
+      const msg = result?.message || 'Pharmacy registration submitted. Please wait for admin approval before logging in.';
+      setSuccess(msg);
+      setTimeout(() => navigate('/login', { state: { message: msg } }), 3000);
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(getApiErrorMessage(err, 'Registration failed'));
     }
   };
 
@@ -73,7 +86,7 @@ export default function PharmacyRegister() {
 
       {error && (
         <motion.div
-          className="mt-4 rounded-xl p-3 text-sm"
+          className="mt-4 rounded-xl p-3 text-sm font-medium"
           style={{ background: 'var(--error-bg)', color: 'var(--error)' }}
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -84,7 +97,7 @@ export default function PharmacyRegister() {
       
       {success && (
         <motion.div
-          className="mt-4 rounded-xl p-3 text-sm"
+          className="mt-4 rounded-xl p-3 text-sm font-medium"
           style={{ background: 'var(--success-bg)', color: 'var(--success)' }}
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -95,37 +108,139 @@ export default function PharmacyRegister() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 grid gap-4 md:grid-cols-2">
         <div className="md:col-span-2">
-          <Input label="Pharmacy Name" {...register('pharmacyName', { required: true })} />
+          <Input
+            label="Pharmacy Name"
+            placeholder="City Care Pharmacy"
+            error={errors.pharmacyName?.message}
+            {...register('pharmacyName', { required: 'Pharmacy name is required' })}
+          />
         </div>
         <div className="md:col-span-2">
-          <Input label="Owner Name" {...register('ownerName', { required: true })} />
-        </div>
-        <div>
-          <Input label="Email" type="email" {...register('email', { required: true })} />
-        </div>
-        <div>
-          <Input label="Password" type="password" {...register('password', { required: true, minLength: 6 })} />
-        </div>
-        <div>
-          <Input label="Phone" {...register('phone', { required: true })} />
-        </div>
-        <div>
-          <Input label="License Number" {...register('licenseNumber', { required: true })} />
+          <Input
+            label="Owner Name"
+            placeholder="Jane Doe"
+            error={errors.ownerName?.message}
+            {...register('ownerName', { required: 'Owner name is required' })}
+          />
         </div>
         <div className="md:col-span-2">
-          <Input label="Address" {...register('address', { required: true })} />
+          <Input
+            label="Email"
+            type="email"
+            placeholder="pharmacy@example.com"
+            autoComplete="email"
+            error={errors.email?.message}
+            {...register('email', {
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Please enter a valid email address',
+              },
+            })}
+          />
         </div>
         <div>
-          <Input label="District" {...register('district', { required: true })} />
+          <Input
+            label="Password"
+            type="password"
+            placeholder="Min. 6 characters"
+            autoComplete="new-password"
+            error={errors.password?.message}
+            {...register('password', {
+              required: 'Password is required',
+              minLength: {
+                value: 6,
+                message: 'Password must be at least 6 characters.',
+              },
+            })}
+          />
         </div>
         <div>
-          <Input label="City" {...register('city', { required: true })} />
+          <Input
+            label="Confirm Password"
+            type="password"
+            placeholder="••••••••"
+            autoComplete="new-password"
+            error={errors.confirmPassword?.message}
+            {...register('confirmPassword', {
+              required: 'Please confirm your password',
+              validate: (val) => val === password || 'Passwords do not match',
+            })}
+          />
         </div>
         <div>
-          <Input id="latitude" label="Latitude" type="number" step="any" {...register('latitude', { required: true })} />
+          <Input
+            label="Phone"
+            placeholder="+1 234 567 8900"
+            error={errors.phone?.message}
+            {...register('phone', {
+              required: 'Phone number is required',
+              validate: (val) =>
+                /^[+]?[\d\s().-]{7,20}$/.test(val) || 'Please enter a valid phone number',
+            })}
+          />
         </div>
         <div>
-          <Input id="longitude" label="Longitude" type="number" step="any" {...register('longitude', { required: true })} />
+          <Input
+            label="License Number"
+            placeholder="PH-2024-001"
+            error={errors.licenseNumber?.message}
+            {...register('licenseNumber', { required: 'License number is required' })}
+          />
+        </div>
+        <div className="md:col-span-2">
+          <Input
+            label="Address"
+            placeholder="123 Main Street"
+            error={errors.address?.message}
+            {...register('address', { required: 'Address is required' })}
+          />
+        </div>
+        <div>
+          <Input
+            label="District"
+            placeholder="Central"
+            error={errors.district?.message}
+            {...register('district', { required: 'District is required' })}
+          />
+        </div>
+        <div>
+          <Input
+            label="City"
+            placeholder="Metropolis"
+            error={errors.city?.message}
+            {...register('city', { required: 'City is required' })}
+          />
+        </div>
+        <div>
+          <Input
+            id="latitude"
+            label="Latitude"
+            type="number"
+            step="any"
+            placeholder="40.7128"
+            error={errors.latitude?.message}
+            {...register('latitude', {
+              required: 'Latitude is required',
+              min: { value: -90, message: 'Latitude must be between -90 and 90' },
+              max: { value: 90, message: 'Latitude must be between -90 and 90' },
+            })}
+          />
+        </div>
+        <div>
+          <Input
+            id="longitude"
+            label="Longitude"
+            type="number"
+            step="any"
+            placeholder="-74.0060"
+            error={errors.longitude?.message}
+            {...register('longitude', {
+              required: 'Longitude is required',
+              min: { value: -180, message: 'Longitude must be between -180 and 180' },
+              max: { value: 180, message: 'Longitude must be between -180 and 180' },
+            })}
+          />
         </div>
         
         <div className="md:col-span-2">

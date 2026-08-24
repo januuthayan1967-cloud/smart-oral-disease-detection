@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { motion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
@@ -12,8 +12,14 @@ import LoadingAnimation from '../components/LoadingAnimation';
 export default function Login() {
   const { login, user, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState('');
-  const { register, handleSubmit, formState: { isSubmitting } } = useForm();
+  const [success, setSuccess] = useState(location.state?.message || '');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm();
 
   useEffect(() => {
     if (!loading && user) {
@@ -24,6 +30,7 @@ export default function Login() {
   const onSubmit = async (data) => {
     try {
       setError('');
+      setSuccess('');
       await login(data);
     } catch (err) {
       setError(getApiErrorMessage(err, 'Login failed. Please check your credentials.'));
@@ -36,9 +43,20 @@ export default function Login() {
 
   return (
     <AuthLayout title="Welcome Back" subtitle="Sign in to your Oral AI account">
+      {success && (
+        <motion.div
+          className="mt-4 rounded-xl p-3 text-sm font-medium"
+          style={{ background: 'var(--success-bg)', color: 'var(--success)' }}
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {success}
+        </motion.div>
+      )}
+
       {error && (
         <motion.div
-          className="mt-4 rounded-xl p-3 text-sm"
+          className="mt-4 rounded-xl p-3 text-sm font-medium"
           style={{ background: 'var(--error-bg)', color: 'var(--error)' }}
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -52,13 +70,25 @@ export default function Login() {
           label="Email"
           type="email"
           autoComplete="email"
-          {...register('email', { required: true })}
+          placeholder="name@example.com"
+          error={errors.email?.message}
+          {...register('email', {
+            required: 'Email is required',
+            pattern: {
+              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+              message: 'Please enter a valid email address',
+            },
+          })}
         />
         <Input
           label="Password"
           type="password"
           autoComplete="current-password"
-          {...register('password', { required: true })}
+          placeholder="••••••••"
+          error={errors.password?.message}
+          {...register('password', {
+            required: 'Password is required',
+          })}
         />
         <Button type="submit" disabled={isSubmitting} className="w-full" size="lg">
           {isSubmitting ? 'Signing in...' : 'Login'}

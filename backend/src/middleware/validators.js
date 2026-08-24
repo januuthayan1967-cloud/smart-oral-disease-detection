@@ -4,10 +4,10 @@ export const registerValidation = [
   body('name').trim().notEmpty().withMessage('Full name is required'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('phone').optional().isMobilePhone('any').withMessage('Valid phone number required'),
-  body('age').optional().isInt({ min: 1, max: 120 }).withMessage('Age must be between 1 and 120'),
+  body('phone').optional({ values: 'falsy' }).isMobilePhone('any').withMessage('Valid phone number required'),
+  body('age').optional({ values: 'falsy' }).isInt({ min: 1, max: 120 }).withMessage('Age must be between 1 and 120'),
   body('gender')
-    .optional()
+    .optional({ values: 'falsy' })
     .isIn(['male', 'female', 'other', 'prefer_not_to_say'])
     .withMessage('Invalid gender'),
 ];
@@ -103,7 +103,7 @@ export const dentistRegisterValidation = [
   body('name').trim().notEmpty().withMessage('Full name is required'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('phone').optional().isMobilePhone('any').withMessage('Valid phone number required'),
+  body('phone').optional({ values: 'falsy' }).isMobilePhone('any').withMessage('Valid phone number required'),
   body('professionalLicenseNumber').trim().notEmpty().withMessage('Professional license number is required'),
 ];
 
@@ -111,7 +111,7 @@ export const pharmacyUserRegisterValidation = [
   body('name').trim().notEmpty().withMessage('Owner name is required'),
   body('email').isEmail().withMessage('Valid email is required'),
   body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
-  body('phone').optional().isMobilePhone('any').withMessage('Valid phone number required'),
+  body('phone').optional({ values: 'falsy' }).isMobilePhone('any').withMessage('Valid phone number required'),
   body('pharmacyName').trim().notEmpty().withMessage('Pharmacy name is required'),
   body('pharmacyLicenseNumber').trim().notEmpty().withMessage('Pharmacy license number is required'),
   body('address').trim().notEmpty().withMessage('Address is required'),
