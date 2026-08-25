@@ -12,7 +12,8 @@ import { predictionAPI, reportAPI } from '../services/api';
 
 /* ── Animated confidence bar ─────────────────────────────────────── */
 function ConfidenceBar({ value }) {
-  const pct = Math.min(100, Math.max(0, value));
+  const pct = Math.min(100, Math.max(0, Number(value) || 0));
+  const isLowConfidence = pct < 60;
   const color =
     pct >= 80 ? 'var(--error)' :
     pct >= 60 ? '#F97316' :
@@ -21,10 +22,24 @@ function ConfidenceBar({ value }) {
 
   return (
     <div>
-      <div className="mb-1.5 flex items-end justify-between">
-        <span className="text-sm font-medium" style={{ color: 'var(--muted)' }}>Confidence Score</span>
+      <div className="mb-1.5 flex items-end justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm font-medium" style={{ color: 'var(--muted)' }}>Confidence Score</span>
+          {isLowConfidence && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold tracking-wide"
+              style={{
+                background: 'rgba(245, 158, 11, 0.15)',
+                color: '#F59E0B',
+                border: '1px solid rgba(245, 158, 11, 0.3)',
+              }}
+            >
+              ⚠️ Diagnostic Uncertainty (&lt;60%)
+            </span>
+          )}
+        </div>
         <motion.span
-          className="text-2xl font-extrabold"
+          className="text-2xl font-extrabold shrink-0"
           style={{ color, fontFamily: 'Outfit, sans-serif' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -287,7 +302,9 @@ Do not provide a definitive medical diagnosis.`;
   };
 
   const pred = result?.prediction || result || {};
-  const currentRiskLevel = result?.riskLevel || pred.riskLevel || (pred.confidence >= 80 ? 'HIGH' : pred.confidence >= 60 ? 'MEDIUM' : 'LOW');
+  const confidenceScore = Number(pred.confidence ?? pred.confidencePercentage ?? result?.confidence ?? result?.confidencePercentage ?? 0);
+  const isLowConfidence = Boolean(result) && confidenceScore < 60;
+  const currentRiskLevel = result?.riskLevel || pred.riskLevel || (confidenceScore >= 80 ? 'HIGH' : confidenceScore >= 60 ? 'MEDIUM' : 'LOW');
   const currentRiskReason = result?.riskReason || pred.riskReason || '';
 
   return (
@@ -540,6 +557,32 @@ Do not provide a definitive medical diagnosis.`;
 
                   {/* First Aid Tips */}
                   <FirstAidTips predictedClass={pred.predictedClass || pred.rawClass || pred.displayName || pred.diseaseName} />
+
+                  {/* ── LOW/MODERATE CONFIDENCE & DIAGNOSTIC UNCERTAINTY ALERT SECTION (TC20) ── */}
+                  {isLowConfidence && (
+                    <div className="mt-5 rounded-2xl border border-amber-500/40 bg-amber-500/10 p-5 text-left shadow-lg">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">⚠️</span>
+                        <div>
+                          <h3 className="text-lg font-bold text-amber-400">
+                            Diagnostic Uncertainty ({confidenceScore.toFixed(1)}% Confidence)
+                          </h3>
+                          <p className="mt-0.5 text-xs text-amber-300">
+                            Moderate / low AI prediction confidence due to image quality or ambiguous visual patterns.
+                          </p>
+                        </div>
+                      </div>
+                      <p className="mt-3 text-sm text-gray-200 leading-relaxed">
+                        The AI model encountered ambiguity or lower clarity in the cropped dental image. Because confidence is below 60%, this prediction carries diagnostic uncertainty and cannot replace a clinical diagnosis. Please consult a qualified dentist for a professional confirmation.
+                      </p>
+                      <Button
+                        onClick={() => navigate('/consultation')}
+                        className="mt-4 w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-xl shadow-lg transition"
+                      >
+                        👨‍⚕️ Consult Dentist for Confirmation
+                      </Button>
+                    </div>
+                  )}
 
                   {/* ── HIGH RISK DETECTED ALERT SECTION ── */}
                   {currentRiskLevel === 'HIGH' && (
