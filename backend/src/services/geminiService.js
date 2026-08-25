@@ -133,8 +133,13 @@ Provide general educational assistance regarding this condition. Do NOT claim ce
 
   const finalUserMessage = message;
 
-  // Models to attempt in priority order
-  const modelCandidates = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-2.0-flash'];
+  // Models to attempt in priority order (active, currently supported Gemini 3.x models)
+  const modelCandidates = [
+    'gemini-3.6-flash',
+    'gemini-3.5-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite',
+  ];
   let lastError = null;
 
   for (const modelName of modelCandidates) {
