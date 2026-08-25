@@ -6,7 +6,7 @@ import { Doughnut, Bar } from 'react-chartjs-2';
 import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SeverityBadge from '../components/SeverityBadge';
-import { adminAPI, predictionAPI, reportAPI, appointmentAPI } from '../services/api';
+import { adminAPI, predictionAPI, reportAPI, appointmentAPI, educationAPI } from '../services/api';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -71,6 +71,27 @@ export default function AdminDashboard() {
   const [historyError, setHistoryError] = useState(null);
   const [dentistForm, setDentistForm] = useState({
     name: '', email: '', password: '', qualification: '', specialization: '', experience: '', contact: '', professionalLicenseNumber: '',
+  });
+
+  // Educational Content State
+  const [educationList, setEducationList] = useState([]);
+  const [educationLoading, setEducationLoading] = useState(false);
+  const [educationError, setEducationError] = useState(null);
+  const [educationSuccess, setEducationSuccess] = useState(null);
+  const [educationSubmitting, setEducationSubmitting] = useState(false);
+  const [deletingEducationId, setDeletingEducationId] = useState(null);
+  const [editingEducationId, setEditingEducationId] = useState(null);
+  const [educationCategoryFilter, setEducationCategoryFilter] = useState('');
+  const [educationSearchQuery, setEducationSearchQuery] = useState('');
+  const [educationForm, setEducationForm] = useState({
+    title: '',
+    category: 'articles',
+    description: '',
+    videoUrl: '',
+    source: 'World Health Organization (WHO)',
+    sourceUrl: 'https://www.who.int/news-room/fact-sheets/detail/oral-health',
+    readTime: '3 min read',
+    imageUrl: '',
   });
 
   const viewPatientHistory = async (patientId) => {
@@ -157,6 +178,18 @@ export default function AdminDashboard() {
     } else if (tab === 'appointments') {
       const { data: res } = await appointmentAPI.getAll();
       setAppointments(res.data);
+    } else if (tab === 'education') {
+      setEducationLoading(true);
+      setEducationError(null);
+      try {
+        const { data: res } = await educationAPI.getAll();
+        const items = Array.isArray(res.data) ? res.data : (Array.isArray(res.data?.data) ? res.data.data : []);
+        setEducationList(items);
+      } catch (err) {
+        setEducationError(err.response?.data?.message || 'Failed to load educational content.');
+      } finally {
+        setEducationLoading(false);
+      }
     }
   };
 
@@ -242,6 +275,108 @@ export default function AdminDashboard() {
     loadTabData('dentist-approvals');
   };
 
+  const handleCreateOrUpdateEducation = async (e) => {
+    e.preventDefault();
+    setEducationSubmitting(true);
+    setEducationError(null);
+    setEducationSuccess(null);
+
+    const payload = {
+      title: educationForm.title.trim(),
+      category: educationForm.category,
+      description: educationForm.description.trim(),
+      videoUrl: educationForm.videoUrl.trim() || undefined,
+      source: educationForm.source.trim() || 'World Health Organization (WHO)',
+      sourceUrl:
+        educationForm.sourceUrl.trim() ||
+        educationForm.videoUrl.trim() ||
+        'https://www.who.int/news-room/fact-sheets/detail/oral-health',
+      readTime:
+        educationForm.readTime.trim() ||
+        (educationForm.videoUrl ? '5 min video' : '3 min read'),
+      imageUrl: educationForm.imageUrl.trim() || undefined,
+    };
+
+    try {
+      if (editingEducationId) {
+        await educationAPI.update(editingEducationId, payload);
+        setEducationSuccess('Educational article updated successfully!');
+      } else {
+        await educationAPI.create(payload);
+        setEducationSuccess('Educational article created and published successfully!');
+      }
+      setEducationForm({
+        title: '',
+        category: 'articles',
+        description: '',
+        videoUrl: '',
+        source: 'World Health Organization (WHO)',
+        sourceUrl: 'https://www.who.int/news-room/fact-sheets/detail/oral-health',
+        readTime: '3 min read',
+        imageUrl: '',
+      });
+      setEditingEducationId(null);
+      loadTabData('education');
+      loadDashboard();
+    } catch (err) {
+      console.error('Failed to save educational content:', err);
+      setEducationError(
+        err.response?.data?.message ||
+          'Failed to publish educational article. Please check the inputs.'
+      );
+    } finally {
+      setEducationSubmitting(false);
+    }
+  };
+
+  const handleEditEducation = (item) => {
+    setEditingEducationId(item._id);
+    setEducationError(null);
+    setEducationSuccess(null);
+    setEducationForm({
+      title: item.title || '',
+      category: item.category || 'articles',
+      description: item.description || '',
+      videoUrl: item.videoUrl || '',
+      source: item.source || 'World Health Organization (WHO)',
+      sourceUrl: item.sourceUrl || 'https://www.who.int/news-room/fact-sheets/detail/oral-health',
+      readTime: item.readTime || '3 min read',
+      imageUrl: item.imageUrl || '',
+    });
+  };
+
+  const handleCancelEditEducation = () => {
+    setEditingEducationId(null);
+    setEducationError(null);
+    setEducationForm({
+      title: '',
+      category: 'articles',
+      description: '',
+      videoUrl: '',
+      source: 'World Health Organization (WHO)',
+      sourceUrl: 'https://www.who.int/news-room/fact-sheets/detail/oral-health',
+      readTime: '3 min read',
+      imageUrl: '',
+    });
+  };
+
+  const handleDeleteEducation = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this educational article?')) return;
+    setDeletingEducationId(id);
+    setEducationError(null);
+    setEducationSuccess(null);
+    try {
+      const { data: res } = await educationAPI.delete(id);
+      setEducationList((prev) => prev.filter((item) => item._id !== id));
+      setEducationSuccess(res.message || 'Educational article deleted successfully.');
+      loadDashboard();
+    } catch (err) {
+      setEducationError(err.response?.data?.message || 'Failed to delete educational article.');
+    } finally {
+      setDeletingEducationId(null);
+    }
+  };
+
   const tabs = [
     { id: 'overview', label: 'Overview' },
     { id: 'users', label: 'Users' },
@@ -250,6 +385,7 @@ export default function AdminDashboard() {
     { id: 'marketplace-orders', label: 'Marketplace Orders' },
     { id: 'dentist-approvals', label: 'Dentist Approvals' },
     { id: 'appointments', label: 'Appointments' },
+    { id: 'education', label: 'Educational Content' },
   ];
 
   if (loading && activeTab === 'overview') return <Layout><LoadingSpinner /></Layout>;
@@ -388,6 +524,9 @@ export default function AdminDashboard() {
           } else if (tab.id === 'marketplace-orders') {
             countVal = marketplaceOrders.filter((o) => o.status === 'pending').length;
             countColor = 'bg-blue-500 text-white';
+          } else if (tab.id === 'education') {
+            countVal = educationList.length || stats.totalContent || 0;
+            countColor = 'bg-purple-500 text-white';
           }
 
           return (
@@ -1348,6 +1487,392 @@ export default function AdminDashboard() {
                   <p className="font-semibold text-theme-heading text-base">No system appointments found.</p>
                 </div>
               )}
+            </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'education' && (
+          <motion.div
+            key="education"
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            className="mt-6 space-y-5"
+          >
+            {/* Header section */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-theme-border/20 pb-3">
+              <div>
+                <h2 className="text-lg font-bold text-theme-heading font-heading flex items-center gap-2">
+                  <span>📚</span> Educational Content Manager ({educationList.length})
+                </h2>
+                <p className="text-xs text-theme-muted mt-0.5">
+                  Publish and manage verified oral health guides, tips, and video resources visible to patients on <strong className="text-theme-accent">/education</strong>.
+                </p>
+              </div>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-theme-accent/40 bg-theme-accent/10 px-3 py-1 text-xs font-semibold text-theme-accent">
+                ✨ Live Patient Education Hub
+              </span>
+            </div>
+
+            {/* Notification Alerts */}
+            {educationSuccess && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/15 px-4 py-3 text-xs font-medium text-emerald-400"
+              >
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-emerald-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>{educationSuccess}</span>
+                </div>
+                <button type="button" onClick={() => setEducationSuccess(null)} className="text-emerald-400 hover:text-white font-bold ml-2">✕</button>
+              </motion.div>
+            )}
+
+            {educationError && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center justify-between rounded-xl border border-red-500/30 bg-red-500/15 px-4 py-3 text-xs font-medium text-red-400"
+              >
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-red-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>{educationError}</span>
+                </div>
+                <button type="button" onClick={() => setEducationError(null)} className="text-red-400 hover:text-white font-bold ml-2">✕</button>
+              </motion.div>
+            )}
+
+            {/* Compact 2-Column Desktop Grid for Single-Viewport Screenshot Visibility */}
+            <div className="grid gap-6 lg:grid-cols-12 items-start">
+              {/* Left Column: Create / Edit Article Form */}
+              <div className="lg:col-span-5">
+                <form
+                  onSubmit={handleCreateOrUpdateEducation}
+                  className="card border border-theme-border/50 bg-theme-surface/50 p-5 rounded-2xl space-y-3.5 shadow-theme"
+                >
+                  <div className="flex items-center justify-between border-b border-theme-border/20 pb-2.5">
+                    <div>
+                      <h3 className="font-bold text-sm text-theme-heading font-heading flex items-center gap-1.5">
+                        <span>{editingEducationId ? '✏️' : '➕'}</span>
+                        {editingEducationId ? 'Edit Educational Article' : 'Create Educational Article'}
+                      </h3>
+                      <p className="text-[11px] text-theme-muted mt-0.5">
+                        {editingEducationId ? 'Update existing content parameters.' : 'Publish clinical guide or video to the Education portal.'}
+                      </p>
+                    </div>
+                    {editingEducationId && (
+                      <span className="rounded-md border border-amber-500/40 bg-amber-500/10 px-2 py-0.5 text-[10px] font-bold text-amber-400 uppercase tracking-wider">
+                        Edit Mode
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Title Field */}
+                  <div>
+                    <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-theme-muted">
+                      Article Title <span className="text-rose-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={educationForm.title}
+                      onChange={(e) => setEducationForm({ ...educationForm, title: e.target.value })}
+                      placeholder="e.g., Plaque Control and Prevention"
+                      className="w-full rounded-xl border border-theme-border bg-theme-surface/70 px-3.5 py-2 text-xs text-theme-text placeholder:text-theme-muted transition focus:border-theme-accent focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Category & Read Time in 2 cols */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-theme-muted">
+                        Category <span className="text-rose-400">*</span>
+                      </label>
+                      <select
+                        required
+                        value={educationForm.category}
+                        onChange={(e) => setEducationForm({ ...educationForm, category: e.target.value })}
+                        className="w-full rounded-xl border border-theme-border bg-theme-surface/70 px-3 py-2 text-xs text-theme-text transition focus:border-theme-accent focus:outline-none"
+                      >
+                        <option value="articles">Clinical Articles (articles)</option>
+                        <option value="tips">Hygiene Tips (tips)</option>
+                        <option value="brushing">Brushing Techniques (brushing)</option>
+                        <option value="flossing">Flossing Guide (flossing)</option>
+                        <option value="mouthwash">Mouthwash (mouthwash)</option>
+                        <option value="prevention">Disease Prevention (prevention)</option>
+                        <option value="video">Video Tutorials (video)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-theme-muted">
+                        Read Time / Duration
+                      </label>
+                      <input
+                        type="text"
+                        value={educationForm.readTime}
+                        onChange={(e) => setEducationForm({ ...educationForm, readTime: e.target.value })}
+                        placeholder="e.g. 3 min read / 5 min video"
+                        className="w-full rounded-xl border border-theme-border bg-theme-surface/70 px-3.5 py-2 text-xs text-theme-text placeholder:text-theme-muted transition focus:border-theme-accent focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* YouTube Video URL Field */}
+                  <div>
+                    <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-theme-muted flex items-center justify-between">
+                      <span>YouTube Video URL</span>
+                      <span className="text-[10px] text-theme-accent lowercase font-normal">(optional tutorial link)</span>
+                    </label>
+                    <input
+                      type="url"
+                      value={educationForm.videoUrl}
+                      onChange={(e) => setEducationForm({ ...educationForm, videoUrl: e.target.value })}
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      className="w-full rounded-xl border border-theme-border bg-theme-surface/70 px-3.5 py-2 text-xs text-theme-text placeholder:text-theme-muted transition focus:border-theme-accent focus:outline-none"
+                    />
+                  </div>
+
+                  {/* Source Org & Source URL in 2 cols */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-theme-muted">
+                        Source Name
+                      </label>
+                      <input
+                        type="text"
+                        value={educationForm.source}
+                        onChange={(e) => setEducationForm({ ...educationForm, source: e.target.value })}
+                        placeholder="World Health Organization (WHO)"
+                        className="w-full rounded-xl border border-theme-border bg-theme-surface/70 px-3.5 py-2 text-xs text-theme-text placeholder:text-theme-muted transition focus:border-theme-accent focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-theme-muted">
+                        Source Reference URL
+                      </label>
+                      <input
+                        type="url"
+                        value={educationForm.sourceUrl}
+                        onChange={(e) => setEducationForm({ ...educationForm, sourceUrl: e.target.value })}
+                        placeholder="https://www.who.int/..."
+                        className="w-full rounded-xl border border-theme-border bg-theme-surface/70 px-3.5 py-2 text-xs text-theme-text placeholder:text-theme-muted transition focus:border-theme-accent focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Description Field */}
+                  <div>
+                    <label className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-theme-muted">
+                      Description & Clinical Summary <span className="text-rose-400">*</span>
+                    </label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={educationForm.description}
+                      onChange={(e) => setEducationForm({ ...educationForm, description: e.target.value })}
+                      placeholder="Provide concise, evidence-based guidance and recommendations for patient understanding..."
+                      className="w-full rounded-xl border border-theme-border bg-theme-surface/70 px-3.5 py-2 text-xs text-theme-text placeholder:text-theme-muted transition focus:border-theme-accent focus:outline-none resize-none"
+                    />
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="pt-2 border-t border-theme-border/15 flex items-center gap-2">
+                    <button
+                      type="submit"
+                      disabled={educationSubmitting}
+                      className="btn-primary py-2 px-5 shadow-glow text-xs font-bold flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      {educationSubmitting ? (
+                        <>
+                          <span className="inline-block animate-spin">⏳</span>
+                          <span>Processing...</span>
+                        </>
+                      ) : editingEducationId ? (
+                        <>
+                          <span>💾</span>
+                          <span>Update Article</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>🚀</span>
+                          <span>Publish Article</span>
+                        </>
+                      )}
+                    </button>
+
+                    {editingEducationId && (
+                      <button
+                        type="button"
+                        onClick={handleCancelEditEducation}
+                        className="btn-secondary py-2 px-3 text-xs font-semibold text-theme-muted hover:text-theme-text"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </form>
+              </div>
+
+              {/* Right Column: Educational Articles List */}
+              <div className="lg:col-span-7 space-y-3.5">
+                {/* Search and Category Filter Bar */}
+                <div className="card border border-theme-border/40 bg-theme-surface/40 p-3 rounded-2xl flex flex-wrap items-center justify-between gap-2.5">
+                  <div className="relative flex-1 min-w-[180px]">
+                    <svg className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-theme-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input
+                      type="text"
+                      placeholder="Filter articles by title or keyword..."
+                      value={educationSearchQuery}
+                      onChange={(e) => setEducationSearchQuery(e.target.value)}
+                      className="w-full rounded-lg border border-theme-border/50 bg-theme-surface/70 py-1.5 pl-8 pr-3 text-xs text-theme-text placeholder:text-theme-muted focus:border-theme-accent focus:outline-none"
+                    />
+                  </div>
+
+                  <select
+                    value={educationCategoryFilter}
+                    onChange={(e) => setEducationCategoryFilter(e.target.value)}
+                    className="rounded-lg border border-theme-border/50 bg-theme-surface/70 py-1.5 px-2.5 text-xs text-theme-text focus:border-theme-accent focus:outline-none"
+                  >
+                    <option value="">All Categories ({educationList.length})</option>
+                    <option value="articles">Articles</option>
+                    <option value="tips">Tips</option>
+                    <option value="brushing">Brushing</option>
+                    <option value="flossing">Flossing</option>
+                    <option value="mouthwash">Mouthwash</option>
+                    <option value="prevention">Prevention</option>
+                    <option value="video">Video</option>
+                  </select>
+                </div>
+
+                {/* Articles List Content */}
+                {educationLoading ? (
+                  <div className="card border border-theme-border/30 bg-theme-surface/30 p-10 text-center">
+                    <LoadingSpinner />
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[640px] overflow-y-auto pr-1">
+                    {educationList
+                      .filter((item) => {
+                        const matchCat = !educationCategoryFilter || item.category === educationCategoryFilter;
+                        const q = educationSearchQuery.toLowerCase().trim();
+                        const matchQuery =
+                          !q ||
+                          item.title?.toLowerCase().includes(q) ||
+                          item.description?.toLowerCase().includes(q) ||
+                          item.source?.toLowerCase().includes(q);
+                        return matchCat && matchQuery;
+                      })
+                      .map((item, idx) => {
+                        const isBeingDeleted = deletingEducationId === item._id;
+                        const hasVideo = Boolean(item.videoUrl);
+
+                        return (
+                          <motion.div
+                            key={item._id || idx}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: idx * 0.02 }}
+                            className={`card border bg-theme-surface/50 p-4 rounded-2xl space-y-2.5 transition duration-150 ${
+                              editingEducationId === item._id
+                                ? 'border-theme-accent shadow-glow-sm bg-theme-accent/5'
+                                : 'border-theme-border/40 hover:border-theme-accent/30'
+                            }`}
+                          >
+                            <div className="flex flex-wrap items-start justify-between gap-2">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="rounded-md border border-theme-accent/30 bg-theme-accent/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-theme-accent">
+                                  {item.category}
+                                </span>
+                                <span className="text-[11px] text-theme-muted font-medium">
+                                  ⏱ {item.readTime || '3 min read'}
+                                </span>
+                                {hasVideo && (
+                                  <span className="inline-flex items-center gap-1 rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-0.5 text-[10px] font-bold text-rose-400">
+                                    <span>🎥</span> YouTube Video
+                                  </span>
+                                )}
+                              </div>
+
+                              <span className="inline-flex items-center gap-1 rounded-md bg-theme-surface/70 border border-theme-border/40 px-2 py-0.5 text-[10px] font-medium text-theme-muted">
+                                <span>🏛️</span> {item.source || 'Verified Healthcare Source'}
+                              </span>
+                            </div>
+
+                            <div>
+                              <h4 className="font-bold text-theme-heading text-sm font-outfit">
+                                {item.title}
+                              </h4>
+                              <p className="text-xs text-theme-muted leading-relaxed line-clamp-2 mt-1">
+                                {item.description}
+                              </p>
+                            </div>
+
+                            <div className="pt-2 border-t border-theme-border/15 flex flex-wrap items-center justify-between gap-2 text-xs">
+                              <div className="flex flex-wrap items-center gap-3 text-theme-muted text-[11px]">
+                                <span>📅 {item.createdAt ? new Date(item.createdAt).toLocaleDateString() : 'Active'}</span>
+                                {hasVideo && (
+                                  <a
+                                    href={item.videoUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-rose-400 hover:underline inline-flex items-center gap-1 font-semibold"
+                                  >
+                                    <span>▶ Watch Video</span>
+                                  </a>
+                                )}
+                                {item.sourceUrl && (
+                                  <a
+                                    href={item.sourceUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-theme-accent hover:underline inline-flex items-center gap-1 font-semibold"
+                                  >
+                                    <span>🔗 Source Link</span>
+                                  </a>
+                                )}
+                              </div>
+
+                              <div className="flex items-center gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleEditEducation(item)}
+                                  className="rounded-lg border border-theme-border/50 bg-theme-surface/80 px-2.5 py-1 text-xs font-semibold text-theme-text hover:border-theme-accent hover:text-theme-accent transition"
+                                >
+                                  ✏️ Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={isBeingDeleted}
+                                  onClick={() => handleDeleteEducation(item._id)}
+                                  className="rounded-lg border border-red-500/30 bg-red-500/10 px-2.5 py-1 text-xs font-semibold text-red-400 hover:bg-red-500/20 transition disabled:opacity-50"
+                                >
+                                  {isBeingDeleted ? 'Deleting...' : '🗑️ Delete'}
+                                </button>
+                              </div>
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+
+                    {educationList.length === 0 && (
+                      <div className="card text-center py-10 text-theme-muted border border-dashed border-theme-border/40 bg-theme-surface/20 rounded-2xl">
+                        <p className="text-3xl mb-2">📚</p>
+                        <p className="font-semibold text-theme-heading text-sm">No educational articles found</p>
+                        <p className="text-xs text-theme-muted mt-1">Use the form on the left to publish your first educational resource.</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </motion.div>
         )}
