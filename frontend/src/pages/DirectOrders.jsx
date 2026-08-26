@@ -23,6 +23,25 @@ const STATUS_LABELS = {
   cancelled: 'Cancelled',
 };
 
+const PAYMENT_METHOD_LABELS = {
+  card: '💳 Card',
+  cod: '💵 COD',
+};
+
+const PAYMENT_STATUS_LABELS = {
+  paid: '✓ Paid',
+  pending: 'Pending',
+  failed: 'Failed',
+  cancelled: 'Cancelled',
+};
+
+const PAYMENT_STATUS_BADGES = {
+  paid: 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/30 dark:text-emerald-400',
+  pending: 'bg-amber-500/15 text-amber-600 border border-amber-500/30 dark:text-amber-400',
+  failed: 'bg-red-500/15 text-red-500 border border-red-500/30',
+  cancelled: 'bg-gray-500/15 text-gray-400 border border-gray-500/30',
+};
+
 export default function DirectOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -179,8 +198,8 @@ export default function DirectOrders() {
                 {/* Expanded Details */}
                 {isExpanded && (
                   <div className="border-t border-theme-border/20 bg-theme-surface/20 p-5 space-y-4">
-                    {/* Customer & Shipping info */}
-                    <div className="grid gap-4 md:grid-cols-3 text-xs text-theme-muted border-b border-theme-border/20 pb-4">
+                    {/* Customer, Shipping, Pharmacy & Payment info */}
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 text-xs text-theme-muted border-b border-theme-border/20 pb-4">
                       <div>
                         <span className="font-bold text-theme-heading block uppercase tracking-wider mb-1 text-[10px]">
                           Customer Info
@@ -200,6 +219,32 @@ export default function DirectOrders() {
                         </span>
                         <p className="text-theme-text">{order.pharmacyId?.phone || 'N/A'}</p>
                         <p>{order.pharmacyId?.address}, {order.pharmacyId?.city}</p>
+                      </div>
+                      <div>
+                        <span className="font-bold text-theme-heading block uppercase tracking-wider mb-1 text-[10px]">
+                          Payment Details
+                        </span>
+                        <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                          <span className="font-semibold text-theme-text">
+                            {PAYMENT_METHOD_LABELS[order.paymentMethod] || (order.paymentMethod === 'card' ? '💳 Card' : '💵 COD')}
+                          </span>
+                          <span className="text-theme-muted">·</span>
+                          <span
+                            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+                              PAYMENT_STATUS_BADGES[order.paymentStatus] ||
+                              (order.paymentStatus === 'paid'
+                                ? 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/30 dark:text-emerald-400'
+                                : 'bg-amber-500/15 text-amber-600 border border-amber-500/30 dark:text-amber-400')
+                            }`}
+                          >
+                            {PAYMENT_STATUS_LABELS[order.paymentStatus] ||
+                              (order.paymentStatus === 'paid'
+                                ? '✓ Paid'
+                                : order.paymentStatus === 'failed'
+                                ? 'Failed'
+                                : 'Pending')}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
@@ -237,6 +282,38 @@ export default function DirectOrders() {
                             </div>
                           </div>
                         ))}
+                      </div>
+                    </div>
+
+                    {/* Order Total & Payment Summary */}
+                    <div className="rounded-xl border border-theme-border/20 bg-theme-surface/40 p-3.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-theme-muted font-medium">Payment:</span>
+                        <span className="font-semibold text-theme-heading flex items-center gap-1.5">
+                          <span>{PAYMENT_METHOD_LABELS[order.paymentMethod] || (order.paymentMethod === 'card' ? '💳 Card' : '💵 COD')}</span>
+                          <span className="text-theme-muted">·</span>
+                          <span
+                            className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold ${
+                              PAYMENT_STATUS_BADGES[order.paymentStatus] ||
+                              (order.paymentStatus === 'paid'
+                                ? 'bg-emerald-500/15 text-emerald-600 border border-emerald-500/30 dark:text-emerald-400'
+                                : 'bg-amber-500/15 text-amber-600 border border-amber-500/30 dark:text-amber-400')
+                            }`}
+                          >
+                            {PAYMENT_STATUS_LABELS[order.paymentStatus] ||
+                              (order.paymentStatus === 'paid'
+                                ? '✓ Paid'
+                                : order.paymentStatus === 'failed'
+                                ? 'Failed'
+                                : 'Pending')}
+                          </span>
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-theme-muted font-medium">Total Order Amount:</span>
+                        <span className="text-base font-bold text-theme-accent">
+                          Rs. {order.totalAmount.toFixed(2)}
+                        </span>
                       </div>
                     </div>
 
