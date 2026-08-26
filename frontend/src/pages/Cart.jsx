@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Input from '../components/Input';
+import Modal from '../components/Modal';
+import Button from '../components/Button';
 import { cartAPI, directOrderAPI, paymentAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { getImageUrl } from '../utils/imageUrl';
@@ -133,6 +135,8 @@ export default function Cart() {
   const [successMsg, setSuccessMsg] = useState('');
   const [checkoutPharmacyId, setCheckoutPharmacyId] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [itemToRemove, setItemToRemove] = useState(null);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   // Checkout delivery form
   const [checkoutForm, setCheckoutForm] = useState({
@@ -240,13 +244,27 @@ export default function Cart() {
     }
   };
 
-  const handleRemoveItem = async (itemId) => {
+  const handleRemoveClick = (item) => {
+    setItemToRemove(item);
+  };
+
+  const handleCancelRemove = () => {
+    if (isRemoving) return;
+    setItemToRemove(null);
+  };
+
+  const handleConfirmRemove = async () => {
+    if (!itemToRemove) return;
     try {
-      const { data } = await cartAPI.removeItem(itemId);
+      setIsRemoving(true);
+      const { data } = await cartAPI.removeItem(itemToRemove._id);
       setCart(data.data);
+      setItemToRemove(null);
     } catch (_) {
       setErrorMsg('Failed to remove item.');
       setTimeout(() => setErrorMsg(''), 3000);
+    } finally {
+      setIsRemoving(false);
     }
   };
 
@@ -524,7 +542,7 @@ export default function Cart() {
 
                         <button
                           type="button"
-                          onClick={() => handleRemoveItem(item._id)}
+                          onClick={() => handleRemoveClick(item)}
                           className="rounded-lg p-2 text-theme-muted hover:bg-red-500/10 hover:text-red-400 transition"
                           title="Remove item"
                         >
@@ -708,6 +726,62 @@ export default function Cart() {
           </div>
         </div>
       )}
+
+      {/* Remove Item Confirmation Modal */}
+      <Modal
+        isOpen={Boolean(itemToRemove)}
+        onClose={handleCancelRemove}
+        title="Remove Item"
+        size="sm"
+      >
+        <div className="space-y-4">
+          <p className="text-sm text-theme-muted">
+            Are you sure you want to remove this item from your cart?
+          </p>
+
+          {itemToRemove && (
+            <div className="rounded-xl border border-theme-border/40 bg-theme-surface/50 p-3 flex items-center gap-3">
+              <div className="h-12 w-12 shrink-0 rounded-lg overflow-hidden border border-theme-border/30 bg-theme-background">
+                <img
+                  src={getImageUrl(itemToRemove.image, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=80')}
+                  alt={itemToRemove.medicineName}
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    e.target.src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=80';
+                  }}
+                />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-bold text-theme-heading truncate">{itemToRemove.medicineName}</p>
+                <p className="text-xs text-theme-muted">
+                  Rs. {itemToRemove.unitPrice.toFixed(2)} × {itemToRemove.quantity}
+                </p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 pt-2">
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={handleCancelRemove}
+              disabled={isRemoving}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              size="sm"
+              onClick={handleConfirmRemove}
+              loading={isRemoving}
+            >
+              Remove
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </Layout>
   );
 }
