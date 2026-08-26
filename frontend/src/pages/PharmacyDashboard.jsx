@@ -51,6 +51,14 @@ export default function PharmacyDashboard() {
   // Modal Control
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMedicine, setEditingMedicine] = useState(null);
+  const [toastMessage, setToastMessage] = useState('');
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => setToastMessage(''), 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   const loadData = async () => {
     try {
@@ -147,8 +155,10 @@ export default function PharmacyDashboard() {
   const handleModalSubmit = async (formData) => {
     if (editingMedicine) {
       await pharmacyAPI.updateInventoryItem(editingMedicine._id, formData);
+      setToastMessage('Item updated successfully!');
     } else {
       await pharmacyAPI.addInventoryItem(formData);
+      setToastMessage('Item added successfully!');
     }
     loadData();
   };
@@ -210,6 +220,31 @@ export default function PharmacyDashboard() {
 
   return (
     <Layout>
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-theme-surface/95 px-4 py-3 text-sm font-semibold text-emerald-400 shadow-glow backdrop-blur-md"
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-xs">
+              ✓
+            </span>
+            <span>{toastMessage}</span>
+            <button
+              type="button"
+              onClick={() => setToastMessage('')}
+              className="ml-2 rounded-lg p-1 text-theme-muted hover:text-theme-text transition"
+              aria-label="Close notification"
+            >
+              ✕
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-theme-heading font-heading">Pharmacy Dashboard</h1>
