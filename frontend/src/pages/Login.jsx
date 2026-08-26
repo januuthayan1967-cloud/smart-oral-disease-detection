@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import { getApiErrorMessage, getDashboardPath } from '../services/api';
 import AuthLayout from '../components/AuthLayout';
@@ -9,12 +9,27 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import LoadingAnimation from '../components/LoadingAnimation';
 
+const getWelcomeMessage = (role) => {
+  switch (role) {
+    case 'dentist':
+      return 'Welcome Dentist! You have logged in successfully.';
+    case 'pharmacy':
+      return 'Welcome Pharmacy! You have logged in successfully.';
+    case 'admin':
+      return 'Welcome Admin! You have logged in successfully.';
+    case 'user':
+    default:
+      return 'Welcome User! You have logged in successfully.';
+  }
+};
+
 export default function Login() {
   const { login, user, loading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(location.state?.message || '');
+  const [toastMessage, setToastMessage] = useState('');
   const {
     register,
     handleSubmit,
@@ -23,7 +38,11 @@ export default function Login() {
 
   useEffect(() => {
     if (!loading && user) {
-      navigate(getDashboardPath(user.role), { replace: true });
+      const welcomeMsg = getWelcomeMessage(user.role);
+      navigate(getDashboardPath(user.role), {
+        replace: true,
+        state: { toastMessage: welcomeMsg, message: welcomeMsg },
+      });
     }
   }, [user, loading, navigate]);
 
@@ -31,7 +50,16 @@ export default function Login() {
     try {
       setError('');
       setSuccess('');
-      await login(data);
+      const loggedUser = await login(data);
+      const welcomeMsg = getWelcomeMessage(loggedUser?.role);
+      setSuccess(welcomeMsg);
+      setToastMessage(welcomeMsg);
+      setTimeout(() => {
+        navigate(getDashboardPath(loggedUser?.role), {
+          replace: true,
+          state: { toastMessage: welcomeMsg, message: welcomeMsg },
+        });
+      }, 400);
     } catch (err) {
       setError(getApiErrorMessage(err, 'Login failed. Please check your credentials.'));
     }
@@ -43,6 +71,30 @@ export default function Login() {
 
   return (
     <AuthLayout title="Welcome Back" subtitle="Sign in to your Oral AI account">
+      {/* Floating Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-theme-surface/95 px-4 py-3 text-sm font-semibold text-emerald-400 shadow-glow backdrop-blur-md"
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-xs">
+              ✓
+            </span>
+            <span>{toastMessage}</span>
+            <button
+              type="button"
+              onClick={() => setToastMessage('')}
+              className="ml-2 rounded-lg p-1 text-theme-muted hover:text-theme-text transition"
+              aria-label="Close notification"
+            >
+              ✕
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {success && (
         <motion.div
           className="mt-4 rounded-xl p-3 text-sm font-medium"
