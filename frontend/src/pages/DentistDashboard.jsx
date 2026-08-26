@@ -6,6 +6,22 @@ import { dentistDashboardAPI, prescriptionAPI, appointmentAPI } from '../service
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+const generateSlots = (startTime, endTime) => {
+  if (!startTime || !endTime) return [];
+  const [sh, sm] = startTime.split(':').map(Number);
+  const [eh, em] = endTime.split(':').map(Number);
+  const startMins = sh * 60 + sm;
+  const endMins = eh * 60 + em;
+  if (endMins <= startMins) return [];
+  const slots = [];
+  for (let cur = startMins; cur < endMins; cur += 30) {
+    const h = Math.floor(cur / 60).toString().padStart(2, '0');
+    const m = (cur % 60).toString().padStart(2, '0');
+    slots.push(`${h}:${m}`);
+  }
+  return slots;
+};
+
 export default function DentistDashboard() {
   const [activeTab, setActiveTab] = useState('consultations');
   const [patients, setPatients] = useState([]);
@@ -17,6 +33,7 @@ export default function DentistDashboard() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState(null);
   const [payments, setPayments] = useState([]);
+  const [availabilityMessage, setAvailabilityMessage] = useState('');
   const [prescriptionForm, setPrescriptionForm] = useState({
     patientId: '',
     caseDiagnosisSelect: '',
@@ -138,6 +155,7 @@ export default function DentistDashboard() {
   };
 
   const updateDayTimes = (day, field, value) => {
+    setAvailabilityMessage('');
     setAvailability((prev) => {
       const exists = prev.find((a) => a.day && a.day.toLowerCase() === day.toLowerCase());
       if (exists) {
@@ -150,6 +168,7 @@ export default function DentistDashboard() {
   };
 
   const toggleDay = (day) => {
+    setAvailabilityMessage('');
     const exists = availability.find((a) => a.day && a.day.toLowerCase() === day.toLowerCase());
     if (exists) {
       setAvailability(availability.filter((a) => a.day && a.day.toLowerCase() !== day.toLowerCase()));
@@ -189,7 +208,8 @@ export default function DentistDashboard() {
         slots: a.slots || [],
       }));
       setAvailability(savedAvail);
-      alert('Availability schedule saved successfully!');
+      setAvailabilityMessage('Availability updated successfully.');
+      setTimeout(() => setAvailabilityMessage(''), 6000);
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to update availability.');
     }
@@ -914,6 +934,27 @@ export default function DentistDashboard() {
             <p className="text-sm text-theme-muted mt-1">Configure available working days and start/end time hours for patient appointments.</p>
           </div>
 
+          {availabilityMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="rounded-xl p-3 text-sm font-semibold border flex items-center justify-between shadow-sm"
+              style={{ background: 'var(--success-bg, rgba(34, 197, 94, 0.15))', color: 'var(--success, #22c55e)', borderColor: 'var(--success, rgba(34, 197, 94, 0.3))' }}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-base font-bold">✓</span>
+                <span>{availabilityMessage}</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAvailabilityMessage('')}
+                className="text-xs opacity-75 hover:opacity-100 font-bold px-1.5 py-0.5 rounded hover:bg-black/10 transition"
+              >
+                ✕
+              </button>
+            </motion.div>
+          )}
+
           <div className="space-y-4">
             {DAYS.map((day) => {
               const dayItem = availability.find((a) => a.day && a.day.toLowerCase() === day.toLowerCase());
@@ -927,6 +968,7 @@ export default function DentistDashboard() {
                   return (endH * 60 + endM) <= (startH * 60 + startM);
                 })()
               );
+              const generatedSlotsList = isAvailable && !isInvalidTime ? generateSlots(startTime, endTime) : [];
 
               return (
                 <div
@@ -984,6 +1026,27 @@ export default function DentistDashboard() {
                       <span>⚠️</span>
                       <span>End time must be later than start time.</span>
                     </p>
+                  )}
+
+                  {isAvailable && !isInvalidTime && generatedSlotsList.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-theme-border/20">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-semibold text-theme-heading flex items-center gap-1.5">
+                          <span>⏰</span>
+                          <span>Generated Slots ({generatedSlotsList.length} slots):</span>
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {generatedSlotsList.map((slot) => (
+                          <span
+                            key={slot}
+                            className="rounded-lg px-2.5 py-1 text-xs font-mono font-bold bg-theme-accent/10 text-theme-accent border border-theme-accent/25 shadow-sm"
+                          >
+                            {slot}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </div>
               );
