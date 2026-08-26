@@ -180,15 +180,30 @@ export default function Cart() {
     }
   }, [user]);
 
-  const handleQuantityChange = async (itemId, currentQty, amount) => {
-    const newQty = currentQty + amount;
+  const handleQuantityChange = async (item, amount) => {
+    const newQty = item.quantity + amount;
     if (newQty < 1) return;
+
+    if (amount > 0 && item.availableStock !== undefined) {
+      if (item.availableStock === 0) {
+        setErrorMsg('This item is currently out of stock.');
+        setTimeout(() => setErrorMsg(''), 3500);
+        return;
+      }
+      if (item.quantity >= item.availableStock) {
+        setErrorMsg(`Only ${item.availableStock} items are available in stock.`);
+        setTimeout(() => setErrorMsg(''), 3500);
+        return;
+      }
+    }
+
     try {
-      const { data } = await cartAPI.updateItem(itemId, newQty);
+      const { data } = await cartAPI.updateItem(item._id, newQty);
       setCart(data.data);
     } catch (err) {
       setErrorMsg(err.response?.data?.message || 'Failed to update item quantity.');
-      setTimeout(() => setErrorMsg(''), 3000);
+      fetchCart();
+      setTimeout(() => setErrorMsg(''), 4000);
     }
   };
 
@@ -226,6 +241,23 @@ export default function Cart() {
     if (!checkoutForm.customerName || !checkoutForm.deliveryAddress || !checkoutForm.contactNumber) {
       setErrorMsg('Please fill in all required customer details.');
       return;
+    }
+
+    // Client-side stock check before submission
+    const group = groupedItems[pharmacyId];
+    if (group && group.items) {
+      for (const item of group.items) {
+        if (item.availableStock !== undefined) {
+          if (item.availableStock === 0) {
+            setErrorMsg('This item is currently out of stock.');
+            return;
+          }
+          if (item.quantity > item.availableStock) {
+            setErrorMsg(`Only ${item.availableStock} items are available in stock.`);
+            return;
+          }
+        }
+      }
     }
 
     // Validate card if selected
@@ -269,7 +301,9 @@ export default function Cart() {
 
       setTimeout(() => navigate('/direct-orders'), 2500);
     } catch (err) {
-      setErrorMsg(err.response?.data?.message || 'Failed to place order. Please try again.');
+      const backendError = err.response?.data?.message || 'Failed to place order. Please try again.';
+      setErrorMsg(backendError);
+      fetchCart();
     } finally {
       setIsSubmitting(false);
     }
@@ -351,6 +385,15 @@ export default function Cart() {
                             {item.category}
                           </span>
                           <p className="mt-1 text-xs text-theme-muted">Rs. {item.unitPrice.toFixed(2)} / unit</p>
+                          {item.availableStock !== undefined && (
+                            item.availableStock === 0 ? (
+                              <span className="text-[11px] font-semibold text-red-400 block mt-0.5">⚠️ Out of stock</span>
+                            ) : item.quantity > item.availableStock ? (
+                              <span className="text-[11px] font-semibold text-red-400 block mt-0.5">⚠️ Only {item.availableStock} available</span>
+                            ) : (
+                              <span className="text-[11px] text-theme-muted block mt-0.5">Stock: {item.availableStock} available</span>
+                            )
+                          )}
                         </div>
                       </div>
 
@@ -359,18 +402,22 @@ export default function Cart() {
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
-                            onClick={() => handleQuantityChange(item._id, item.quantity, -1)}
+                            onClick={() => handleQuantityChange(item, -1)}
                             className="h-8 w-8 rounded-lg border border-theme-border/60 bg-theme-surface/50 flex items-center justify-center text-theme-text font-bold hover:bg-theme-surface transition"
                           >
                             -
                           </button>
-                          <span className="w-8 text-center text-sm font-semibold text-theme-heading">
+                          <span className={`w-8 text-center text-sm font-semibold ${item.availableStock !== undefined && item.quantity > item.availableStock ? 'text-red-400 font-bold' : 'text-theme-heading'}`}>
                             {item.quantity}
                           </span>
                           <button
                             type="button"
-                            onClick={() => handleQuantityChange(item._id, item.quantity, 1)}
-                            className="h-8 w-8 rounded-lg border border-theme-border/60 bg-theme-surface/50 flex items-center justify-center text-theme-text font-bold hover:bg-theme-surface transition"
+                            onClick={() => handleQuantityChange(item, 1)}
+                            disabled={item.availableStock !== undefined && item.quantity >= item.availableStock}
+                            className={`h-8 w-8 rounded-lg border border-theme-border/60 bg-theme-surface/50 flex items-center justify-center text-theme-text font-bold hover:bg-theme-surface transition ${
+                              item.availableStock !== undefined && item.quantity >= item.availableStock ? 'opacity-40 cursor-not-allowed' : ''
+                            }`}
+                            title={item.availableStock !== undefined && item.quantity >= item.availableStock ? `Only ${item.availableStock} items are available in stock.` : 'Increase quantity'}
                           >
                             +
                           </button>

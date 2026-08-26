@@ -145,7 +145,7 @@ export default function MedicineCard({
             onClick={() => onAddToCart(medicine)}
             disabled={quantity === 0 || isAdding}
             className={`btn-primary px-4 py-2 text-sm flex items-center gap-1.5 ${
-              quantity === 0 ? 'opacity-50 cursor-not-allowed' : ''
+              quantity === 0 ? 'opacity-50 cursor-not-allowed bg-gray-500/20 hover:bg-gray-500/20 shadow-none' : ''
             }`}
           >
             <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -153,7 +153,7 @@ export default function MedicineCard({
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
-            <span>{isAdding ? 'Adding...' : 'Add to Cart'}</span>
+            <span>{isAdding ? 'Adding...' : quantity === 0 ? 'Out of Stock' : 'Add to Cart'}</span>
           </button>
         ) : null}
       </div>

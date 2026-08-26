@@ -4,11 +4,36 @@ import { AppError } from '../utils/AppError.js';
 
 /**
  * GET /api/cart
- * Get the authenticated user's cart.
+ * Get the authenticated user's cart enriched with real-time stock.
  */
 export const getCart = async (req, res) => {
   const cart = await Cart.findOne({ userId: req.user._id });
-  res.json({ success: true, data: cart || { items: [] } });
+  if (!cart || !cart.items || cart.items.length === 0) {
+    return res.json({ success: true, data: cart || { items: [] } });
+  }
+
+  // Fetch pharmacies for items in cart to get real-time stock
+  const pharmacyIds = [...new Set(cart.items.map((i) => i.pharmacyId.toString()))];
+  const pharmacies = await Pharmacy.find({ _id: { $in: pharmacyIds }, status: 'approved' });
+  const pharmacyMap = new Map(pharmacies.map((p) => [p._id.toString(), p]));
+
+  const enrichedItems = cart.items.map((item) => {
+    const itemObj = item.toObject ? item.toObject() : { ...item };
+    const pharmacy = pharmacyMap.get(item.pharmacyId.toString());
+    const inventoryItem = pharmacy ? pharmacy.inventory.id(item.inventoryItemId) : null;
+    const availableStock = inventoryItem ? inventoryItem.quantity : 0;
+    return {
+      ...itemObj,
+      availableStock,
+      isOutOfStock: availableStock === 0,
+      isExceedingStock: item.quantity > availableStock,
+    };
+  });
+
+  const cartObj = cart.toObject ? cart.toObject() : { ...cart };
+  cartObj.items = enrichedItems;
+
+  res.json({ success: true, data: cartObj });
 };
 
 /**
@@ -23,6 +48,11 @@ export const addToCart = async (req, res) => {
     throw new AppError('pharmacyId and inventoryItemId are required.', 400);
   }
 
+  const requestedQty = parseInt(quantity, 10);
+  if (!requestedQty || requestedQty < 1) {
+    throw new AppError('Quantity must be at least 1.', 400);
+  }
+
   // Verify the medicine exists in the pharmacy inventory
   const pharmacy = await Pharmacy.findOne({ _id: pharmacyId, status: 'approved' });
   if (!pharmacy) throw new AppError('Pharmacy not found or not approved.', 404);
@@ -31,7 +61,7 @@ export const addToCart = async (req, res) => {
   if (!inventoryItem) throw new AppError('Medicine not found in pharmacy inventory.', 404);
 
   if (inventoryItem.quantity < 1) {
-    throw new AppError('This medicine is currently out of stock.', 400);
+    throw new AppError('This item is currently out of stock.', 400);
   }
 
   let cart = await Cart.findOne({ userId: req.user._id });
@@ -42,21 +72,19 @@ export const addToCart = async (req, res) => {
   // Check if item already in cart
   const existingItem = cart.items.find(
     (item) =>
-      item.pharmacyId.toString() === pharmacyId &&
-      item.inventoryItemId.toString() === inventoryItemId
+      item.pharmacyId.toString() === pharmacyId.toString() &&
+      item.inventoryItemId.toString() === inventoryItemId.toString()
   );
-
-  const requestedQty = parseInt(quantity, 10);
 
   if (existingItem) {
     const newQty = existingItem.quantity + requestedQty;
     if (newQty > inventoryItem.quantity) {
-      throw new AppError(`Only ${inventoryItem.quantity} units available.`, 400);
+      throw new AppError(`Only ${inventoryItem.quantity} items are available in stock.`, 400);
     }
     existingItem.quantity = newQty;
   } else {
     if (requestedQty > inventoryItem.quantity) {
-      throw new AppError(`Only ${inventoryItem.quantity} units available.`, 400);
+      throw new AppError(`Only ${inventoryItem.quantity} items are available in stock.`, 400);
     }
     cart.items.push({
       pharmacyId,
@@ -71,7 +99,7 @@ export const addToCart = async (req, res) => {
   }
 
   await cart.save();
-  res.json({ success: true, data: cart });
+  return getCart(req, res);
 };
 
 /**
@@ -93,9 +121,23 @@ export const updateCartItem = async (req, res) => {
   const item = cart.items.id(req.params.itemId);
   if (!item) throw new AppError('Cart item not found.', 404);
 
+  const pharmacy = await Pharmacy.findOne({ _id: item.pharmacyId, status: 'approved' });
+  if (!pharmacy) throw new AppError('Pharmacy not found or not approved.', 404);
+
+  const inventoryItem = pharmacy.inventory.id(item.inventoryItemId);
+  if (!inventoryItem) throw new AppError('Medicine not found in pharmacy inventory.', 404);
+
+  if (inventoryItem.quantity < 1) {
+    throw new AppError('This item is currently out of stock.', 400);
+  }
+
+  if (parsedQty > inventoryItem.quantity) {
+    throw new AppError(`Only ${inventoryItem.quantity} items are available in stock.`, 400);
+  }
+
   item.quantity = parsedQty;
   await cart.save();
-  res.json({ success: true, data: cart });
+  return getCart(req, res);
 };
 
 /**
@@ -108,7 +150,7 @@ export const removeFromCart = async (req, res) => {
 
   cart.items.pull(req.params.itemId);
   await cart.save();
-  res.json({ success: true, data: cart });
+  return getCart(req, res);
 };
 
 /**

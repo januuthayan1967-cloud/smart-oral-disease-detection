@@ -144,8 +144,10 @@ export const sendPrescriptionToPharmacy = async (req, res) => {
     throw new AppError('An active order already exists for this prescription at this pharmacy.', 400);
   }
 
-  // Verify inventory stock availability and calculate amount
+  // Pre-validate inventory stock availability and calculate amount
   let totalAmount = 0;
+  const itemsToDeduct = [];
+
   for (const med of prescription.medicines) {
     const inventoryItem = pharmacy.inventory.find(
       (item) => item.medicineName.toLowerCase() === med.medicineName.toLowerCase()
@@ -153,49 +155,100 @@ export const sendPrescriptionToPharmacy = async (req, res) => {
     if (!inventoryItem) {
       throw new AppError(`Medicine "${med.medicineName}" not found in pharmacy inventory.`, 404);
     }
-    if (inventoryItem.quantity < med.quantity) {
-      throw new AppError(`Insufficient stock for "${med.medicineName}". Available: ${inventoryItem.quantity}, Requested: ${med.quantity}`, 400);
+    if (inventoryItem.quantity < 1) {
+      throw new AppError('This item is currently out of stock.', 400);
     }
-    inventoryItem.quantity -= med.quantity;
+    if (med.quantity > inventoryItem.quantity) {
+      throw new AppError(`Only ${inventoryItem.quantity} items are available in stock.`, 400);
+    }
     totalAmount += inventoryItem.price * med.quantity;
-  }
-
-  // Save the updated pharmacy inventory
-  await pharmacy.save();
-
-  let safeCard = {};
-  if (paymentMethod === 'card') {
-    safeCard = validateCardInput({ cardHolderName, cardNumber, cardExpiry, cvv });
-  }
-
-  const order = await MedicineOrder.create({
-    prescriptionId,
-    pharmacyId,
-    userId: req.user._id,
-    deliveryAddress,
-    totalAmount,
-    status: 'pending',
-    paymentMethod,
-    paymentStatus: paymentMethod === 'card' ? 'paid' : 'pending',
-  });
-
-  if (paymentMethod === 'card') {
-    const payment = await Payment.create({
-      userId: req.user._id,
-      orderId: order._id,
-      orderType: 'medicine_order',
-      amount: totalAmount,
-      method: 'card',
-      status: 'paid',
-      cardHolderName: safeCard.cardHolderName || '',
-      cardLastFour: safeCard.cardLastFour || '',
-      cardExpiry: safeCard.cardExpiry || '',
-      transactionId: randomUUID(),
-      paidAt: new Date(),
+    itemsToDeduct.push({
+      inventoryItemId: inventoryItem._id,
+      quantity: med.quantity,
+      medicineName: med.medicineName,
     });
-    order.paymentId = payment._id;
-    await order.save();
   }
+
+  // Perform atomic concurrency-safe stock deduction with rollback capability
+  const deductedItems = [];
+  try {
+    for (const item of itemsToDeduct) {
+      const updatedPharmacy = await Pharmacy.findOneAndUpdate(
+        {
+          _id: pharmacyId,
+          status: 'approved',
+          inventory: {
+            $elemMatch: {
+              _id: item.inventoryItemId,
+              quantity: { $gte: item.quantity },
+            },
+          },
+        },
+        {
+          $inc: { 'inventory.$.quantity': -item.quantity },
+        },
+        { new: true }
+      );
+
+      if (!updatedPharmacy) {
+        // Rollback any already deducted items in this batch
+        for (const deducted of deductedItems) {
+          await Pharmacy.findOneAndUpdate(
+            { _id: pharmacyId, 'inventory._id': deducted.inventoryItemId },
+            { $inc: { 'inventory.$.quantity': deducted.quantity } }
+          );
+        }
+
+        const freshPharmacy = await Pharmacy.findById(pharmacyId);
+        const freshItem = freshPharmacy?.inventory?.id(item.inventoryItemId);
+        const latestStock = freshItem ? freshItem.quantity : 0;
+
+        if (latestStock === 0) {
+          throw new AppError('This item is currently out of stock.', 400);
+        } else {
+          throw new AppError(`Only ${latestStock} items are available in stock.`, 400);
+        }
+      }
+
+      deductedItems.push({
+        inventoryItemId: item.inventoryItemId,
+        quantity: item.quantity,
+      });
+    }
+
+    let safeCard = {};
+    if (paymentMethod === 'card') {
+      safeCard = validateCardInput({ cardHolderName, cardNumber, cardExpiry, cvv });
+    }
+
+    const order = await MedicineOrder.create({
+      prescriptionId,
+      pharmacyId,
+      userId: req.user._id,
+      deliveryAddress,
+      totalAmount,
+      status: 'pending',
+      paymentMethod,
+      paymentStatus: paymentMethod === 'card' ? 'paid' : 'pending',
+    });
+
+    if (paymentMethod === 'card') {
+      const payment = await Payment.create({
+        userId: req.user._id,
+        orderId: order._id,
+        orderType: 'medicine_order',
+        amount: totalAmount,
+        method: 'card',
+        status: 'paid',
+        cardHolderName: safeCard.cardHolderName || '',
+        cardLastFour: safeCard.cardLastFour || '',
+        cardExpiry: safeCard.cardExpiry || '',
+        transactionId: randomUUID(),
+        paidAt: new Date(),
+      });
+      order.paymentId = payment._id;
+      await order.save();
+    }
 
   // Notify pharmacy about new prescription order
   try {

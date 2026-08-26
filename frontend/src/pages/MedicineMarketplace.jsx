@@ -61,6 +61,12 @@ export default function MedicineMarketplace() {
       return;
     }
 
+    if (med.quantity < 1) {
+      setErrorMsg('This item is currently out of stock.');
+      setTimeout(() => setErrorMsg(''), 4000);
+      return;
+    }
+
     try {
       setAddingId(med.itemId);
       setSuccessMsg('');

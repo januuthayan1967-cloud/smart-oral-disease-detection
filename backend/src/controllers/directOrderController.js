@@ -29,71 +29,133 @@ export const placeOrder = async (req, res) => {
     throw new AppError('No cart items found for this pharmacy.', 400);
   }
 
-  // Verify pharmacy still exists
+  // Verify pharmacy still exists and is approved
   const pharmacy = await Pharmacy.findOne({ _id: pharmacyId, status: 'approved' });
   if (!pharmacy) throw new AppError('Pharmacy not found or not approved.', 404);
 
-  // Check inventory stock and reduce quantity
+  // Pre-validate inventory stock availability and messages
   for (const item of pharmacyItems) {
     const inventoryItem = pharmacy.inventory.id(item.inventoryItemId);
     if (!inventoryItem) {
       throw new AppError(`Medicine "${item.medicineName}" not found in pharmacy inventory.`, 404);
     }
-    if (inventoryItem.quantity < item.quantity) {
-      throw new AppError(`Insufficient stock for "${item.medicineName}". Available: ${inventoryItem.quantity}, Requested: ${item.quantity}`, 400);
+    if (inventoryItem.quantity < 1) {
+      throw new AppError('This item is currently out of stock.', 400);
     }
-    inventoryItem.quantity -= item.quantity;
+    if (item.quantity > inventoryItem.quantity) {
+      throw new AppError(`Only ${inventoryItem.quantity} items are available in stock.`, 400);
+    }
   }
 
-  // Save the updated inventory back to the pharmacy
-  await pharmacy.save();
-
-  // Build order items with snapshots
-  const orderItems = pharmacyItems.map((item) => ({
-    inventoryItemId: item.inventoryItemId,
-    medicineName: item.medicineName,
-    category: item.category || 'General',
-    image: item.image || '',
-    unitPrice: item.unitPrice,
-    quantity: item.quantity,
-    totalPrice: item.unitPrice * item.quantity,
-  }));
-
-  const totalAmount = orderItems.reduce((sum, item) => sum + item.totalPrice, 0);
-
-  const order = await DirectOrder.create({
-    userId: req.user._id,
-    pharmacyId,
-    items: orderItems,
-    customerName,
-    deliveryAddress,
-    contactNumber,
-    notes: notes || '',
-    totalAmount,
-    status: 'pending',
-  });
-
-  // Remove ordered items from cart
-  cart.items = cart.items.filter(
-    (item) => item.pharmacyId.toString() !== pharmacyId
-  );
-  await cart.save();
-
-  await order.populate('pharmacyId', 'pharmacyName phone address city');
-
-  // Notify pharmacy
+  // Perform atomic concurrency-safe stock deductions with rollback capability
+  const deductedItems = [];
   try {
-    await Notification.create({
-      recipientId: pharmacyId,
-      recipientRole: 'pharmacy',
-      title: 'New Direct Order',
-      message: `New order from ${customerName} with ${orderItems.length} item(s). Total: Rs. ${totalAmount.toFixed(2)}.`,
-      type: 'order_placed',
-      orderId: order._id,
-    });
-  } catch (_) { /* non-critical */ }
+    for (const item of pharmacyItems) {
+      const updatedPharmacy = await Pharmacy.findOneAndUpdate(
+        {
+          _id: pharmacyId,
+          status: 'approved',
+          inventory: {
+            $elemMatch: {
+              _id: item.inventoryItemId,
+              quantity: { $gte: item.quantity },
+            },
+          },
+        },
+        {
+          $inc: { 'inventory.$.quantity': -item.quantity },
+        },
+        { new: true }
+      );
 
-  res.status(201).json({ success: true, data: order });
+      if (!updatedPharmacy) {
+        // Race condition: another purchase depleted or reduced stock
+        // Rollback any items already deducted in this batch
+        for (const deducted of deductedItems) {
+          await Pharmacy.findOneAndUpdate(
+            { _id: pharmacyId, 'inventory._id': deducted.inventoryItemId },
+            { $inc: { 'inventory.$.quantity': deducted.quantity } }
+          );
+        }
+
+        // Check fresh stock to produce exact error message
+        const freshPharmacy = await Pharmacy.findById(pharmacyId);
+        const freshItem = freshPharmacy?.inventory?.id(item.inventoryItemId);
+        const latestStock = freshItem ? freshItem.quantity : 0;
+
+        if (latestStock === 0) {
+          throw new AppError('This item is currently out of stock.', 400);
+        } else {
+          throw new AppError(`Only ${latestStock} items are available in stock.`, 400);
+        }
+      }
+
+      deductedItems.push({
+        inventoryItemId: item.inventoryItemId,
+        quantity: item.quantity,
+      });
+    }
+
+    // Build order items with snapshots
+    const orderItems = pharmacyItems.map((item) => ({
+      inventoryItemId: item.inventoryItemId,
+      medicineName: item.medicineName,
+      category: item.category || 'General',
+      image: item.image || '',
+      unitPrice: item.unitPrice,
+      quantity: item.quantity,
+      totalPrice: item.unitPrice * item.quantity,
+    }));
+
+    const totalAmount = orderItems.reduce((sum, item) => sum + item.totalPrice, 0);
+
+    const order = await DirectOrder.create({
+      userId: req.user._id,
+      pharmacyId,
+      items: orderItems,
+      customerName,
+      deliveryAddress,
+      contactNumber,
+      notes: notes || '',
+      totalAmount,
+      status: 'pending',
+    });
+
+    // Remove ordered items from cart
+    cart.items = cart.items.filter(
+      (item) => item.pharmacyId.toString() !== pharmacyId
+    );
+    await cart.save();
+
+    await order.populate('pharmacyId', 'pharmacyName phone address city');
+
+    // Notify pharmacy
+    try {
+      await Notification.create({
+        recipientId: pharmacyId,
+        recipientRole: 'pharmacy',
+        title: 'New Direct Order',
+        message: `New order from ${customerName} with ${orderItems.length} item(s). Total: Rs. ${totalAmount.toFixed(2)}.`,
+        type: 'order_placed',
+        orderId: order._id,
+      });
+    } catch (_) { /* non-critical */ }
+
+    return res.status(201).json({ success: true, data: order });
+  } catch (err) {
+    // If order creation failed, rollback any deducted items
+    if (deductedItems.length > 0 && !(err instanceof AppError)) {
+      for (const deducted of deductedItems) {
+        try {
+          await Pharmacy.findOneAndUpdate(
+            { _id: pharmacyId, 'inventory._id': deducted.inventoryItemId },
+            { $inc: { 'inventory.$.quantity': deducted.quantity } }
+          );
+        } catch (_) {}
+      }
+    }
+    throw err;
+  }
 };
 
 /**
