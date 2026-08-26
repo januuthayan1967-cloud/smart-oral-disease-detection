@@ -250,28 +250,41 @@ export const sendPrescriptionToPharmacy = async (req, res) => {
       await order.save();
     }
 
-  // Notify pharmacy about new prescription order
-  try {
-    await Notification.create({
-      recipientId: pharmacy._id,
-      recipientRole: 'pharmacy',
-      title: paymentMethod === 'card' ? 'New Prescription Order (Paid)' : 'New Prescription Order (COD)',
-      message: paymentMethod === 'card'
-        ? `New prescription order #${order._id.toString().slice(-8)} placed. Payment of Rs. ${totalAmount.toFixed(2)} received.`
-        : `New prescription order #${order._id.toString().slice(-8)} placed with Cash on Delivery.`,
-      type: 'order_placed',
-      orderId: order._id,
-    });
-  } catch (_) { /* non-critical */ }
+    // Notify pharmacy about new prescription order
+    try {
+      await Notification.create({
+        recipientId: pharmacy._id,
+        recipientRole: 'pharmacy',
+        title: paymentMethod === 'card' ? 'New Prescription Order (Paid)' : 'New Prescription Order (COD)',
+        message: paymentMethod === 'card'
+          ? `New prescription order #${order._id.toString().slice(-8)} placed. Payment of Rs. ${totalAmount.toFixed(2)} received.`
+          : `New prescription order #${order._id.toString().slice(-8)} placed with Cash on Delivery.`,
+        type: 'order_placed',
+        orderId: order._id,
+      });
+    } catch (_) { /* non-critical */ }
 
-  await order.populate([
-    { path: 'prescriptionId', populate: { path: 'dentistId', select: 'name specialization' } },
-    { path: 'pharmacyId', select: 'pharmacyName phone address city district' },
-    { path: 'userId', select: 'name email phone' },
-    { path: 'paymentId' },
-  ]);
+    await order.populate([
+      { path: 'prescriptionId', populate: { path: 'dentistId', select: 'name specialization' } },
+      { path: 'pharmacyId', select: 'pharmacyName phone address city district' },
+      { path: 'userId', select: 'name email phone' },
+      { path: 'paymentId' },
+    ]);
 
-  res.status(201).json({ success: true, data: order });
+    return res.status(201).json({ success: true, data: order });
+  } catch (err) {
+    if (deductedItems.length > 0 && !(err instanceof AppError)) {
+      for (const deducted of deductedItems) {
+        try {
+          await Pharmacy.findOneAndUpdate(
+            { _id: pharmacyId, 'inventory._id': deducted.inventoryItemId },
+            { $inc: { 'inventory.$.quantity': deducted.quantity } }
+          );
+        } catch (_) {}
+      }
+    }
+    throw err;
+  }
 };
 
 export const getOrderHistory = async (req, res) => {

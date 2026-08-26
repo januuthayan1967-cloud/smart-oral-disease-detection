@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Input from '../components/Input';
@@ -207,6 +208,38 @@ export default function Cart() {
     }
   };
 
+  const handleManualQuantityChange = async (item, val) => {
+    if (val === '') return;
+    let parsed = parseInt(val, 10);
+    if (isNaN(parsed) || parsed < 1) {
+      parsed = 1;
+    }
+
+    if (item.availableStock !== undefined) {
+      if (item.availableStock === 0) {
+        setErrorMsg('This item is currently out of stock.');
+        setTimeout(() => setErrorMsg(''), 3500);
+        return;
+      }
+      if (parsed > item.availableStock) {
+        setErrorMsg(`Only ${item.availableStock} items are available in stock.`);
+        setTimeout(() => setErrorMsg(''), 3500);
+        parsed = item.availableStock;
+      }
+    }
+
+    if (parsed === item.quantity) return;
+
+    try {
+      const { data } = await cartAPI.updateItem(item._id, parsed);
+      setCart(data.data);
+    } catch (err) {
+      setErrorMsg(err.response?.data?.message || 'Failed to update item quantity.');
+      fetchCart();
+      setTimeout(() => setErrorMsg(''), 4000);
+    }
+  };
+
   const handleRemoveItem = async (itemId) => {
     try {
       const { data } = await cartAPI.removeItem(itemId);
@@ -313,6 +346,52 @@ export default function Cart() {
 
   return (
     <Layout>
+      {/* Floating Toast Notification */}
+      <AnimatePresence>
+        {errorMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-amber-500/40 bg-theme-surface/95 px-4 py-3 text-sm font-semibold text-amber-400 shadow-glow backdrop-blur-md"
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-amber-500/20 text-xs">
+              ⚠️
+            </span>
+            <span>{errorMsg}</span>
+            <button
+              type="button"
+              onClick={() => setErrorMsg('')}
+              className="ml-2 rounded-lg p-1 text-theme-muted hover:text-theme-text transition"
+              aria-label="Close notification"
+            >
+              ✕
+            </button>
+          </motion.div>
+        )}
+        {successMsg && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="fixed top-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-emerald-500/40 bg-theme-surface/95 px-4 py-3 text-sm font-semibold text-emerald-400 shadow-glow backdrop-blur-md"
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/20 text-xs">
+              ✓
+            </span>
+            <span>{successMsg}</span>
+            <button
+              type="button"
+              onClick={() => setSuccessMsg('')}
+              className="ml-2 rounded-lg p-1 text-theme-muted hover:text-theme-text transition"
+              aria-label="Close notification"
+            >
+              ✕
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-bold text-theme-heading">Shopping Cart</h1>
@@ -399,25 +478,39 @@ export default function Cart() {
 
                       {/* Quantity & Delete actions */}
                       <div className="flex items-center justify-between sm:justify-end gap-6">
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1.5">
                           <button
                             type="button"
                             onClick={() => handleQuantityChange(item, -1)}
-                            className="h-8 w-8 rounded-lg border border-theme-border/60 bg-theme-surface/50 flex items-center justify-center text-theme-text font-bold hover:bg-theme-surface transition"
+                            disabled={item.quantity <= 1}
+                            className="h-8 w-8 rounded-lg border border-theme-border/60 bg-theme-surface/50 flex items-center justify-center text-theme-text font-bold hover:bg-theme-surface transition disabled:opacity-40 disabled:cursor-not-allowed"
+                            title="Decrease quantity"
                           >
                             -
                           </button>
-                          <span className={`w-8 text-center text-sm font-semibold ${item.availableStock !== undefined && item.quantity > item.availableStock ? 'text-red-400 font-bold' : 'text-theme-heading'}`}>
-                            {item.quantity}
-                          </span>
+                          <input
+                            type="number"
+                            min="1"
+                            max={item.availableStock !== undefined ? item.availableStock : 999}
+                            value={item.quantity}
+                            onChange={(e) => handleManualQuantityChange(item, e.target.value)}
+                            onBlur={(e) => {
+                              if (!e.target.value || parseInt(e.target.value, 10) < 1) {
+                                handleManualQuantityChange(item, '1');
+                              }
+                            }}
+                            className={`w-14 h-8 text-center text-sm font-semibold bg-theme-surface/50 border rounded-lg focus:outline-none focus:border-theme-accent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none transition ${
+                              item.availableStock !== undefined && item.quantity > item.availableStock
+                                ? 'border-red-400 text-red-400 font-bold'
+                                : 'border-theme-border/60 text-theme-heading'
+                            }`}
+                            title="Enter quantity"
+                          />
                           <button
                             type="button"
                             onClick={() => handleQuantityChange(item, 1)}
-                            disabled={item.availableStock !== undefined && item.quantity >= item.availableStock}
-                            className={`h-8 w-8 rounded-lg border border-theme-border/60 bg-theme-surface/50 flex items-center justify-center text-theme-text font-bold hover:bg-theme-surface transition ${
-                              item.availableStock !== undefined && item.quantity >= item.availableStock ? 'opacity-40 cursor-not-allowed' : ''
-                            }`}
-                            title={item.availableStock !== undefined && item.quantity >= item.availableStock ? `Only ${item.availableStock} items are available in stock.` : 'Increase quantity'}
+                            className="h-8 w-8 rounded-lg border border-theme-border/60 bg-theme-surface/50 flex items-center justify-center text-theme-text font-bold hover:bg-theme-surface hover:text-theme-accent transition"
+                            title="Increase quantity"
                           >
                             +
                           </button>
