@@ -9,18 +9,28 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import LoadingAnimation from '../components/LoadingAnimation';
 
-const getWelcomeMessage = (role) => {
-  switch (role) {
-    case 'dentist':
-      return 'Welcome Dentist! You have logged in successfully.';
-    case 'pharmacy':
-      return 'Welcome Pharmacy! You have logged in successfully.';
-    case 'admin':
-      return 'Welcome Admin! You have logged in successfully.';
-    case 'user':
-    default:
-      return 'Welcome User! You have logged in successfully.';
+const getWelcomeMessage = (user) => {
+  if (!user) return 'Welcome User! Login successful.';
+  const role = user.role || 'user';
+
+  let displayName = '';
+  if (role === 'pharmacy') {
+    displayName = user.pharmacyName || user.name || 'Pharmacy';
+  } else if (role === 'dentist') {
+    if (user.name) {
+      displayName = user.name.trim().startsWith('Dr.') || user.name.trim().startsWith('Dr ')
+        ? user.name.trim()
+        : `Dr. ${user.name.trim()}`;
+    } else {
+      displayName = 'Dentist';
+    }
+  } else if (role === 'admin') {
+    displayName = user.name || 'Admin';
+  } else {
+    displayName = user.name || 'User';
   }
+
+  return `Welcome ${displayName}! Login successful.`;
 };
 
 export default function Login() {
@@ -38,7 +48,7 @@ export default function Login() {
 
   useEffect(() => {
     if (!loading && user) {
-      const welcomeMsg = getWelcomeMessage(user.role);
+      const welcomeMsg = getWelcomeMessage(user);
       navigate(getDashboardPath(user.role), {
         replace: true,
         state: { toastMessage: welcomeMsg, message: welcomeMsg },
@@ -51,7 +61,7 @@ export default function Login() {
       setError('');
       setSuccess('');
       const loggedUser = await login(data);
-      const welcomeMsg = getWelcomeMessage(loggedUser?.role);
+      const welcomeMsg = getWelcomeMessage(loggedUser);
       setSuccess(welcomeMsg);
       setToastMessage(welcomeMsg);
       setTimeout(() => {
