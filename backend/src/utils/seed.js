@@ -20,6 +20,21 @@ const seedData = async () => {
     console.log('Admin user created: admin@oralhealth.ai / Admin@123');
   }
 
+  const dentistUserExists = await User.findOne({ email: 'dentist@oralhealth.ai' });
+  if (!dentistUserExists) {
+    await User.create({
+      name: 'Dr. Sarah Mitchell',
+      email: 'dentist@oralhealth.ai',
+      password: 'Dentist@123',
+      role: 'dentist',
+      approvalStatus: 'approved',
+      isEmailVerified: true,
+      phone: '+1234567890',
+      professionalLicenseNumber: 'DENT-2024-001',
+    });
+    console.log('Dentist user created: dentist@oralhealth.ai / Dentist@123');
+  }
+
   const contentCount = await Education.countDocuments();
     await Education.deleteMany({}); // refresh education seed with verified resources
     await Education.insertMany([

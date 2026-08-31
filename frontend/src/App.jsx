@@ -45,7 +45,7 @@ function AnimatedRoutes() {
         <Route path="/dashboard" element={<ProtectedRoute roles={['user', 'admin']}><PageTransition><Dashboard /></PageTransition></ProtectedRoute>} />
         <Route path="/detect" element={<ProtectedRoute roles={['user', 'admin']}><PageTransition><Detection /></PageTransition></ProtectedRoute>} />
         <Route path="/chat" element={<ProtectedRoute roles={['user', 'admin']}><PageTransition><ChatAssistant /></PageTransition></ProtectedRoute>} />
-        <Route path="/education" element={<ProtectedRoute roles={['user', 'admin']}><PageTransition><Education /></PageTransition></ProtectedRoute>} />
+        <Route path="/education" element={<ProtectedRoute roles={['user', 'admin', 'dentist']}><PageTransition><Education /></PageTransition></ProtectedRoute>} />
         <Route path="/consultation" element={<ProtectedRoute roles={['user', 'admin', 'dentist']}><PageTransition><Consultation /></PageTransition></ProtectedRoute>} />
         <Route path="/history" element={<ProtectedRoute roles={['user', 'admin']}><PageTransition><History /></PageTransition></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute roles={['user', 'admin', 'dentist']}><PageTransition><Profile /></PageTransition></ProtectedRoute>} />
