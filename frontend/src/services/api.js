@@ -173,6 +173,7 @@ export const orderAPI = {
   sendPrescription: (data) => api.post('/orders/send-prescription', data),
   getHistory: () => api.get('/orders/history'),
   getById: (id) => api.get(`/orders/${id}`),
+  getTrackingHistory: (id) => api.get(`/orders/${id}/tracking`),
   cancel: (id) => api.put(`/orders/${id}/cancel`),
   confirm: (id) => api.put(`/orders/${id}/confirm`),
 };
@@ -217,6 +218,7 @@ export const directOrderAPI = {
   place: (data) => api.post('/direct-orders', data),
   getMyOrders: (params) => api.get('/direct-orders', { params }),
   getById: (id) => api.get(`/direct-orders/${id}`),
+  getTrackingHistory: (id) => api.get(`/direct-orders/${id}/tracking`),
   cancel: (id) => api.put(`/direct-orders/${id}/cancel`),
   confirm: (id) => api.put(`/direct-orders/${id}/confirm`),
 };

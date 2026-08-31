@@ -4,6 +4,8 @@ import MedicineOrder from '../models/MedicineOrder.js';
 import Prescription from '../models/Prescription.js';
 import Payment from '../models/Payment.js';
 import Notification from '../models/Notification.js';
+import OrderTrackingHistory from '../models/OrderTrackingHistory.js';
+import { recordTrackingEvent, getOrderTrackingEvents } from '../services/trackingService.js';
 import { AppError } from '../utils/AppError.js';
 
 /**
@@ -311,6 +313,25 @@ export const sendPrescriptionToPharmacy = async (req, res) => {
       await order.save();
     }
 
+    // Record initial order placement tracking event
+    try {
+      await recordTrackingEvent({
+        orderId: order._id,
+        orderType: 'MedicineOrder',
+        status: 'pending',
+        previousStatus: null,
+        message: paymentMethod === 'card'
+          ? `Prescription order placed with online card payment. Total: Rs. ${totalAmount.toFixed(2)}.`
+          : 'Prescription order placed with Cash on Delivery.',
+        actionBy: req.user._id,
+        actionByModel: 'User',
+        actionByRole: 'user',
+        actionByName: req.user.name || 'Customer',
+      });
+    } catch (trackErr) {
+      console.warn('Failed to record initial tracking event for prescription order:', trackErr.message);
+    }
+
     // Notify pharmacy about new prescription order
     try {
       await Notification.create({
@@ -332,7 +353,10 @@ export const sendPrescriptionToPharmacy = async (req, res) => {
       { path: 'paymentId' },
     ]);
 
-    return res.status(201).json({ success: true, data: order });
+    const orderObj = order.toObject();
+    orderObj.trackingHistory = await getOrderTrackingEvents(order._id, order);
+
+    return res.status(201).json({ success: true, data: orderObj });
   } catch (err) {
     if (deductedItems.length > 0 && !(err instanceof AppError)) {
       for (const deducted of deductedItems) {
@@ -358,7 +382,32 @@ export const getOrderHistory = async (req, res) => {
     .populate('pharmacyId', 'pharmacyName phone address city district')
     .populate('paymentId');
 
-  res.json({ success: true, count: orders.length, data: orders });
+  const orderIds = orders.map((o) => o._id);
+  const allEvents = await OrderTrackingHistory.find({ orderId: { $in: orderIds } })
+    .sort({ createdAt: 1 })
+    .lean();
+
+  const eventMap = {};
+  for (const ev of allEvents) {
+    const key = ev.orderId.toString();
+    if (!eventMap[key]) eventMap[key] = [];
+    eventMap[key].push(ev);
+  }
+
+  const enrichedOrders = await Promise.all(
+    orders.map(async (o) => {
+      const oObj = o.toObject ? o.toObject() : o;
+      const historyList = eventMap[o._id.toString()];
+      if (historyList && historyList.length > 0) {
+        oObj.trackingHistory = historyList;
+      } else {
+        oObj.trackingHistory = await getOrderTrackingEvents(o._id, o);
+      }
+      return oObj;
+    })
+  );
+
+  res.json({ success: true, count: enrichedOrders.length, data: enrichedOrders });
 };
 
 export const getOrderById = async (req, res) => {
@@ -386,7 +435,50 @@ export const getOrderById = async (req, res) => {
     throw new AppError('Not authorized.', 403);
   }
 
-  res.json({ success: true, data: order });
+  const orderObj = order.toObject();
+  orderObj.trackingHistory = await getOrderTrackingEvents(order._id, order);
+
+  res.json({ success: true, data: orderObj });
+};
+
+/**
+ * GET /api/orders/:id/tracking
+ * Dedicated endpoint to fetch tracking history for a prescription order.
+ */
+export const getOrderTracking = async (req, res) => {
+  const order = await MedicineOrder.findById(req.params.id)
+    .populate('pharmacyId', 'pharmacyName phone address city district')
+    .populate('userId', 'name email phone');
+
+  if (!order) {
+    throw new AppError('Order not found.', 404);
+  }
+
+  const isOwner = order.userId._id.toString() === req.user._id.toString();
+  const isPharmacy =
+    req.user.role === 'pharmacy' && order.pharmacyId._id.toString() === req.user._id.toString();
+
+  if (!isOwner && !isPharmacy && req.user.role !== 'admin') {
+    throw new AppError('Not authorized to view tracking history for this order.', 403);
+  }
+
+  const history = await getOrderTrackingEvents(order._id, order);
+
+  res.json({
+    success: true,
+    count: history.length,
+    data: history,
+    order: {
+      _id: order._id,
+      status: order.status,
+      deliveryAddress: order.deliveryAddress,
+      totalAmount: order.totalAmount,
+      createdAt: order.createdAt,
+      pharmacy: order.pharmacyId,
+      paymentMethod: order.paymentMethod,
+      paymentStatus: order.paymentStatus,
+    },
+  });
 };
 
 export const cancelOrder = async (req, res) => {
@@ -404,8 +496,26 @@ export const cancelOrder = async (req, res) => {
     throw new AppError('Order cannot be cancelled at this stage.', 400);
   }
 
+  const previousStatus = order.status;
   order.status = 'cancelled';
+  order.rejectionReason = 'Cancelled by customer';
   await order.save();
+
+  try {
+    await recordTrackingEvent({
+      orderId: order._id,
+      orderType: 'MedicineOrder',
+      status: 'cancelled',
+      previousStatus,
+      message: 'Order cancelled by customer.',
+      actionBy: req.user._id,
+      actionByModel: 'User',
+      actionByRole: 'user',
+      actionByName: req.user.name || 'Customer',
+    });
+  } catch (trackErr) {
+    console.warn('Failed to record cancel tracking event:', trackErr.message);
+  }
 
   res.json({ success: true, data: order });
 };
@@ -426,9 +536,26 @@ export const confirmOrder = async (req, res) => {
     throw new AppError('Only delivered orders can be confirmed.', 400);
   }
 
+  const previousStatus = order.status;
   order.status = 'completed';
   order.deliveryConfirmed = true;
   await order.save();
+
+  try {
+    await recordTrackingEvent({
+      orderId: order._id,
+      orderType: 'MedicineOrder',
+      status: 'completed',
+      previousStatus,
+      message: 'Delivery receipt confirmed by customer. Order completed.',
+      actionBy: req.user._id,
+      actionByModel: 'User',
+      actionByRole: 'user',
+      actionByName: req.user.name || 'Customer',
+    });
+  } catch (trackErr) {
+    console.warn('Failed to record confirm tracking event:', trackErr.message);
+  }
 
   // Notify pharmacy
   try {
@@ -450,6 +577,7 @@ export default {
   sendPrescriptionToPharmacy,
   getOrderHistory,
   getOrderById,
+  getOrderTracking,
   cancelOrder,
   confirmOrder,
 };

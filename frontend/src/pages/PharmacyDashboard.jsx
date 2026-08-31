@@ -6,11 +6,12 @@ import MedicineCard from '../components/MedicineCard';
 import MedicineModal from '../components/MedicineModal';
 import { pharmacyAPI } from '../services/api';
 
-const STATUS_FLOW = ['pending', 'accepted', 'out_for_delivery', 'delivered'];
+const STATUS_FLOW = ['pending', 'accepted', 'preparing', 'out_for_delivery', 'delivered'];
 
 const STATUS_BADGES = {
   pending: 'bg-yellow-500/15 text-yellow-400 border border-yellow-500/30',
   accepted: 'bg-blue-500/15 text-blue-400 border border-blue-500/30',
+  preparing: 'bg-purple-500/15 text-purple-400 border border-purple-500/30',
   out_for_delivery: 'bg-orange-500/15 text-orange-400 border border-orange-500/30',
   delivered: 'bg-green-500/15 text-green-400 border border-green-500/30',
   completed: 'bg-teal-500/15 text-teal-400 border border-teal-500/30',
@@ -20,6 +21,7 @@ const STATUS_BADGES = {
 const STATUS_LABELS = {
   pending: 'Pending',
   accepted: 'Accepted',
+  preparing: 'Preparing',
   out_for_delivery: 'Out for Delivery',
   delivered: 'Delivered',
   completed: 'Completed',

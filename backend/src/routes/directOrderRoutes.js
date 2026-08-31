@@ -1,5 +1,12 @@
 import { Router } from 'express';
-import { placeOrder, getMyOrders, getOrderById, cancelOrder, confirmOrder } from '../controllers/directOrderController.js';
+import {
+  placeOrder,
+  getMyOrders,
+  getOrderById,
+  getDirectOrderTracking,
+  cancelOrder,
+  confirmOrder,
+} from '../controllers/directOrderController.js';
 import { protect, authorize } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/AppError.js';
 
@@ -12,7 +19,8 @@ router.use(protect);
 router.post('/', authorize('user', 'dentist', 'admin'), asyncHandler(placeOrder));
 router.get('/', authorize('user', 'dentist', 'admin'), asyncHandler(getMyOrders));
 
-// Getting specific order can be done by customer, pharmacy, or admin
+// Getting specific order tracking history or order details can be done by customer, pharmacy, or admin
+router.get('/:id/tracking', asyncHandler(getDirectOrderTracking));
 router.get('/:id', asyncHandler(getOrderById));
 
 // Cancelling order is for customer (user, dentist, admin)

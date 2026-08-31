@@ -3,6 +3,7 @@ import MedicineOrder from '../models/MedicineOrder.js';
 import DirectOrder from '../models/DirectOrder.js';
 import Notification from '../models/Notification.js';
 import Payment from '../models/Payment.js';
+import { recordTrackingEvent, getDefaultTrackingMessage } from '../services/trackingService.js';
 import { AppError } from '../utils/AppError.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -51,16 +52,53 @@ export const updateOrderStatus = async (req, res) => {
     throw new AppError('Not authorized.', 403);
   }
 
+  // If already at this status (e.g. duplicate accept click), return without duplicating history (TC08)
+  if (order.status === status) {
+    await order.populate([
+      {
+        path: 'prescriptionId',
+        populate: { path: 'dentistId', select: 'name specialization' },
+      },
+      { path: 'userId', select: 'name email phone' },
+      { path: 'paymentId' },
+    ]);
+    return res.json({ success: true, data: order });
+  }
+
   if (status === 'accepted' && order.status !== 'pending') {
     throw new AppError('Only pending orders can be accepted.', 400);
   }
 
+  const previousStatus = order.status;
   if (status === 'cancelled' && order.status === 'pending') {
     order.rejectionReason = rejectionReason || 'Order rejected by pharmacy';
   }
 
   order.status = status;
   await order.save();
+
+  // Atomically create tracking history event with rollback safeguard
+  const pharmacy = await Pharmacy.findById(req.user._id).select('pharmacyName');
+  const pharmacyName = pharmacy?.pharmacyName || req.user.name || 'Pharmacy';
+
+  try {
+    await recordTrackingEvent({
+      orderId: order._id,
+      orderType: 'MedicineOrder',
+      status,
+      previousStatus,
+      message: rejectionReason || getDefaultTrackingMessage(status, rejectionReason),
+      actionBy: req.user._id,
+      actionByModel: 'Pharmacy',
+      actionByRole: 'pharmacy',
+      actionByName: pharmacyName,
+    });
+  } catch (trackErr) {
+    // Rollback order status to prevent inconsistent state
+    order.status = previousStatus;
+    await order.save();
+    throw trackErr;
+  }
 
   await order.populate([
     {
@@ -198,12 +236,41 @@ export const updateDirectOrderStatus = async (req, res) => {
     throw new AppError('Not authorized.', 403);
   }
 
+  // If already at this status, return without duplicating (TC08)
+  if (order.status === status) {
+    await order.populate('userId', 'name email phone');
+    return res.json({ success: true, data: order });
+  }
+
+  const previousStatus = order.status;
   if (status === 'cancelled') {
     order.rejectionReason = rejectionReason || 'Cancelled by pharmacy';
   }
 
   order.status = status;
   await order.save();
+
+  // Atomically create tracking history event with rollback safeguard
+  const pharmacy = await Pharmacy.findById(req.user._id).select('pharmacyName');
+  const pharmacyName = pharmacy?.pharmacyName || req.user.name || 'Pharmacy';
+
+  try {
+    await recordTrackingEvent({
+      orderId: order._id,
+      orderType: 'DirectOrder',
+      status,
+      previousStatus,
+      message: rejectionReason || getDefaultTrackingMessage(status, rejectionReason),
+      actionBy: req.user._id,
+      actionByModel: 'Pharmacy',
+      actionByRole: 'pharmacy',
+      actionByName: pharmacyName,
+    });
+  } catch (trackErr) {
+    order.status = previousStatus;
+    await order.save();
+    throw trackErr;
+  }
 
   await order.populate('userId', 'name email phone');
 

@@ -4,6 +4,7 @@ import {
   sendPrescriptionToPharmacy,
   getOrderHistory,
   getOrderById,
+  getOrderTracking,
   cancelOrder,
   confirmOrder,
 } from '../controllers/orderController.js';
@@ -16,12 +17,14 @@ const router = Router();
 
 router.get('/nearby', protect, authorize('user', 'admin'), asyncHandler(getNearbyPharmacies));
 
-router.use(protect, authorize('user', 'admin'));
+router.post('/send-prescription', protect, authorize('user', 'admin'), orderValidation, validate, asyncHandler(sendPrescriptionToPharmacy));
+router.get('/history', protect, authorize('user', 'admin'), asyncHandler(getOrderHistory));
 
-router.post('/send-prescription', orderValidation, validate, asyncHandler(sendPrescriptionToPharmacy));
-router.get('/history', asyncHandler(getOrderHistory));
-router.get('/:id', asyncHandler(getOrderById));
-router.put('/:id/cancel', asyncHandler(cancelOrder));
-router.put('/:id/confirm', asyncHandler(confirmOrder));
+// Getting specific order or tracking history (checked inside controller for user, pharmacy, admin)
+router.get('/:id/tracking', protect, asyncHandler(getOrderTracking));
+router.get('/:id', protect, asyncHandler(getOrderById));
+
+router.put('/:id/cancel', protect, authorize('user', 'admin'), asyncHandler(cancelOrder));
+router.put('/:id/confirm', protect, authorize('user', 'admin'), asyncHandler(confirmOrder));
 
 export default router;

@@ -2,6 +2,8 @@ import DirectOrder from '../models/DirectOrder.js';
 import Cart from '../models/Cart.js';
 import Notification from '../models/Notification.js';
 import Pharmacy from '../models/Pharmacy.js';
+import OrderTrackingHistory from '../models/OrderTrackingHistory.js';
+import { recordTrackingEvent, getOrderTrackingEvents } from '../services/trackingService.js';
 import { AppError } from '../utils/AppError.js';
 
 /**
@@ -121,6 +123,23 @@ export const placeOrder = async (req, res) => {
       status: 'pending',
     });
 
+    // Record initial tracking event
+    try {
+      await recordTrackingEvent({
+        orderId: order._id,
+        orderType: 'DirectOrder',
+        status: 'pending',
+        previousStatus: null,
+        message: `Direct order placed for ${orderItems.length} item(s). Total: Rs. ${totalAmount.toFixed(2)}.`,
+        actionBy: req.user._id,
+        actionByModel: 'User',
+        actionByRole: 'user',
+        actionByName: customerName || req.user.name || 'Customer',
+      });
+    } catch (trackErr) {
+      console.warn('Failed to record initial tracking event for direct order:', trackErr.message);
+    }
+
     // Remove ordered items from cart
     cart.items = cart.items.filter(
       (item) => item.pharmacyId.toString() !== pharmacyId
@@ -141,7 +160,10 @@ export const placeOrder = async (req, res) => {
       });
     } catch (_) { /* non-critical */ }
 
-    return res.status(201).json({ success: true, data: order });
+    const orderObj = order.toObject();
+    orderObj.trackingHistory = await getOrderTrackingEvents(order._id, order);
+
+    return res.status(201).json({ success: true, data: orderObj });
   } catch (err) {
     // If order creation failed, rollback any deducted items
     if (deductedItems.length > 0 && !(err instanceof AppError)) {
@@ -178,7 +200,32 @@ export const getMyOrders = async (req, res) => {
     DirectOrder.countDocuments(filter),
   ]);
 
-  res.json({ success: true, count: orders.length, total, data: orders });
+  const orderIds = orders.map((o) => o._id);
+  const allEvents = await OrderTrackingHistory.find({ orderId: { $in: orderIds } })
+    .sort({ createdAt: 1 })
+    .lean();
+
+  const eventMap = {};
+  for (const ev of allEvents) {
+    const key = ev.orderId.toString();
+    if (!eventMap[key]) eventMap[key] = [];
+    eventMap[key].push(ev);
+  }
+
+  const enrichedOrders = await Promise.all(
+    orders.map(async (o) => {
+      const oObj = o.toObject ? o.toObject() : o;
+      const historyList = eventMap[o._id.toString()];
+      if (historyList && historyList.length > 0) {
+        oObj.trackingHistory = historyList;
+      } else {
+        oObj.trackingHistory = await getOrderTrackingEvents(o._id, o);
+      }
+      return oObj;
+    })
+  );
+
+  res.json({ success: true, count: enrichedOrders.length, total, data: enrichedOrders });
 };
 
 /**
@@ -202,7 +249,51 @@ export const getOrderById = async (req, res) => {
     throw new AppError('Not authorized.', 403);
   }
 
-  res.json({ success: true, data: order });
+  const orderObj = order.toObject();
+  orderObj.trackingHistory = await getOrderTrackingEvents(order._id, order);
+
+  res.json({ success: true, data: orderObj });
+};
+
+/**
+ * GET /api/direct-orders/:id/tracking
+ * Dedicated endpoint to fetch tracking history for a direct order.
+ */
+export const getDirectOrderTracking = async (req, res) => {
+  const order = await DirectOrder.findById(req.params.id)
+    .populate('pharmacyId', 'pharmacyName phone address city')
+    .populate('userId', 'name email');
+
+  if (!order) throw new AppError('Order not found.', 404);
+
+  const isOwner = order.userId._id.toString() === req.user._id.toString();
+  const isPharmacy =
+    req.user.role === 'pharmacy' &&
+    order.pharmacyId._id.toString() === req.user._id.toString();
+  const isAdmin = req.user.role === 'admin';
+
+  if (!isOwner && !isPharmacy && !isAdmin) {
+    throw new AppError('Not authorized to view tracking history for this order.', 403);
+  }
+
+  const history = await getOrderTrackingEvents(order._id, order);
+
+  res.json({
+    success: true,
+    count: history.length,
+    data: history,
+    order: {
+      _id: order._id,
+      status: order.status,
+      customerName: order.customerName,
+      deliveryAddress: order.deliveryAddress,
+      totalAmount: order.totalAmount,
+      createdAt: order.createdAt,
+      pharmacy: order.pharmacyId,
+      paymentMethod: order.paymentMethod,
+      paymentStatus: order.paymentStatus,
+    },
+  });
 };
 
 /**
@@ -219,9 +310,26 @@ export const cancelOrder = async (req, res) => {
     throw new AppError('Order cannot be cancelled at this stage.', 400);
   }
 
+  const previousStatus = order.status;
   order.status = 'cancelled';
   order.rejectionReason = 'Cancelled by customer';
   await order.save();
+
+  try {
+    await recordTrackingEvent({
+      orderId: order._id,
+      orderType: 'DirectOrder',
+      status: 'cancelled',
+      previousStatus,
+      message: 'Order cancelled by customer.',
+      actionBy: req.user._id,
+      actionByModel: 'User',
+      actionByRole: 'user',
+      actionByName: req.user.name || order.customerName || 'Customer',
+    });
+  } catch (trackErr) {
+    console.warn('Failed to record cancel tracking event:', trackErr.message);
+  }
 
   // Notify pharmacy
   try {
@@ -254,9 +362,26 @@ export const confirmOrder = async (req, res) => {
     throw new AppError('Only delivered orders can be confirmed.', 400);
   }
 
+  const previousStatus = order.status;
   order.status = 'completed';
   order.deliveryConfirmed = true;
   await order.save();
+
+  try {
+    await recordTrackingEvent({
+      orderId: order._id,
+      orderType: 'DirectOrder',
+      status: 'completed',
+      previousStatus,
+      message: 'Delivery receipt confirmed by customer. Order completed.',
+      actionBy: req.user._id,
+      actionByModel: 'User',
+      actionByRole: 'user',
+      actionByName: req.user.name || order.customerName || 'Customer',
+    });
+  } catch (trackErr) {
+    console.warn('Failed to record confirm tracking event:', trackErr.message);
+  }
 
   // Notify pharmacy
   try {
@@ -273,4 +398,11 @@ export const confirmOrder = async (req, res) => {
   res.json({ success: true, data: order });
 };
 
-export default { placeOrder, getMyOrders, getOrderById, cancelOrder, confirmOrder };
+export default {
+  placeOrder,
+  getMyOrders,
+  getOrderById,
+  getDirectOrderTracking,
+  cancelOrder,
+  confirmOrder,
+};

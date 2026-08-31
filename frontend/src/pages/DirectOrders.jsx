@@ -317,6 +317,56 @@ export default function DirectOrders() {
                       </div>
                     </div>
 
+                    {/* Tracking History Timeline */}
+                    <div className="rounded-xl border border-theme-border/25 bg-theme-background/30 p-4 space-y-3">
+                      <div className="flex items-center justify-between border-b border-theme-border/15 pb-2">
+                        <span className="font-bold text-theme-heading text-xs uppercase tracking-wider flex items-center gap-1.5">
+                          <span>🕒</span> Tracking History ({order.trackingHistory?.length || 0})
+                        </span>
+                        <span className="text-[11px] text-theme-muted font-medium">
+                          Current: <strong className="text-theme-accent uppercase">{STATUS_LABELS[order.status] || order.status}</strong>
+                        </span>
+                      </div>
+
+                      {order.trackingHistory && order.trackingHistory.length > 0 ? (
+                        <div className="relative pl-5 space-y-3 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-theme-border/40 pt-1">
+                          {order.trackingHistory.map((ev, idx) => {
+                            const isLast = idx === order.trackingHistory.length - 1;
+                            const evTime = ev.createdAt || ev.timestamp;
+                            return (
+                              <div key={ev._id || idx} className="relative text-xs">
+                                <div
+                                  className={`absolute -left-5 top-1 h-3 w-3 rounded-full border ${
+                                    isLast
+                                      ? 'border-theme-accent bg-theme-accent ring-4 ring-theme-accent/20'
+                                      : 'border-theme-border bg-theme-surface'
+                                  }`}
+                                />
+                                <div className="rounded-lg border border-theme-border/20 bg-theme-surface/40 p-2.5">
+                                  <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1">
+                                    <span className={`rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${STATUS_BADGES[ev.status] || 'bg-theme-surface text-theme-muted'}`}>
+                                      {STATUS_LABELS[ev.status] || ev.status}
+                                    </span>
+                                    <span className="text-[10px] text-theme-muted">
+                                      {evTime ? new Date(evTime).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' }) : ''}
+                                    </span>
+                                  </div>
+                                  <p className="text-theme-text text-[11px]">{ev.message}</p>
+                                  {(ev.actionByName || ev.actionByRole) && (
+                                    <p className="text-[10px] text-theme-muted mt-1">
+                                      By: <span className="font-semibold text-theme-heading">{ev.actionByName || ev.actionByRole}</span>
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-theme-muted italic">No tracking records logged.</p>
+                      )}
+                    </div>
+
                     {/* Notes & Actions */}
                     {order.notes && (
                       <div className="rounded-xl border border-theme-border/20 bg-theme-background/30 p-3 text-xs">

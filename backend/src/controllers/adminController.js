@@ -10,6 +10,7 @@ import MedicineOrder from '../models/MedicineOrder.js';
 import DirectOrder from '../models/DirectOrder.js';
 import Cart from '../models/Cart.js';
 import Notification from '../models/Notification.js';
+import { recordTrackingEvent, getDefaultTrackingMessage } from '../services/trackingService.js';
 import { AppError } from '../utils/AppError.js';
 
 export const getDashboard = async (_req, res) => {
@@ -387,6 +388,18 @@ export const updateMarketplaceOrderStatus = async (req, res) => {
     throw new AppError('Order not found.', 404);
   }
 
+  // Idempotency check (TC08)
+  if (order.status === status) {
+    await order.populate('userId', 'name email phone');
+    await order.populate('pharmacyId', 'pharmacyName phone address city district');
+    return res.json({
+      success: true,
+      message: `Order status updated to ${status}.`,
+      data: order,
+    });
+  }
+
+  const previousStatus = order.status;
   if (status === 'cancelled') {
     order.rejectionReason = rejectionReason || 'Cancelled by admin';
   }
@@ -397,6 +410,25 @@ export const updateMarketplaceOrderStatus = async (req, res) => {
   }
 
   await order.save();
+
+  try {
+    await recordTrackingEvent({
+      orderId: order._id,
+      orderType: 'DirectOrder',
+      status,
+      previousStatus,
+      message: rejectionReason ? `Order status updated to ${status}. Reason: ${rejectionReason}` : `Order status updated to ${status} by administrator.`,
+      actionBy: req.user._id,
+      actionByModel: 'User',
+      actionByRole: 'admin',
+      actionByName: req.user.name || 'Administrator',
+    });
+  } catch (trackErr) {
+    order.status = previousStatus;
+    await order.save();
+    throw trackErr;
+  }
+
   await order.populate('userId', 'name email phone');
   await order.populate('pharmacyId', 'pharmacyName phone address city district');
 
