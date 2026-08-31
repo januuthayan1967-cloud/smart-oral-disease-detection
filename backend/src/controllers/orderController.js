@@ -46,53 +46,114 @@ function validateCardInput({ cardHolderName, cardNumber, cardExpiry, cvv }) {
   };
 }
 
-const RADIUS_OPTIONS = {
-  5: 5000,
-  10: 10000,
-  20: 20000,
-};
+/**
+ * Calculate the great-circle distance between two points in kilometers (Haversine formula).
+ */
+function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Earth's radius in kilometers
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
 export const getNearbyPharmacies = async (req, res) => {
   const { latitude, longitude, radius = 10 } = req.query;
 
-  if (!latitude || !longitude) {
+  if (latitude === undefined || longitude === undefined || latitude === null || longitude === null || latitude === '' || longitude === '') {
     throw new AppError('Latitude and longitude are required.', 400);
   }
 
-  const radiusKm = parseInt(radius, 10);
-  const maxDistance = RADIUS_OPTIONS[radiusKm] || RADIUS_OPTIONS[10];
+  const lat = parseFloat(latitude);
+  const lng = parseFloat(longitude);
 
-  const pharmacies = await Pharmacy.aggregate([
-    {
-      $geoNear: {
-        near: {
-          type: 'Point',
-          coordinates: [parseFloat(longitude), parseFloat(latitude)],
+  if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+    throw new AppError('Invalid coordinates. Latitude must be between -90 and 90, and longitude between -180 and 180.', 400);
+  }
+
+  const isAllRadius = radius === 'all' || radius === '0' || parseFloat(radius) >= 20000;
+  const parsedRadius = parseFloat(radius);
+  const radiusKm = !isNaN(parsedRadius) && parsedRadius > 0 ? parsedRadius : 10;
+  const maxDistanceMeters = isAllRadius ? undefined : radiusKm * 1000;
+
+  let pharmacies = [];
+
+  try {
+    const geoNearStage = {
+      near: {
+        type: 'Point',
+        coordinates: [lng, lat],
+      },
+      distanceField: 'distance',
+      spherical: true,
+      query: { status: 'approved' },
+    };
+    if (maxDistanceMeters !== undefined) {
+      geoNearStage.maxDistance = maxDistanceMeters;
+    }
+
+    pharmacies = await Pharmacy.aggregate([
+      { $geoNear: geoNearStage },
+      {
+        $project: {
+          pharmacyName: 1,
+          ownerName: 1,
+          email: 1,
+          phone: 1,
+          address: 1,
+          city: 1,
+          district: 1,
+          location: 1,
+          licenseNumber: 1,
+          status: 1,
+          distance: 1,
+          distanceKm: { $divide: ['$distance', 1000] },
         },
-        distanceField: 'distance',
-        maxDistance,
-        spherical: true,
-        query: { status: 'approved' },
       },
-    },
-    {
-      $project: {
-        pharmacyName: 1,
-        ownerName: 1,
-        email: 1,
-        phone: 1,
-        address: 1,
-        city: 1,
-        district: 1,
-        location: 1,
-        licenseNumber: 1,
-        status: 1,
-        distance: 1,
-        distanceKm: { $divide: ['$distance', 1000] },
-      },
-    },
-    { $sort: { distance: 1 } },
-  ]);
+      { $sort: { distance: 1 } },
+    ]);
+  } catch (geoErr) {
+    console.warn('MongoDB $geoNear aggregation failed, falling back to in-memory Haversine calculation:', geoErr.message);
+    const approvedPharmacies = await Pharmacy.find({ status: 'approved' })
+      .select('pharmacyName ownerName email phone address city district location licenseNumber status')
+      .lean();
+
+    pharmacies = approvedPharmacies
+      .map((p) => {
+        let pLng, pLat;
+        if (p.location?.coordinates && Array.isArray(p.location.coordinates) && p.location.coordinates.length === 2) {
+          [pLng, pLat] = p.location.coordinates;
+        } else if (p.latitude !== undefined && p.longitude !== undefined) {
+          pLat = parseFloat(p.latitude);
+          pLng = parseFloat(p.longitude);
+        }
+
+        if (typeof pLat !== 'number' || typeof pLng !== 'number' || isNaN(pLat) || isNaN(pLng)) {
+          return null;
+        }
+
+        const distKm = calculateHaversineDistance(lat, lng, pLat, pLng);
+        const distMeters = distKm * 1000;
+
+        if (maxDistanceMeters !== undefined && distMeters > maxDistanceMeters) {
+          return null;
+        }
+
+        return {
+          ...p,
+          distance: distMeters,
+          distanceKm: distKm,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.distance - b.distance);
+  }
 
   res.json({
     success: true,

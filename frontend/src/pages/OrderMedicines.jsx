@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { prescriptionAPI, pharmacySearchAPI, orderAPI } from '../services/api';
+import { prescriptionAPI, pharmacySearchAPI, orderAPI, getApiErrorMessage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
 // ──────────────────────────────────────────────────────────────
@@ -125,6 +125,8 @@ export default function OrderMedicines() {
   const [pharmacies, setPharmacies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
+  const [searchStatus, setSearchStatus] = useState('');
+  const [hasSearched, setHasSearched] = useState(false);
   const [radius, setRadius] = useState(10);
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [selectedPharmacy, setSelectedPharmacy] = useState(null);
@@ -163,42 +165,80 @@ export default function OrderMedicines() {
     }
   }, [user]);
 
-  const searchPharmacies = async (coords) => {
+  const searchPharmacies = async (coords, searchRadius = radius) => {
     const searchCoords = coords || location;
     if (!searchCoords) return;
+    setError('');
     setSearching(true);
     try {
-      const { data } = await pharmacySearchAPI.getNearby({ ...searchCoords, radius });
-      setPharmacies(data.data);
-    } catch {
-      setError('Failed to find nearby pharmacies.');
+      const { data } = await pharmacySearchAPI.getNearby({
+        latitude: searchCoords.latitude,
+        longitude: searchCoords.longitude,
+        radius: searchRadius,
+      });
+      const results = data.data || [];
+      setPharmacies(results);
+      setHasSearched(true);
+      if (selectedPharmacy) {
+        const stillInList = results.find((p) => p._id === selectedPharmacy._id);
+        if (!stillInList) setSelectedPharmacy(null);
+      }
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Failed to find nearby pharmacies.'));
     } finally {
       setSearching(false);
+      setSearchStatus('');
     }
   };
 
   const detectAndSearch = () => {
     if (!navigator.geolocation) {
-      setError('Geolocation not supported.');
+      setError('Geolocation is not supported by your browser.');
       return;
     }
+    setError('');
     setSearching(true);
+    setSearchStatus('Detecting your location...');
+
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         const coords = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
         setLocation(coords);
-        await searchPharmacies(coords);
+        setSearchStatus(`Finding nearby pharmacies within ${radius} km...`);
+        await searchPharmacies(coords, radius);
       },
-      () => {
-        setError('Unable to detect location.');
+      (geoErr) => {
         setSearching(false);
+        setSearchStatus('');
+        switch (geoErr.code) {
+          case 1: // PERMISSION_DENIED
+            setError('Location access was denied. Please allow location permissions in your browser to find nearby pharmacies.');
+            break;
+          case 2: // POSITION_UNAVAILABLE
+            setError('Location information is currently unavailable. Please check your network or GPS connection.');
+            break;
+          case 3: // TIMEOUT
+            setError('The request to get your location timed out. Please try clicking "Use My Location" again.');
+            break;
+          default:
+            setError('Unable to detect your location. Please check browser permissions.');
+            break;
+        }
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 30000,
       }
     );
   };
 
-  useEffect(() => {
-    if (location) searchPharmacies();
-  }, [radius]);
+  const handleRadiusChange = (newRadius) => {
+    setRadius(newRadius);
+    if (location) {
+      searchPharmacies(location, newRadius);
+    }
+  };
 
   const handleSubmitOrder = async (e) => {
     if (e) e.preventDefault();
@@ -304,24 +344,66 @@ export default function OrderMedicines() {
       )}
 
       <div className="card mt-6 border border-theme-border/40 bg-theme-surface/50">
-        <h2 className="mb-4 font-bold text-theme-heading text-lg">1. Find Nearby Pharmacies</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div>
+            <h2 className="font-bold text-theme-heading text-lg">1. Find Nearby Pharmacies</h2>
+            <p className="text-xs text-theme-muted">Find approved pharmacies near your current location to deliver your prescription.</p>
+          </div>
+          {location && (
+            <span className="text-xs text-theme-muted bg-theme-surface/60 px-2.5 py-1 rounded-lg border border-theme-border/30">
+              📍 {location.latitude.toFixed(4)}, {location.longitude.toFixed(4)}
+            </span>
+          )}
+        </div>
+
         <div className="flex flex-wrap items-center gap-4">
-          <button onClick={detectAndSearch} disabled={searching} className="btn-primary shadow-glow">
-            {searching ? 'Searching...' : '📍 Use My Location'}
-          </button>
-          <select
-            className="input-field w-auto font-medium"
-            value={radius}
-            onChange={(e) => setRadius(parseInt(e.target.value, 10))}
+          <button
+            type="button"
+            onClick={detectAndSearch}
+            disabled={searching}
+            className="btn-primary shadow-glow flex items-center gap-2"
           >
-            <option value={5}>Within 5 km</option>
-            <option value={10}>Within 10 km</option>
-            <option value={20}>Within 20 km</option>
-          </select>
+            {searching ? (
+              <>
+                <span className="animate-spin text-sm">⏳</span>
+                <span>{searchStatus || 'Searching...'}</span>
+              </>
+            ) : (
+              <>
+                <span>📍</span>
+                <span>{location ? 'Refresh Location & Search' : 'Use My Location'}</span>
+              </>
+            )}
+          </button>
+          <div className="flex items-center gap-2">
+            <label className="text-xs font-semibold text-theme-muted">Radius:</label>
+            <select
+              className="input-field w-auto font-medium py-2 text-sm"
+              value={radius}
+              onChange={(e) => handleRadiusChange(e.target.value === 'all' ? 'all' : parseInt(e.target.value, 10))}
+              disabled={searching}
+            >
+              <option value={5}>Within 5 km</option>
+              <option value={10}>Within 10 km</option>
+              <option value={25}>Within 25 km</option>
+              <option value={50}>Within 50 km</option>
+              <option value={100}>Within 100 km</option>
+              <option value={500}>Within 500 km (Nationwide)</option>
+              <option value="all">All Pharmacies</option>
+            </select>
+          </div>
         </div>
 
         <div className="mt-6 space-y-3">
-          {pharmacies.map((pharmacy) => (
+          {searching && (
+            <div className="py-8 text-center text-sm text-theme-muted animate-pulse">
+              <p className="text-2xl mb-2">🔍</p>
+              <p className="font-medium text-theme-heading">{searchStatus || 'Searching for nearby pharmacies...'}</p>
+              <p className="text-xs text-theme-muted mt-1">Please ensure your browser location permission is granted.</p>
+            </div>
+          )}
+
+          {!searching && pharmacies.map((pharmacy) => (
             <button
               key={pharmacy._id}
               type="button"
@@ -350,7 +432,29 @@ export default function OrderMedicines() {
               )}
             </button>
           ))}
-          {pharmacies.length === 0 && !searching && (
+
+          {!searching && hasSearched && pharmacies.length === 0 && (
+            <div className="py-8 text-center text-sm text-theme-muted rounded-xl bg-theme-surface/30 border border-theme-border/30 p-4 space-y-3">
+              <p className="text-2xl mb-1">🏥</p>
+              <p className="font-semibold text-theme-heading">
+                No registered pharmacies found within {radius === 'all' ? 'any' : `${radius} km`}.
+              </p>
+              <p className="text-xs">
+                Try expanding your search radius to find registered pharmacies across all districts.
+              </p>
+              {radius !== 'all' && (
+                <button
+                  type="button"
+                  onClick={() => handleRadiusChange('all')}
+                  className="btn-secondary text-xs px-4 py-2 mt-2 font-semibold border border-theme-border/60 hover:border-theme-accent"
+                >
+                  🔍 Search All Registered Pharmacies
+                </button>
+              )}
+            </div>
+          )}
+
+          {!searching && !hasSearched && (
             <div className="py-8 text-center text-sm text-theme-muted">
               <p className="text-2xl mb-1">🔍</p>
               <p>Click &quot;Use My Location&quot; to find registered pharmacies near you.</p>

@@ -13,6 +13,7 @@ export default function PharmacyRegister() {
   const navigate = useNavigate();
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [detectingLocation, setDetectingLocation] = useState(false);
   const [docs, setDocs] = useState({
     pharmacyLicense: null,
     businessRegistration: null,
@@ -22,6 +23,7 @@ export default function PharmacyRegister() {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm();
 
@@ -36,12 +38,34 @@ export default function PharmacyRegister() {
       setError('Geolocation is not supported by your browser.');
       return;
     }
+    setError('');
+    setDetectingLocation(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        document.getElementById('latitude').value = pos.coords.latitude;
-        document.getElementById('longitude').value = pos.coords.longitude;
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        setValue('latitude', lat, { shouldValidate: true });
+        setValue('longitude', lng, { shouldValidate: true });
+        setDetectingLocation(false);
       },
-      () => setError('Unable to detect location. Please enter coordinates manually.')
+      (geoErr) => {
+        setDetectingLocation(false);
+        switch (geoErr.code) {
+          case 1:
+            setError('Location permission denied. Please allow location access or enter coordinates manually.');
+            break;
+          case 2:
+            setError('Location information unavailable. Please enter coordinates manually.');
+            break;
+          case 3:
+            setError('Location request timed out. Please enter coordinates manually.');
+            break;
+          default:
+            setError('Unable to detect location. Please enter coordinates manually.');
+            break;
+        }
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 30000 }
     );
   };
 
@@ -244,8 +268,14 @@ export default function PharmacyRegister() {
         </div>
         
         <div className="md:col-span-2">
-          <Button type="button" variant="secondary" onClick={detectLocation} className="w-full text-sm">
-            Detect Current Location
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={detectLocation}
+            disabled={detectingLocation}
+            className="w-full text-sm"
+          >
+            {detectingLocation ? '📍 Detecting Location...' : '📍 Detect Current Location'}
           </Button>
         </div>
 

@@ -14,9 +14,9 @@ import { asyncHandler } from '../utils/AppError.js';
 
 const router = Router();
 
-router.get('/nearby', protect, authorize('user'), asyncHandler(getNearbyPharmacies));
+router.get('/nearby', protect, authorize('user', 'admin'), asyncHandler(getNearbyPharmacies));
 
-router.use(protect, authorize('user'));
+router.use(protect, authorize('user', 'admin'));
 
 router.post('/send-prescription', orderValidation, validate, asyncHandler(sendPrescriptionToPharmacy));
 router.get('/history', asyncHandler(getOrderHistory));

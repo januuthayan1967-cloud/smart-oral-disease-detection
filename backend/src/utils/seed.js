@@ -3,6 +3,7 @@ import connectDB from '../config/db.js';
 import User from '../models/User.js';
 import Education from '../models/Education.js';
 import Dentist from '../models/Dentist.js';
+import Pharmacy from '../models/Pharmacy.js';
 
 const seedData = async () => {
   await connectDB();
@@ -119,6 +120,54 @@ const seedData = async () => {
       },
     ]);
     console.log('Sample dentists seeded.');
+  }
+
+  const pharmacyCount = await Pharmacy.countDocuments();
+  if (pharmacyCount === 0) {
+    await Pharmacy.create([
+      {
+        pharmacyName: 'Central Care Pharmacy',
+        ownerName: 'Robert Johnson',
+        email: 'central.care@pharmacy.com',
+        password: 'Pharmacy@123',
+        phone: '+1234567892',
+        address: '100 Main Hospital Road',
+        city: 'Metropolis',
+        district: 'Central',
+        licenseNumber: 'PH-2024-001',
+        status: 'approved',
+        location: {
+          type: 'Point',
+          coordinates: [79.8612, 6.9271], // Colombo / Sample default [lng, lat]
+        },
+        inventory: [
+          { medicineName: 'Amoxicillin 500mg', category: 'Antibiotics', price: 15.0, quantity: 100 },
+          { medicineName: 'Ibuprofen 400mg', category: 'Pain Relief', price: 8.5, quantity: 150 },
+          { medicineName: 'Chlorhexidine 0.2% Mouthwash', category: 'Antiseptic', price: 12.0, quantity: 50 },
+        ],
+      },
+      {
+        pharmacyName: 'City Dental & Health Pharmacy',
+        ownerName: 'Emily Clark',
+        email: 'city.dental@pharmacy.com',
+        password: 'Pharmacy@123',
+        phone: '+1234567893',
+        address: '45 Health Avenue',
+        city: 'Metropolis',
+        district: 'North',
+        licenseNumber: 'PH-2024-002',
+        status: 'approved',
+        location: {
+          type: 'Point',
+          coordinates: [79.8700, 6.9350], // ~1.5 km from center [lng, lat]
+        },
+        inventory: [
+          { medicineName: 'Paracetamol 500mg', category: 'Pain Relief', price: 5.0, quantity: 200 },
+          { medicineName: 'Metronidazole 400mg', category: 'Antibiotics', price: 18.0, quantity: 80 },
+        ],
+      },
+    ]);
+    console.log('Sample approved pharmacies seeded.');
   }
 
   console.log('Seeding completed.');
