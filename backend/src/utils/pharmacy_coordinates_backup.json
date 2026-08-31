@@ -1,0 +1,118 @@
+{
+  "timestamp": "2026-08-31T12:26:16.787Z",
+  "userReferenceLocation": {
+    "latitude": 6.9324747,
+    "longitude": 79.8475878,
+    "source": "IP Geolocation (https://ipwho.is/)"
+  },
+  "pharmacies": [
+    {
+      "_id": "6a3132caf6220b6378758f18",
+      "pharmacyName": "vandu  pharmecy",
+      "ownerName": "vanojan",
+      "email": "vanojan50@gmail.com",
+      "phone": "0761234567",
+      "address": "meesalai",
+      "city": "chavalkachcheri",
+      "district": "jaffna",
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          4,
+          7
+        ]
+      },
+      "status": "approved"
+    },
+    {
+      "_id": "6a8951eeda5d1520f2a0f3ee",
+      "pharmacyName": "vano vano",
+      "ownerName": "vanojan",
+      "email": "vanojan1000@gmail.com",
+      "phone": "0761234567",
+      "address": "meesalai",
+      "city": "chavalkachcheri",
+      "district": "jaffna",
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          80.01687,
+          9.672621
+        ]
+      },
+      "status": "approved"
+    },
+    {
+      "_id": "6a8d1624801947dc4474de79",
+      "pharmacyName": "roman",
+      "ownerName": "roman",
+      "email": "roman15@gmail.com",
+      "phone": "+94779876543",
+      "address": "roman14@gmail.com",
+      "city": "chavalkachcheri",
+      "district": "jaffna",
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          80.01687,
+          9.672621
+        ]
+      },
+      "status": "pending"
+    },
+    {
+      "_id": "6a9500f99822fdcece830836",
+      "pharmacyName": "roman new",
+      "ownerName": "vanojan",
+      "email": "romannew@gmail.com",
+      "phone": "0779876543",
+      "address": "Kurukkal Lane",
+      "city": "Jaffna",
+      "district": "jaffna",
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          83.8476,
+          7.9394
+        ]
+      },
+      "status": "approved"
+    },
+    {
+      "_id": "6a950420173e9aa0b76126a4",
+      "pharmacyName": "Colombo Central Pharmacy",
+      "ownerName": "Dr. Nimal Perera",
+      "email": "colombo.care@pharmacy.com",
+      "phone": "+94 11 234 5678",
+      "address": "150 Galle Road, Kollupitiya",
+      "city": "Colombo",
+      "district": "Colombo",
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          79.851,
+          6.915
+        ]
+      },
+      "status": "approved"
+    },
+    {
+      "_id": "6a957050063c5add5690eb3e",
+      "pharmacyName": "city pharmacy",
+      "ownerName": "new vanno",
+      "email": "vanojan14p@gmail.com",
+      "phone": "+94776644972",
+      "address": "Kurukkal Lane",
+      "city": "Jaffna",
+      "district": "jaffna",
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          79.8476,
+          6.9394
+        ]
+      },
+      "status": "approved"
+    }
+  ]
+}

@@ -248,7 +248,7 @@ export default function OrderMedicines() {
             setError('Unable to determine your current location. Please enable location services and try again.');
             break;
           case 3: // TIMEOUT
-            setError('The request to get your location timed out. Please try clicking "Use My Location" again.');
+            setError('The request to get your location timed out. Please try clicking "Find Nearby Pharmacy" again.');
             break;
           default:
             setError('Unable to determine your current location. Please enable location services and try again.');
@@ -416,7 +416,7 @@ export default function OrderMedicines() {
                 ) : (
                   <>
                     <span>📍</span>
-                    <span>{location ? 'Refresh Location & Search' : 'Use My Location'}</span>
+                    <span>{location ? 'Refresh Location & Search' : 'Find Nearby Pharmacy'}</span>
                   </>
                 )}
               </button>
@@ -502,7 +502,7 @@ export default function OrderMedicines() {
               {!searching && !hasSearched && (
                 <div className="py-8 text-center text-sm text-theme-muted rounded-xl bg-theme-surface/20 border border-dashed border-theme-border/40 p-4">
                   <p className="text-2xl mb-1">📍</p>
-                  <p>Click &ldquo;Use My Location&rdquo; to find approved pharmacies nearest to your current location.</p>
+                  <p>Click &ldquo;Find Nearby Pharmacy&rdquo; to find approved pharmacies nearest to your current location.</p>
                 </div>
               )}
             </div>

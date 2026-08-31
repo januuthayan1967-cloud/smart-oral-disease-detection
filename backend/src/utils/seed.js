@@ -130,15 +130,15 @@ const seedData = async () => {
         ownerName: 'Robert Johnson',
         email: 'central.care@pharmacy.com',
         password: 'Pharmacy@123',
-        phone: '+1234567892',
-        address: '100 Main Hospital Road',
-        city: 'Metropolis',
-        district: 'Central',
+        phone: '+94 11 234 5678',
+        address: '100 Main Hospital Road, Colombo 03',
+        city: 'Colombo',
+        district: 'Colombo',
         licenseNumber: 'PH-2024-001',
         status: 'approved',
         location: {
           type: 'Point',
-          coordinates: [79.8612, 6.9271], // Colombo / Sample default [lng, lat]
+          coordinates: [79.8612, 6.9271], // Colombo [lng, lat]
         },
         inventory: [
           { medicineName: 'Amoxicillin 500mg', category: 'Antibiotics', price: 15.0, quantity: 100 },
@@ -151,23 +151,86 @@ const seedData = async () => {
         ownerName: 'Emily Clark',
         email: 'city.dental@pharmacy.com',
         password: 'Pharmacy@123',
-        phone: '+1234567893',
-        address: '45 Health Avenue',
-        city: 'Metropolis',
-        district: 'North',
+        phone: '+94 11 876 5432',
+        address: '45 Health Avenue, Colombo 07',
+        city: 'Colombo',
+        district: 'Colombo',
         licenseNumber: 'PH-2024-002',
         status: 'approved',
         location: {
           type: 'Point',
-          coordinates: [79.8700, 6.9350], // ~1.5 km from center [lng, lat]
+          coordinates: [79.8700, 6.9350], // Colombo North [lng, lat]
         },
         inventory: [
           { medicineName: 'Paracetamol 500mg', category: 'Pain Relief', price: 5.0, quantity: 200 },
           { medicineName: 'Metronidazole 400mg', category: 'Antibiotics', price: 18.0, quantity: 80 },
         ],
       },
+      {
+        pharmacyName: 'Meesalai Medicare Pharmacy',
+        ownerName: 'K. Thavanesan',
+        email: 'meesalai.pharmacy@example.com',
+        password: 'Pharmacy@123',
+        phone: '+94 21 228 1234',
+        address: 'A9 Road, Meesalai Junction',
+        city: 'Chavakachcheri',
+        district: 'Jaffna',
+        licenseNumber: 'PH-2024-003',
+        status: 'approved',
+        location: {
+          type: 'Point',
+          coordinates: [80.1415, 9.6795], // Meesalai [lng, lat]
+        },
+        inventory: [
+          { medicineName: 'Amoxicillin 500mg', category: 'Antibiotics', price: 15.0, quantity: 120 },
+          { medicineName: 'Paracetamol 500mg', category: 'Pain Relief', price: 5.0, quantity: 300 },
+          { medicineName: 'Ibuprofen 400mg', category: 'Pain Relief', price: 8.0, quantity: 100 },
+          { medicineName: 'Chlorhexidine 0.2% Mouthwash', category: 'Antiseptic', price: 12.0, quantity: 60 },
+        ],
+      },
+      {
+        pharmacyName: 'Jaffna Central Medicare Pharmacy',
+        ownerName: 'S. Rajasingham',
+        email: 'jaffna.medicare@example.com',
+        password: 'Pharmacy@123',
+        phone: '+94 21 222 5678',
+        address: 'Hospital Road, Jaffna',
+        city: 'Jaffna',
+        district: 'Jaffna',
+        licenseNumber: 'PH-2024-004',
+        status: 'approved',
+        location: {
+          type: 'Point',
+          coordinates: [80.0150, 9.6650], // Jaffna Town (~14 km from Meesalai) [lng, lat]
+        },
+        inventory: [
+          { medicineName: 'Amoxicillin 500mg', category: 'Antibiotics', price: 16.0, quantity: 80 },
+          { medicineName: 'Metronidazole 400mg', category: 'Antibiotics', price: 18.0, quantity: 90 },
+          { medicineName: 'Paracetamol 500mg', category: 'Pain Relief', price: 5.0, quantity: 250 },
+        ],
+      },
+      {
+        pharmacyName: 'Kandy Royal Care Pharmacy',
+        ownerName: 'Nimal Perera',
+        email: 'kandy.royal@example.com',
+        password: 'Pharmacy@123',
+        phone: '+94 81 223 4567',
+        address: 'Peradeniya Road, Kandy',
+        city: 'Kandy',
+        district: 'Kandy',
+        licenseNumber: 'PH-2024-005',
+        status: 'approved',
+        location: {
+          type: 'Point',
+          coordinates: [80.6337, 7.2906], // Kandy [lng, lat]
+        },
+        inventory: [
+          { medicineName: 'Amoxicillin 500mg', category: 'Antibiotics', price: 15.0, quantity: 110 },
+          { medicineName: 'Ibuprofen 400mg', category: 'Pain Relief', price: 8.5, quantity: 140 },
+        ],
+      },
     ]);
-    console.log('Sample approved pharmacies seeded.');
+    console.log('Sample approved pharmacies seeded across Colombo, Jaffna/Meesalai, and Kandy.');
   }
 
   console.log('Seeding completed.');
