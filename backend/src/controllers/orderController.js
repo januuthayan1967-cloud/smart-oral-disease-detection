@@ -200,7 +200,7 @@ export const sendPrescriptionToPharmacy = async (req, res) => {
   const existingOrder = await MedicineOrder.findOne({
     prescriptionId,
     pharmacyId,
-    status: { $nin: ['cancelled', 'delivered'] },
+    status: { $nin: ['cancelled', 'delivered', 'completed'] },
   });
 
   if (existingOrder) {

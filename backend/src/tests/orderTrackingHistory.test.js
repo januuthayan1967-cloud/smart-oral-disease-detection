@@ -105,9 +105,11 @@ async function runTests() {
       userId: testDentistUser._id,
       name: 'Dr. Track Dentist',
       email: 'track_dentist@test.com',
+      qualification: 'BDS, MDS',
       specialization: 'Orthodontics',
-      experienceYears: 10,
-      licenseNumber: 'DEN-TRACK-001',
+      experience: 10,
+      phone: '0771234568',
+      professionalLicenseNumber: 'DEN-TRACK-001',
     });
 
     testPharmacy = await Pharmacy.create({
@@ -442,11 +444,28 @@ async function runTests() {
     // ─────────────────────────────────────────────────────────────
     console.log('👉 [TC08] Duplicate accept request does not create duplicate tracking-history events');
     {
+      const testPrescription2 = await Prescription.create({
+        patientId: testUser._id,
+        dentistId: testDentistProfile._id,
+        patientName: 'Track Test User',
+        diagnosis: 'Toothache',
+        medicines: [
+          {
+            medicineName: 'Paracetamol 500mg',
+            dosage: '1 tablet as needed',
+            frequency: 'As needed',
+            duration: '3 days',
+            quantity: 5,
+            instructions: 'Take after food',
+          },
+        ],
+      });
+
       // Create a fresh test order
       const reqOrder = {
         user: testUser,
         body: {
-          prescriptionId: testPrescription._id.toString(),
+          prescriptionId: testPrescription2._id.toString(),
           pharmacyId: testPharmacy._id.toString(),
           deliveryAddress: '123 Test Avenue, Colombo',
           paymentMethod: 'cod',
@@ -502,6 +521,7 @@ async function runTests() {
         items: [
           {
             pharmacyId: testPharmacy._id,
+            pharmacyName: testPharmacy.pharmacyName,
             inventoryItemId: testPharmacy.inventory[0]._id,
             medicineName: testPharmacy.inventory[0].medicineName,
             quantity: 2,
