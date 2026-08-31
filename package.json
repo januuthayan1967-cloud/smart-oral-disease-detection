@@ -4,9 +4,11 @@
   "description": "Smart Oral Disease Detection System",
   "private": true,
   "scripts": {
-    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"blue.bold,green.bold\" \"npm run dev:server\" \"npm run dev:client\"",
+    "dev": "concurrently -n \"SERVER,CLIENT,AI\" -c \"blue.bold,green.bold,magenta.bold\" \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:ai\"",
     "dev:server": "npm run dev --prefix backend",
     "dev:client": "npm run dev --prefix frontend",
+    "dev:ai": "node ai-service/start.js",
+    "ai": "node ai-service/start.js",
     "server": "npm run dev --prefix backend",
     "client": "npm run dev --prefix frontend",
     "start:server": "npm run start --prefix backend",
