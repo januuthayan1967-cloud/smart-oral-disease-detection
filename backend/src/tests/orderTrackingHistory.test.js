@@ -6,6 +6,7 @@ import Pharmacy from '../models/Pharmacy.js';
 import User from '../models/User.js';
 import Prescription from '../models/Prescription.js';
 import Dentist from '../models/Dentist.js';
+import Payment from '../models/Payment.js';
 import MedicineOrder from '../models/MedicineOrder.js';
 import DirectOrder from '../models/DirectOrder.js';
 import OrderTrackingHistory from '../models/OrderTrackingHistory.js';
@@ -145,6 +146,8 @@ async function runTests() {
       dentistId: testDentistProfile._id,
       patientName: 'Track Test User',
       diagnosis: 'Dental Infection',
+      prescriptionFee: 500,
+      paymentStatus: 'paid',
       medicines: [
         {
           medicineName: 'Amoxicillin 500mg',
@@ -156,6 +159,18 @@ async function runTests() {
         },
       ],
     });
+
+    const testPayment = await Payment.create({
+      userId: testUser._id,
+      orderId: testPrescription._id,
+      orderType: 'prescription',
+      amount: 500,
+      method: 'card',
+      status: 'paid',
+      paidAt: new Date(),
+    });
+    testPrescription.paymentId = testPayment._id;
+    await testPrescription.save();
 
     console.log('Seed entities created successfully.\n');
     console.log('================== RUNNING TEST CASES ==================\n');
@@ -449,6 +464,8 @@ async function runTests() {
         dentistId: testDentistProfile._id,
         patientName: 'Track Test User',
         diagnosis: 'Toothache',
+        prescriptionFee: 500,
+        paymentStatus: 'paid',
         medicines: [
           {
             medicineName: 'Paracetamol 500mg',
@@ -460,6 +477,18 @@ async function runTests() {
           },
         ],
       });
+
+      const testPayment2 = await Payment.create({
+        userId: testUser._id,
+        orderId: testPrescription2._id,
+        orderType: 'prescription',
+        amount: 500,
+        method: 'card',
+        status: 'paid',
+        paidAt: new Date(),
+      });
+      testPrescription2.paymentId = testPayment2._id;
+      await testPrescription2.save();
 
       // Create a fresh test order
       const reqOrder = {
@@ -589,7 +618,10 @@ async function runTests() {
     console.log('--- Cleaning up test records ---');
     if (testUser) await User.deleteMany({ email: { $in: ['track_test_user@test.com', 'track_unauthorized_user@test.com', 'track_dentist@test.com'] } });
     if (testPharmacy) await Pharmacy.deleteMany({ email: 'track_test_pharmacy@test.com' });
-    if (testPrescription) await Prescription.deleteMany({ patientName: 'Track Test User' });
+    if (testPrescription) {
+      await Prescription.deleteMany({ patientName: 'Track Test User' });
+      await Payment.deleteMany({ orderId: testPrescription._id });
+    }
     if (testDentistProfile) await Dentist.deleteMany({ _id: testDentistProfile._id });
     await OrderTrackingHistory.deleteMany({ actionByName: { $in: ['Track Test User', 'Track City Care Pharmacy', 'Unauthorized User'] } });
     await MedicineOrder.deleteMany({ deliveryAddress: '123 Test Avenue, Colombo' });

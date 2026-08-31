@@ -1,6 +1,7 @@
 import Prescription from '../models/Prescription.js';
 import Dentist from '../models/Dentist.js';
 import User from '../models/User.js';
+import Payment from '../models/Payment.js';
 import { AppError } from '../utils/AppError.js';
 import PDFDocument from 'pdfkit';
 
@@ -111,8 +112,19 @@ export const downloadPrescription = async (req, res) => {
   if (!isOwner && !isAdmin) throw new AppError('Not authorized.', 403);
 
   // Enforce payment gate
-  if (prescription.paymentStatus !== 'paid' && !isAdmin) {
-    throw new AppError('Payment is required before downloading this prescription.', 402);
+  if (!isAdmin) {
+    if (prescription.paymentStatus !== 'paid') {
+      throw new AppError('Payment is required before downloading this prescription.', 402);
+    }
+    const verifiedPayment = await Payment.findOne({
+      orderId: prescription._id,
+      userId: req.user._id,
+      orderType: 'prescription',
+      status: 'paid',
+    });
+    if (!verifiedPayment) {
+      throw new AppError('Payment verification failed. A confirmed payment is required before downloading this prescription.', 402);
+    }
   }
 
   // Generate PDF

@@ -315,9 +315,20 @@ export default function Prescriptions() {
 
                   {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-2 shrink-0">
-                    <Link to={`/orders/send/${rx._id}`} className="btn-secondary text-sm text-center">
-                      Send to Pharmacy
-                    </Link>
+                    {isPaid ? (
+                      <Link to={`/orders/send/${rx._id}`} className="btn-secondary text-sm text-center">
+                        Send to Pharmacy
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled
+                        className="btn-secondary text-sm text-center opacity-50 cursor-not-allowed flex items-center justify-center gap-1"
+                        title="Payment required before sending prescription to pharmacy"
+                      >
+                        <span>🔒</span> Send to Pharmacy
+                      </button>
+                    )}
 
                     {isPaid ? (
                       <button
@@ -336,7 +347,7 @@ export default function Prescriptions() {
                         onClick={() => setPayingFor(rx)}
                         className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-semibold bg-amber-500 hover:bg-amber-600 text-white transition shadow-sm"
                       >
-                        💳 Pay to Download
+                        💳 Pay to Unlock
                         <span className="text-xs font-normal opacity-80">(Rs. {rx.prescriptionFee ?? 500})</span>
                       </button>
                     )}
@@ -346,7 +357,7 @@ export default function Prescriptions() {
                 {/* Prescription Fee Info for unpaid */}
                 {!isPaid && (
                   <div className="mt-3 rounded-lg bg-amber-500/10 border border-amber-500/20 px-3 py-2 text-xs text-amber-600 dark:text-amber-400">
-                    💡 Pay <strong>Rs. {rx.prescriptionFee ?? 500}</strong> by card to unlock the download for this prescription.
+                    💡 Pay <strong>Rs. {rx.prescriptionFee ?? 500}</strong> by card to unlock download and pharmacy delivery for this prescription.
                   </div>
                 )}
 

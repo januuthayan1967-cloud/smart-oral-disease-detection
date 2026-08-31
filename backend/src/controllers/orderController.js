@@ -188,8 +188,24 @@ export const sendPrescriptionToPharmacy = async (req, res) => {
     throw new AppError('Prescription not found.', 404);
   }
 
-  if (prescription.patientId.toString() !== req.user._id.toString()) {
+  if (prescription.patientId.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
     throw new AppError('Not authorized to send this prescription.', 403);
+  }
+
+  // Enforce payment gate: prescription consultation fee must be paid before dispatching to pharmacy
+  if (req.user.role !== 'admin') {
+    if (prescription.paymentStatus !== 'paid') {
+      throw new AppError('Payment for this prescription must be completed before sending it to a pharmacy.', 402);
+    }
+    const verifiedPayment = await Payment.findOne({
+      orderId: prescription._id,
+      userId: req.user._id,
+      orderType: 'prescription',
+      status: 'paid',
+    });
+    if (!verifiedPayment) {
+      throw new AppError('Payment verification failed. A confirmed payment is required before sending this prescription to a pharmacy.', 402);
+    }
   }
 
   const pharmacy = await Pharmacy.findOne({ _id: pharmacyId, status: 'approved' });
