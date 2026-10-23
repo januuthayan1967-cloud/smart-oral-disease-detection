@@ -26,12 +26,7 @@ import directOrderRoutes from './routes/directOrderRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
-import connectDB from './config/db.js';
 
-// Connect to MongoDB
-connectDB().catch(err => {
-  console.error('Database connection failed to initialize at startup:', err.message);
-});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

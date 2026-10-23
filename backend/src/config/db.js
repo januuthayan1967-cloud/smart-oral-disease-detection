@@ -1,6 +1,10 @@
 import mongoose from 'mongoose';
 
 const connectDB = async () => {
+  if (mongoose.connection.readyState >= 1) {
+    return mongoose.connection;
+  }
+
   const uri = process.env.MONGODB_URI;
 
   if (!uri) {
@@ -9,7 +13,8 @@ const connectDB = async () => {
 
   try {
     const conn = await mongoose.connect(uri);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    console.log(`MongoDB Connected: ${conn.connection.host || mongoose.connection.host || 'ready'}`);
+    return conn;
   } catch (error) {
     console.error('MongoDB connection error:', error.message);
     console.error('Check backend/.env, verify MONGODB_URI, and make sure your Atlas IP access list allows this machine.');
