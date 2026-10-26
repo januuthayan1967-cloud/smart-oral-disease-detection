@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { getImageUrl } from '../utils/imageUrl';
 
 export default function MedicineCard({
@@ -10,6 +10,7 @@ export default function MedicineCard({
   isPharmacyView = false,
   isAdding = false,
 }) {
+  const shouldReduceMotion = useReducedMotion();
   const {
     medicineName,
     category,
@@ -49,9 +50,9 @@ export default function MedicineCard({
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
-      className="card flex flex-col justify-between overflow-hidden border border-theme-border/40 bg-theme-surface/65 shadow-theme hover:border-theme-accent/30 hover:shadow-glow"
+      whileHover={shouldReduceMotion ? {} : { y: -4, boxShadow: '0 16px 40px var(--shadow-accent)' }}
+      transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
+      className="card flex flex-col justify-between overflow-hidden border border-theme-border/40 bg-theme-surface/75 shadow-theme hover:border-theme-accent/40"
     >
       <div>
         {/* Medicine Image */}

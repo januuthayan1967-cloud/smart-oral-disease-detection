@@ -1,0 +1,1240 @@
+{
+  "checks": [
+    {
+      "width": 375,
+      "theme": "dark",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 18,
+          "y": 80,
+          "width": 339,
+          "height": 1429.6875,
+          "right": 357,
+          "bottom": 1509.6875
+        },
+        "copy": {
+          "x": 18,
+          "y": 80,
+          "width": 339,
+          "height": 550.1875,
+          "right": 357,
+          "bottom": 630.1875
+        },
+        "tooth": {
+          "x": 82.40625,
+          "y": 690.09375,
+          "width": 210.171875,
+          "height": 210.171875,
+          "right": 292.578125,
+          "bottom": 900.265625
+        },
+        "viewport": {
+          "x": 18,
+          "y": 630.1875,
+          "width": 339,
+          "height": 390,
+          "right": 357,
+          "bottom": 1020.1875
+        },
+        "strip": {
+          "x": 18,
+          "y": 1544.6875,
+          "width": 339,
+          "height": 425.75,
+          "right": 357,
+          "bottom": 1970.4375
+        },
+        "cards": [
+          {
+            "x": 18,
+            "y": 1030.1875,
+            "width": 339,
+            "height": 107.875,
+            "right": 357,
+            "bottom": 1138.0625
+          },
+          {
+            "x": 18,
+            "y": 1154.0625,
+            "width": 339,
+            "height": 107.875,
+            "right": 357,
+            "bottom": 1261.9375
+          },
+          {
+            "x": 18,
+            "y": 1277.9375,
+            "width": 339,
+            "height": 107.875,
+            "right": 357,
+            "bottom": 1385.8125
+          },
+          {
+            "x": 18,
+            "y": 1401.8125,
+            "width": 339,
+            "height": 107.875,
+            "right": 357,
+            "bottom": 1509.6875
+          }
+        ]
+      }
+    },
+    {
+      "width": 430,
+      "theme": "dark",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 18,
+          "y": 80,
+          "width": 394,
+          "height": 1407.90625,
+          "right": 412,
+          "bottom": 1487.90625
+        },
+        "copy": {
+          "x": 18,
+          "y": 80,
+          "width": 394,
+          "height": 528.40625,
+          "right": 412,
+          "bottom": 608.40625
+        },
+        "tooth": {
+          "x": 92.859375,
+          "y": 651.265625,
+          "width": 244.265625,
+          "height": 244.265625,
+          "right": 337.125,
+          "bottom": 895.53125
+        },
+        "viewport": {
+          "x": 18,
+          "y": 608.40625,
+          "width": 394,
+          "height": 390,
+          "right": 412,
+          "bottom": 998.40625
+        },
+        "strip": {
+          "x": 18,
+          "y": 1522.90625,
+          "width": 394,
+          "height": 425.75,
+          "right": 412,
+          "bottom": 1948.65625
+        },
+        "cards": [
+          {
+            "x": 18,
+            "y": 1008.40625,
+            "width": 394,
+            "height": 107.875,
+            "right": 412,
+            "bottom": 1116.28125
+          },
+          {
+            "x": 18,
+            "y": 1132.28125,
+            "width": 394,
+            "height": 107.875,
+            "right": 412,
+            "bottom": 1240.15625
+          },
+          {
+            "x": 18,
+            "y": 1256.15625,
+            "width": 394,
+            "height": 107.875,
+            "right": 412,
+            "bottom": 1364.03125
+          },
+          {
+            "x": 18,
+            "y": 1380.03125,
+            "width": 394,
+            "height": 107.875,
+            "right": 412,
+            "bottom": 1487.90625
+          }
+        ]
+      }
+    },
+    {
+      "width": 768,
+      "theme": "dark",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 24,
+          "y": 94,
+          "width": 720,
+          "height": 776.34375,
+          "right": 744,
+          "bottom": 870.34375
+        },
+        "copy": {
+          "x": 24,
+          "y": 135.875,
+          "width": 295.796875,
+          "height": 692.59375,
+          "right": 319.796875,
+          "bottom": 828.46875
+        },
+        "tooth": {
+          "x": 427.84375,
+          "y": 162.9375,
+          "width": 232.109375,
+          "height": 232.109375,
+          "right": 659.953125,
+          "bottom": 395.046875
+        },
+        "viewport": {
+          "x": 343.796875,
+          "y": 94,
+          "width": 400.203125,
+          "height": 430,
+          "right": 744,
+          "bottom": 524
+        },
+        "strip": {
+          "x": 24,
+          "y": 905.34375,
+          "width": 720,
+          "height": 183.5625,
+          "right": 744,
+          "bottom": 1088.90625
+        },
+        "cards": [
+          {
+            "x": 343.796875,
+            "y": 524,
+            "width": 192.09375,
+            "height": 156.375,
+            "right": 535.890625,
+            "bottom": 680.375
+          },
+          {
+            "x": 551.890625,
+            "y": 524,
+            "width": 192.109375,
+            "height": 156.375,
+            "right": 744,
+            "bottom": 680.375
+          },
+          {
+            "x": 343.796875,
+            "y": 696.375,
+            "width": 192.09375,
+            "height": 173.96875,
+            "right": 535.890625,
+            "bottom": 870.34375
+          },
+          {
+            "x": 551.890625,
+            "y": 696.375,
+            "width": 192.109375,
+            "height": 173.96875,
+            "right": 744,
+            "bottom": 870.34375
+          }
+        ]
+      }
+    },
+    {
+      "width": 1024,
+      "theme": "dark",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 24,
+          "y": 94,
+          "width": 976,
+          "height": 684.5625,
+          "right": 1000,
+          "bottom": 778.5625
+        },
+        "copy": {
+          "x": 24,
+          "y": 162.859375,
+          "width": 404.59375,
+          "height": 546.84375,
+          "right": 428.59375,
+          "bottom": 709.703125
+        },
+        "tooth": {
+          "x": 567.546875,
+          "y": 120.25,
+          "width": 317.484375,
+          "height": 317.484375,
+          "right": 885.03125,
+          "bottom": 437.734375
+        },
+        "viewport": {
+          "x": 452.59375,
+          "y": 94,
+          "width": 547.40625,
+          "height": 430,
+          "right": 1000,
+          "bottom": 524
+        },
+        "strip": {
+          "x": 24,
+          "y": 813.5625,
+          "width": 976,
+          "height": 182,
+          "right": 1000,
+          "bottom": 995.5625
+        },
+        "cards": [
+          {
+            "x": 452.59375,
+            "y": 524,
+            "width": 265.703125,
+            "height": 119.28125,
+            "right": 718.296875,
+            "bottom": 643.28125
+          },
+          {
+            "x": 734.296875,
+            "y": 524,
+            "width": 265.703125,
+            "height": 119.28125,
+            "right": 1000,
+            "bottom": 643.28125
+          },
+          {
+            "x": 452.59375,
+            "y": 659.28125,
+            "width": 265.703125,
+            "height": 119.28125,
+            "right": 718.296875,
+            "bottom": 778.5625
+          },
+          {
+            "x": 734.296875,
+            "y": 659.28125,
+            "width": 265.703125,
+            "height": 119.28125,
+            "right": 1000,
+            "bottom": 778.5625
+          }
+        ]
+      }
+    },
+    {
+      "width": 1440,
+      "theme": "dark",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 32,
+          "y": 96,
+          "width": 1376,
+          "height": 579.84375,
+          "right": 1408,
+          "bottom": 675.84375
+        },
+        "copy": {
+          "x": 32,
+          "y": 96,
+          "width": 432.265625,
+          "height": 579.84375,
+          "right": 464.265625,
+          "bottom": 675.84375
+        },
+        "tooth": {
+          "x": 782.578125,
+          "y": 168.515625,
+          "width": 331.09375,
+          "height": 388.796875,
+          "right": 1113.671875,
+          "bottom": 557.3125
+        },
+        "viewport": {
+          "x": 488.265625,
+          "y": 110.921875,
+          "width": 919.71875,
+          "height": 550,
+          "right": 1407.984375,
+          "bottom": 660.921875
+        },
+        "strip": {
+          "x": 32,
+          "y": 675.84375,
+          "width": 1376,
+          "height": 98.78125,
+          "right": 1408,
+          "bottom": 774.625
+        },
+        "cards": [
+          {
+            "x": 484.4311218261719,
+            "y": 137.56666564941406,
+            "width": 292.7783508300781,
+            "height": 168.71043395996094,
+            "right": 777.20947265625,
+            "bottom": 306.277099609375
+          },
+          {
+            "x": 1119.04052734375,
+            "y": 137.56666564941406,
+            "width": 292.7783203125,
+            "height": 168.71043395996094,
+            "right": 1411.81884765625,
+            "bottom": 306.277099609375
+          },
+          {
+            "x": 485.6651916503906,
+            "y": 341.99371337890625,
+            "width": 290.3102722167969,
+            "height": 163.85635375976562,
+            "right": 775.9754638671875,
+            "bottom": 505.8500671386719
+          },
+          {
+            "x": 1120.274658203125,
+            "y": 341.99371337890625,
+            "width": 290.31005859375,
+            "height": 163.85635375976562,
+            "right": 1410.584716796875,
+            "bottom": 505.8500671386719
+          }
+        ]
+      }
+    },
+    {
+      "width": 1920,
+      "theme": "dark",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 60,
+          "y": 96,
+          "width": 1800,
+          "height": 630,
+          "right": 1860,
+          "bottom": 726
+        },
+        "copy": {
+          "x": 60,
+          "y": 96.5,
+          "width": 567.828125,
+          "height": 629,
+          "right": 627.828125,
+          "bottom": 725.5
+        },
+        "tooth": {
+          "x": 1038.4375,
+          "y": 178,
+          "width": 434.9375,
+          "height": 420,
+          "right": 1473.375,
+          "bottom": 598
+        },
+        "viewport": {
+          "x": 651.828125,
+          "y": 96,
+          "width": 1208.171875,
+          "height": 630,
+          "right": 1860,
+          "bottom": 726
+        },
+        "strip": {
+          "x": 60,
+          "y": 726,
+          "width": 1800,
+          "height": 98,
+          "right": 1860,
+          "bottom": 824
+        },
+        "cards": [
+          {
+            "x": 647.63623046875,
+            "y": 120.31576538085938,
+            "width": 382.9150390625,
+            "height": 189.36846923828125,
+            "right": 1030.55126953125,
+            "bottom": 309.6842346191406
+          },
+          {
+            "x": 1481.27685546875,
+            "y": 120.31576538085938,
+            "width": 382.9150390625,
+            "height": 189.36846923828125,
+            "right": 1864.19189453125,
+            "bottom": 309.6842346191406
+          },
+          {
+            "x": 648.9757690429688,
+            "y": 364.51629638671875,
+            "width": 380.23602294921875,
+            "height": 182.9674072265625,
+            "right": 1029.2117919921875,
+            "bottom": 547.4837036132812
+          },
+          {
+            "x": 1482.616455078125,
+            "y": 364.51629638671875,
+            "width": 380.2359619140625,
+            "height": 182.9674072265625,
+            "right": 1862.8524169921875,
+            "bottom": 547.4837036132812
+          }
+        ]
+      }
+    },
+    {
+      "width": 375,
+      "theme": "light",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 18,
+          "y": 80,
+          "width": 339,
+          "height": 1429.6875,
+          "right": 357,
+          "bottom": 1509.6875
+        },
+        "copy": {
+          "x": 18,
+          "y": 80,
+          "width": 339,
+          "height": 550.1875,
+          "right": 357,
+          "bottom": 630.1875
+        },
+        "tooth": {
+          "x": 82.40625,
+          "y": 690.09375,
+          "width": 210.171875,
+          "height": 210.171875,
+          "right": 292.578125,
+          "bottom": 900.265625
+        },
+        "viewport": {
+          "x": 18,
+          "y": 630.1875,
+          "width": 339,
+          "height": 390,
+          "right": 357,
+          "bottom": 1020.1875
+        },
+        "strip": {
+          "x": 18,
+          "y": 1544.6875,
+          "width": 339,
+          "height": 425.75,
+          "right": 357,
+          "bottom": 1970.4375
+        },
+        "cards": [
+          {
+            "x": 18,
+            "y": 1030.1875,
+            "width": 339,
+            "height": 107.875,
+            "right": 357,
+            "bottom": 1138.0625
+          },
+          {
+            "x": 18,
+            "y": 1154.0625,
+            "width": 339,
+            "height": 107.875,
+            "right": 357,
+            "bottom": 1261.9375
+          },
+          {
+            "x": 18,
+            "y": 1277.9375,
+            "width": 339,
+            "height": 107.875,
+            "right": 357,
+            "bottom": 1385.8125
+          },
+          {
+            "x": 18,
+            "y": 1401.8125,
+            "width": 339,
+            "height": 107.875,
+            "right": 357,
+            "bottom": 1509.6875
+          }
+        ]
+      }
+    },
+    {
+      "width": 430,
+      "theme": "light",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 18,
+          "y": 80,
+          "width": 394,
+          "height": 1407.90625,
+          "right": 412,
+          "bottom": 1487.90625
+        },
+        "copy": {
+          "x": 18,
+          "y": 80,
+          "width": 394,
+          "height": 528.40625,
+          "right": 412,
+          "bottom": 608.40625
+        },
+        "tooth": {
+          "x": 92.859375,
+          "y": 651.265625,
+          "width": 244.265625,
+          "height": 244.265625,
+          "right": 337.125,
+          "bottom": 895.53125
+        },
+        "viewport": {
+          "x": 18,
+          "y": 608.40625,
+          "width": 394,
+          "height": 390,
+          "right": 412,
+          "bottom": 998.40625
+        },
+        "strip": {
+          "x": 18,
+          "y": 1522.90625,
+          "width": 394,
+          "height": 425.75,
+          "right": 412,
+          "bottom": 1948.65625
+        },
+        "cards": [
+          {
+            "x": 18,
+            "y": 1008.40625,
+            "width": 394,
+            "height": 107.875,
+            "right": 412,
+            "bottom": 1116.28125
+          },
+          {
+            "x": 18,
+            "y": 1132.28125,
+            "width": 394,
+            "height": 107.875,
+            "right": 412,
+            "bottom": 1240.15625
+          },
+          {
+            "x": 18,
+            "y": 1256.15625,
+            "width": 394,
+            "height": 107.875,
+            "right": 412,
+            "bottom": 1364.03125
+          },
+          {
+            "x": 18,
+            "y": 1380.03125,
+            "width": 394,
+            "height": 107.875,
+            "right": 412,
+            "bottom": 1487.90625
+          }
+        ]
+      }
+    },
+    {
+      "width": 768,
+      "theme": "light",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 24,
+          "y": 94,
+          "width": 720,
+          "height": 776.34375,
+          "right": 744,
+          "bottom": 870.34375
+        },
+        "copy": {
+          "x": 24,
+          "y": 135.875,
+          "width": 295.796875,
+          "height": 692.59375,
+          "right": 319.796875,
+          "bottom": 828.46875
+        },
+        "tooth": {
+          "x": 427.84375,
+          "y": 162.9375,
+          "width": 232.109375,
+          "height": 232.109375,
+          "right": 659.953125,
+          "bottom": 395.046875
+        },
+        "viewport": {
+          "x": 343.796875,
+          "y": 94,
+          "width": 400.203125,
+          "height": 430,
+          "right": 744,
+          "bottom": 524
+        },
+        "strip": {
+          "x": 24,
+          "y": 905.34375,
+          "width": 720,
+          "height": 183.5625,
+          "right": 744,
+          "bottom": 1088.90625
+        },
+        "cards": [
+          {
+            "x": 343.796875,
+            "y": 524,
+            "width": 192.09375,
+            "height": 156.375,
+            "right": 535.890625,
+            "bottom": 680.375
+          },
+          {
+            "x": 551.890625,
+            "y": 524,
+            "width": 192.109375,
+            "height": 156.375,
+            "right": 744,
+            "bottom": 680.375
+          },
+          {
+            "x": 343.796875,
+            "y": 696.375,
+            "width": 192.09375,
+            "height": 173.96875,
+            "right": 535.890625,
+            "bottom": 870.34375
+          },
+          {
+            "x": 551.890625,
+            "y": 696.375,
+            "width": 192.109375,
+            "height": 173.96875,
+            "right": 744,
+            "bottom": 870.34375
+          }
+        ]
+      }
+    },
+    {
+      "width": 1024,
+      "theme": "light",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 24,
+          "y": 94,
+          "width": 976,
+          "height": 684.5625,
+          "right": 1000,
+          "bottom": 778.5625
+        },
+        "copy": {
+          "x": 24,
+          "y": 162.859375,
+          "width": 404.59375,
+          "height": 546.84375,
+          "right": 428.59375,
+          "bottom": 709.703125
+        },
+        "tooth": {
+          "x": 567.546875,
+          "y": 120.25,
+          "width": 317.484375,
+          "height": 317.484375,
+          "right": 885.03125,
+          "bottom": 437.734375
+        },
+        "viewport": {
+          "x": 452.59375,
+          "y": 94,
+          "width": 547.40625,
+          "height": 430,
+          "right": 1000,
+          "bottom": 524
+        },
+        "strip": {
+          "x": 24,
+          "y": 813.5625,
+          "width": 976,
+          "height": 182,
+          "right": 1000,
+          "bottom": 995.5625
+        },
+        "cards": [
+          {
+            "x": 452.59375,
+            "y": 524,
+            "width": 265.703125,
+            "height": 119.28125,
+            "right": 718.296875,
+            "bottom": 643.28125
+          },
+          {
+            "x": 734.296875,
+            "y": 524,
+            "width": 265.703125,
+            "height": 119.28125,
+            "right": 1000,
+            "bottom": 643.28125
+          },
+          {
+            "x": 452.59375,
+            "y": 659.28125,
+            "width": 265.703125,
+            "height": 119.28125,
+            "right": 718.296875,
+            "bottom": 778.5625
+          },
+          {
+            "x": 734.296875,
+            "y": 659.28125,
+            "width": 265.703125,
+            "height": 119.28125,
+            "right": 1000,
+            "bottom": 778.5625
+          }
+        ]
+      }
+    },
+    {
+      "width": 1440,
+      "theme": "light",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 32,
+          "y": 96,
+          "width": 1376,
+          "height": 579.84375,
+          "right": 1408,
+          "bottom": 675.84375
+        },
+        "copy": {
+          "x": 32,
+          "y": 96,
+          "width": 432.265625,
+          "height": 579.84375,
+          "right": 464.265625,
+          "bottom": 675.84375
+        },
+        "tooth": {
+          "x": 782.578125,
+          "y": 168.515625,
+          "width": 331.09375,
+          "height": 388.796875,
+          "right": 1113.671875,
+          "bottom": 557.3125
+        },
+        "viewport": {
+          "x": 488.265625,
+          "y": 110.921875,
+          "width": 919.71875,
+          "height": 550,
+          "right": 1407.984375,
+          "bottom": 660.921875
+        },
+        "strip": {
+          "x": 32,
+          "y": 675.84375,
+          "width": 1376,
+          "height": 98.78125,
+          "right": 1408,
+          "bottom": 774.625
+        },
+        "cards": [
+          {
+            "x": 484.4311218261719,
+            "y": 137.56666564941406,
+            "width": 292.7783508300781,
+            "height": 168.71043395996094,
+            "right": 777.20947265625,
+            "bottom": 306.277099609375
+          },
+          {
+            "x": 1119.04052734375,
+            "y": 137.56666564941406,
+            "width": 292.7783203125,
+            "height": 168.71043395996094,
+            "right": 1411.81884765625,
+            "bottom": 306.277099609375
+          },
+          {
+            "x": 485.6651916503906,
+            "y": 341.99371337890625,
+            "width": 290.3102722167969,
+            "height": 163.85635375976562,
+            "right": 775.9754638671875,
+            "bottom": 505.8500671386719
+          },
+          {
+            "x": 1120.274658203125,
+            "y": 341.99371337890625,
+            "width": 290.31005859375,
+            "height": 163.85635375976562,
+            "right": 1410.584716796875,
+            "bottom": 505.8500671386719
+          }
+        ]
+      }
+    },
+    {
+      "width": 1920,
+      "theme": "light",
+      "horizontalOverflow": false,
+      "visibleCards": 4,
+      "cardOverlap": false,
+      "cardsOutsideViewport": false,
+      "cardsCoverTooth": false,
+      "clippedText": false,
+      "platformOutsideSection": false,
+      "platformOverlapsStrip": false,
+      "buttonBlocked": false,
+      "imageLoaded": true,
+      "geometry": {
+        "hero": {
+          "x": 60,
+          "y": 96,
+          "width": 1800,
+          "height": 630,
+          "right": 1860,
+          "bottom": 726
+        },
+        "copy": {
+          "x": 60,
+          "y": 96.5,
+          "width": 567.828125,
+          "height": 629,
+          "right": 627.828125,
+          "bottom": 725.5
+        },
+        "tooth": {
+          "x": 1038.4375,
+          "y": 178,
+          "width": 434.9375,
+          "height": 420,
+          "right": 1473.375,
+          "bottom": 598
+        },
+        "viewport": {
+          "x": 651.828125,
+          "y": 96,
+          "width": 1208.171875,
+          "height": 630,
+          "right": 1860,
+          "bottom": 726
+        },
+        "strip": {
+          "x": 60,
+          "y": 726,
+          "width": 1800,
+          "height": 98,
+          "right": 1860,
+          "bottom": 824
+        },
+        "cards": [
+          {
+            "x": 647.63623046875,
+            "y": 120.31576538085938,
+            "width": 382.9150390625,
+            "height": 189.36846923828125,
+            "right": 1030.55126953125,
+            "bottom": 309.6842346191406
+          },
+          {
+            "x": 1481.27685546875,
+            "y": 120.31576538085938,
+            "width": 382.9150390625,
+            "height": 189.36846923828125,
+            "right": 1864.19189453125,
+            "bottom": 309.6842346191406
+          },
+          {
+            "x": 648.9757690429688,
+            "y": 364.51629638671875,
+            "width": 380.23602294921875,
+            "height": 182.9674072265625,
+            "right": 1029.2117919921875,
+            "bottom": 547.4837036132812
+          },
+          {
+            "x": 1482.616455078125,
+            "y": 364.51629638671875,
+            "width": 380.2359619140625,
+            "height": 182.9674072265625,
+            "right": 1862.8524169921875,
+            "bottom": 547.4837036132812
+          }
+        ]
+      }
+    }
+  ],
+  "actions": [
+    {
+      "name": "Guest Start Detection",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest Learn More",
+      "expected": "/register",
+      "actual": "/register",
+      "passed": true
+    },
+    {
+      "name": "Login button",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Get Started button",
+      "expected": "/register",
+      "actual": "/register",
+      "passed": true
+    },
+    {
+      "name": "Guest navbar /dashboard",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest navbar /detect",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest navbar /chat",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest navbar /consultation",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest navbar /medicines",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest navbar /profile",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest floating card 01",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest floating card 02",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest floating card 03",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest floating card 04",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Keyboard detection card",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest lower feature strip /detect",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest lower feature strip /chat",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest lower feature strip /consultation",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Guest lower feature strip /medicines",
+      "expected": "/login",
+      "actual": "/login",
+      "passed": true
+    },
+    {
+      "name": "Mobile menu expands",
+      "passed": true
+    },
+    {
+      "name": "Mobile guest AI Assistant redirects to login",
+      "passed": true
+    },
+    {
+      "name": "Theme toggles and persists",
+      "passed": true
+    }
+  ],
+  "sameThemeGeometry": [
+    {
+      "width": 375,
+      "passed": true
+    },
+    {
+      "width": 430,
+      "passed": true
+    },
+    {
+      "width": 768,
+      "passed": true
+    },
+    {
+      "width": 1024,
+      "passed": true
+    },
+    {
+      "width": 1440,
+      "passed": true
+    },
+    {
+      "width": 1920,
+      "passed": true
+    }
+  ],
+  "parallax": "matrix3d(0.999995, -3.40961e-05, 0.00320214, 0, 0, 0.999943, 0.0106473, 0, -0.00320232, -0.0106472, 0.999938, 0, 0, 0, 0, 1)",
+  "errors": []
+}

@@ -1,15 +1,17 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 export default function LoadingAnimation({ message = 'Loading...', fullScreen = false }) {
+  const shouldReduceMotion = useReducedMotion();
+
   const content = (
-    <div className="flex flex-col items-center justify-center gap-6">
+    <div className="flex flex-col items-center justify-center gap-6" role="status" aria-live="polite">
       {/* Concentric SVG rings + center icon */}
       <div className="relative flex items-center justify-center" style={{ width: 80, height: 80 }}>
         {/* Outer ring - slow spin */}
         <motion.svg
           className="absolute inset-0"
           width="80" height="80" viewBox="0 0 80 80"
-          animate={{ rotate: 360 }}
+          animate={shouldReduceMotion ? {} : { rotate: 360 }}
           transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
         >
           <circle
@@ -36,7 +38,7 @@ export default function LoadingAnimation({ message = 'Loading...', fullScreen = 
           className="absolute"
           style={{ inset: 10 }}
           width="60" height="60" viewBox="0 0 60 60"
-          animate={{ rotate: -360 }}
+          animate={shouldReduceMotion ? {} : { rotate: -360 }}
           transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
         >
           <circle
@@ -61,7 +63,7 @@ export default function LoadingAnimation({ message = 'Loading...', fullScreen = 
         <motion.div
           className="absolute flex items-center justify-center rounded-full text-xl"
           style={{ width: 36, height: 36, background: 'var(--accent-dim)' }}
-          animate={{ scale: [1, 1.12, 1], opacity: [0.7, 1, 0.7] }}
+          animate={shouldReduceMotion ? {} : { scale: [1, 1.12, 1], opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
         >
           🦷

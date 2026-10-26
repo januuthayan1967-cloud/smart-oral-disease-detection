@@ -39,6 +39,20 @@
   --stat-2: linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(5,150,105,0.08) 100%);
   --stat-3: linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(79,70,229,0.08) 100%);
   --stat-4: linear-gradient(135deg, rgba(20,184,166,0.2) 0%, rgba(13,148,136,0.08) 100%);
+
+  /* Animation Design Tokens */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --timing-btn: 200ms;
+  --timing-card: 260ms;
+  --timing-nav: 220ms;
+  --timing-modal: 300ms;
+  --timing-page: 350ms;
+  --timing-theme: 300ms;
+  --hero-glow: rgba(6, 182, 212, 0.22);
+  --hero-glow-secondary: rgba(13, 148, 136, 0.16);
+  --grid-line: rgba(6, 182, 212, 0.07);
 }
 
 [data-theme='light'] {
@@ -46,23 +60,23 @@
   --secondary: #E0F2FE;
   --accent: #0284C7;
   --accent-soft: #0EA5E9;
-  --accent-dim: rgba(2, 132, 199, 0.1);
+  --accent-dim: rgba(2, 132, 199, 0.12);
   --background: #F0F9FF;
-  --surface: rgba(255, 255, 255, 0.92);
-  --surface-2: rgba(240, 249, 255, 0.95);
+  --surface: rgba(255, 255, 255, 0.95);
+  --surface-2: rgba(240, 249, 255, 0.98);
   --border: #BAE6FD;
-  --border-soft: rgba(186, 230, 253, 0.7);
-  --heading: #0C1A2E;
-  --text: #1E3A4A;
-  --muted: #5B8DA6;
+  --border-soft: rgba(147, 197, 253, 0.75);
+  --heading: #0A192F;
+  --text: #1E293B;
+  --muted: #334E68;
   --button: #0284C7;
   --button-hover: #0369A1;
   --success: #059669;
   --warning: #D97706;
-  --shadow: rgba(12, 26, 46, 0.1);
-  --shadow-accent: rgba(2, 132, 199, 0.15);
-  --glass: rgba(255, 255, 255, 0.82);
-  --glass-border: rgba(2, 132, 199, 0.2);
+  --shadow: rgba(10, 25, 47, 0.12);
+  --shadow-accent: rgba(2, 132, 199, 0.18);
+  --glass: rgba(255, 255, 255, 0.94);
+  --glass-border: rgba(2, 132, 199, 0.28);
   --error: #DC2626;
   --error-bg: rgba(220, 38, 38, 0.07);
   --success-bg: rgba(5, 150, 105, 0.08);
@@ -74,6 +88,11 @@
   --stat-2: linear-gradient(135deg, rgba(5,150,105,0.12) 0%, rgba(4,120,87,0.04) 100%);
   --stat-3: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(79,70,229,0.04) 100%);
   --stat-4: linear-gradient(135deg, rgba(13,148,136,0.12) 0%, rgba(15,118,110,0.04) 100%);
+
+  /* Animation Design Tokens (Light Mode) */
+  --hero-glow: rgba(2, 132, 199, 0.15);
+  --hero-glow-secondary: rgba(13, 148, 136, 0.10);
+  --grid-line: rgba(2, 132, 199, 0.07);
 }
 
 @media (prefers-color-scheme: light) {
@@ -82,23 +101,23 @@
     --secondary: #E0F2FE;
     --accent: #0284C7;
     --accent-soft: #0EA5E9;
-    --accent-dim: rgba(2, 132, 199, 0.1);
+    --accent-dim: rgba(2, 132, 199, 0.12);
     --background: #F0F9FF;
-    --surface: rgba(255, 255, 255, 0.92);
-    --surface-2: rgba(240, 249, 255, 0.95);
+    --surface: rgba(255, 255, 255, 0.95);
+    --surface-2: rgba(240, 249, 255, 0.98);
     --border: #BAE6FD;
-    --border-soft: rgba(186, 230, 253, 0.7);
-    --heading: #0C1A2E;
-    --text: #1E3A4A;
-    --muted: #5B8DA6;
+    --border-soft: rgba(147, 197, 253, 0.75);
+    --heading: #0A192F;
+    --text: #1E293B;
+    --muted: #334E68;
     --button: #0284C7;
     --button-hover: #0369A1;
     --success: #059669;
     --warning: #D97706;
-    --shadow: rgba(12, 26, 46, 0.1);
-    --shadow-accent: rgba(2, 132, 199, 0.15);
-    --glass: rgba(255, 255, 255, 0.82);
-    --glass-border: rgba(2, 132, 199, 0.2);
+    --shadow: rgba(12, 26, 46, 0.12);
+    --shadow-accent: rgba(2, 132, 199, 0.18);
+    --glass: rgba(255, 255, 255, 0.94);
+    --glass-border: rgba(2, 132, 199, 0.28);
     --error: #DC2626;
     --error-bg: rgba(220, 38, 38, 0.07);
     --success-bg: rgba(5, 150, 105, 0.08);
@@ -436,4 +455,134 @@
   ::-webkit-scrollbar-thumb:hover {
     background: var(--accent);
   }
+
+  /* ── Hero Optical Grid ─────────────────────────────────────────────── */
+  .hero-optical-grid {
+    background-image:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+    background-size: 38px 38px;
+    mask-image: radial-gradient(ellipse 75% 65% at 50% 38%, black 15%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 38%, black 15%, transparent 80%);
+    pointer-events: none;
+  }
+
+  /* ── Ambient Glow Breathe ───────────────────────────────────────────── */
+  .hero-ambient-glow {
+    background: radial-gradient(circle, var(--hero-glow) 0%, var(--hero-glow-secondary) 45%, transparent 70%);
+    animation: ambientBreathe 9s var(--ease-in-out-smooth) infinite alternate;
+    pointer-events: none;
+  }
+
+  /* ── Interactive Card Micro-Interactions (Desktop only) ─────────────── */
+  @media (hover: hover) and (pointer: fine) {
+    .card-interactive {
+      transition: transform var(--timing-card) var(--ease-smooth),
+                  box-shadow var(--timing-card) var(--ease-smooth),
+                  border-color var(--timing-card) var(--ease-smooth);
+    }
+    .card-interactive:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 48px var(--shadow-accent), 0 8px 24px var(--shadow);
+      border-color: rgba(6, 182, 212, 0.35);
+    }
+  }
+
+  /* ── AI Scanner Laser & Reticle Styles ──────────────────────────────── */
+  .ai-scan-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem;
+    box-shadow: 0 0 24px rgba(6, 182, 212, 0.25), inset 0 0 16px rgba(6, 182, 212, 0.12);
+    border: 1px solid rgba(6, 182, 212, 0.4);
+  }
+
+  .ai-scan-line {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, rgba(34, 211, 238, 0.4) 15%, #22D3EE 50%, rgba(34, 211, 238, 0.4) 85%, transparent 100%);
+    box-shadow: 0 0 14px #06B6D4, 0 0 24px rgba(6, 182, 212, 0.8), 0 2px 10px rgba(34, 211, 238, 0.9);
+    animation: scanLaser 2.4s var(--ease-in-out-smooth) infinite alternate;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  .ai-scan-trail {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 48px;
+    background: linear-gradient(to top, rgba(6, 182, 212, 0.18), transparent);
+    animation: scanLaser 2.4s var(--ease-in-out-smooth) infinite alternate;
+    z-index: 19;
+    pointer-events: none;
+  }
+
+  /* ── Medical Reticle Corner Brackets ────────────────────────────────── */
+  .reticle-corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    border-color: #22D3EE;
+    z-index: 25;
+    pointer-events: none;
+  }
+  .reticle-tl { top: 8px; left: 8px; border-top: 2px solid #22D3EE; border-left: 2px solid #22D3EE; border-top-left-radius: 4px; }
+  .reticle-tr { top: 8px; right: 8px; border-top: 2px solid #22D3EE; border-right: 2px solid #22D3EE; border-top-right-radius: 4px; }
+  .reticle-bl { bottom: 8px; left: 8px; border-bottom: 2px solid #22D3EE; border-left: 2px solid #22D3EE; border-bottom-left-radius: 4px; }
+  .reticle-br { bottom: 8px; right: 8px; border-bottom: 2px solid #22D3EE; border-right: 2px solid #22D3EE; border-bottom-right-radius: 4px; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOBAL KEYFRAMES
+   ═══════════════════════════════════════════════════════════════════════════ */
+@keyframes ambientBreathe {
+  0% { transform: scale(0.95); opacity: 0.65; }
+  100% { transform: scale(1.06); opacity: 1; }
+}
+
+@keyframes scanLaser {
+  0% { top: 2%; opacity: 0.8; }
+  50% { opacity: 1; }
+  100% { top: 96%; opacity: 0.8; }
+}
+
+@keyframes rotateCW {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotateCCW {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes audioBarWave {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MANDATORY REDUCED-MOTION ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hero-ambient-glow,
+  .ai-scan-line,
+  .ai-scan-trail,
+  .skeleton {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+

@@ -1,0 +1,207 @@
+.oral-home {
+  --oral-glass: linear-gradient(125deg, rgb(8 57 78 / 86%), rgb(7 23 49 / 94%));
+  --oral-line: rgb(21 211 239 / 45%);
+  position: relative;
+  isolation: isolate;
+  background: radial-gradient(ellipse at 70% 42%, #073b50 0, #031a2d 31%, #020c19 72%);
+  color: #d9efff;
+  min-height: 100vh;
+}
+.oral-atmosphere { position: absolute; inset: 0; z-index: -1; pointer-events: none; overflow: clip; }
+.oral-light-columns { position: absolute; inset: 0; opacity: .65; background: repeating-linear-gradient(90deg, transparent 0 82px, #05d9ff12 84px, transparent 88px 170px), linear-gradient(115deg, transparent 16%, #087bb625 17%, transparent 19% 65%, #10cbe51a 66%, transparent 68%); mask-image: linear-gradient(transparent, black 18% 65%, transparent); }
+.oral-light-columns::after { content: ''; position: absolute; inset: 8% 8% 10% 45%; background: repeating-linear-gradient(90deg, transparent 0 63px, #00d9ff32 65px, transparent 69px 130px); filter: blur(3px); }
+.oral-floor { position: absolute; width: 150%; height: 48%; left: -25%; bottom: 0; transform: perspective(450px) rotateX(64deg); transform-origin: bottom; background: repeating-linear-gradient(90deg, transparent 0 118px, #12bded25 120px, transparent 122px), repeating-linear-gradient(0deg, transparent 0 72px, #12bded25 74px, transparent 76px); box-shadow: 0 -18px 100px #00b9e41c; }
+.oral-stars { position: absolute; inset: 8% 0; background-image: radial-gradient(circle, #66efff 1px, transparent 2px), radial-gradient(circle, #9c70e9 1px, transparent 3px); background-size: 173px 149px, 263px 231px; opacity: .27; mask-image: linear-gradient(transparent, black, transparent); }
+.oral-main { width: min(100% - 64px, 1800px); margin: auto; padding: 16px 0 24px; }
+.oral-hero { display: grid; grid-template-columns: minmax(0, .94fr) minmax(0, 2fr); align-items: center; gap: 24px; }
+.oral-copy { position: relative; z-index: 2; padding: 20px 0; }
+.oral-eyebrow { display: inline-flex; gap: 10px; align-items: center; border: 1px solid #00d9ed; border-radius: 50px; padding: 9px 15px; font-size: 11px; font-weight: 600; letter-spacing: .06em; color: #00e5f7; background: #00243480; box-shadow: inset 0 0 16px #00c9e113; }
+.oral-eyebrow > span { font-size: 20px; line-height: 1; }
+.oral-copy h1 { font-family: Outfit, Inter, sans-serif; font-size: clamp(42px, 3.9vw, 72px); font-weight: 750; line-height: 1.04; letter-spacing: -.045em; margin: 19px 0; color: #f7fbff; }
+.oral-copy h1 > span { display: block; color: #00dfdc; background: linear-gradient(100deg, #00c9ed, #00edc2); background-clip: text; -webkit-text-fill-color: transparent; }
+.oral-description { font-size: clamp(15px, 1.08vw, 18px); line-height: 1.65; color: #b6d2ea; max-width: 490px; }
+.oral-capabilities { display: flex; gap: 20px; margin: 22px 0; }
+.oral-capability { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.oral-capability-icon { display: grid; place-items: center; flex: 0 0 39px; height: 43px; border: 1px solid #00bfe650; background: linear-gradient(135deg, #007b9c25, #001525); border-radius: 12px; box-shadow: inset 0 0 14px #00cef514; }
+.oral-capability strong, .oral-capability > span > span { display: block; font-size: 10px; line-height: 1.6; }
+.oral-capability strong { color: #e6f7ff; font-weight: 600; }
+.oral-capability > span > span { color: #aacbea; }
+.oral-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+.oral-actions button { min-height: 52px; border-radius: 16px; padding: 12px 21px; font-size: 14px; }
+.oral-home .oral-primary { background: linear-gradient(105deg, #00e0ee, #00c9ef) !important; color: #001722; box-shadow: 0 6px 30px #00cef540 !important; gap: 12px; }
+.oral-home .oral-secondary { border-color: #00bddb !important; color: #65e6ff; background: #031a2c80 !important; gap: 10px; }
+.oral-play { display: grid; place-items: center; height: 25px; width: 25px; border: 1px solid #00d9ef; border-radius: 50%; font-size: 10px; }
+.oral-care-note { display: flex; gap: 12px; align-items: center; margin-top: 22px; font-size: 12px; color: #e9f7ff; }
+.oral-care-note small { display: block; color: #99bbd5; font-size: 11px; margin-top: 3px; }
+.oral-care-mark { display: grid; place-items: center; height: 35px; width: 35px; color: #19dfed; border: 1px solid #05bccc66; border-radius: 50%; font-size: 28px; }
+.oral-medical-note { max-width: 390px; font-size: 10px; line-height: 1.6; color: #a2bfd4; margin-top: 12px; }
+.oral-visual { min-width: 0; position: relative; }
+.oral-home .oral-tooth-viewport { height: 550px; max-width: none; }
+.oral-home .oral-tooth-viewport > div:first-child { max-width: 100%; }
+.oral-home .oral-floating { width: 31%; min-height: 154px; padding: 16px 14px; gap: 11px; border-radius: 21px; border-color: #18c9e5b0; background: var(--oral-glass); box-shadow: inset 0 1px 0 #b7f6ff38, inset 0 -1px 0 #7d60d94a, 0 14px 32px #0007, 0 0 20px #00c8e51c; align-items: flex-start; }
+.oral-home .oral-floating-01, .oral-home .oral-floating-03 { left: 0; right: auto; }
+.oral-home .oral-floating-02, .oral-home .oral-floating-04 { right: 0; left: auto; }
+.oral-home .oral-floating-01, .oral-home .oral-floating-02 { top: 34px; bottom: auto; }
+.oral-home .oral-floating-03, .oral-home .oral-floating-04 { bottom: 160px; top: auto; border-bottom-color: #a883e6; }
+.oral-home .oral-floating h4 { color: #f0fbff; font: 600 15px/1.35 Outfit, sans-serif; }
+.oral-home .oral-floating p { font-size: 11px; line-height: 1.55; color: #c0d9ee; margin-top: 6px; }
+.oral-home .oral-floating > div:first-of-type { width: 48px; height: 61px; border-radius: 16px; margin-top: 6px; background: linear-gradient(145deg, #13bade55, #112769aa); box-shadow: inset 0 1px 5px #72edff22, 0 8px 18px #0003; }
+.oral-home .oral-floating > div:first-of-type svg { width: 29px; height: 29px; }
+.oral-home .oral-floating > div:nth-of-type(3) { display: none; }
+.oral-home .oral-floating > span:first-child { background: #00dcec; border: 0; color: #002a3c; width: 25px; height: 25px; top: 8px; left: 11px; box-shadow: 0 0 18px #00e2ef44; }
+.oral-home .oral-floating > div:first-of-type { margin-top: 22px; }
+.oral-home .oral-floating > span:last-child { position: absolute; right: 10px; bottom: 10px; height: 27px; width: 27px; background: radial-gradient(circle at 40% 30%, #1bd0ee, #00648f); color: white; }
+.oral-home .oral-floating > div:nth-of-type(2) { padding-bottom: 12px; }
+.oral-home .oral-enamel { margin-bottom: 46px; width: 36%; }
+.oral-home .oral-enamel > div { width: 100%; }
+.oral-home .oral-enamel img { width: 100%; height: auto; mix-blend-mode: screen; filter: brightness(1.04) contrast(1.1) drop-shadow(0 0 16px #00dfff55) !important; }
+@media (min-width: 1280px) {
+  .oral-home .oral-enamel img { height: clamp(350px, 27vw, 420px); object-fit: cover; }
+  .oral-home .oral-floating-01 { rotate: 3deg; }
+  .oral-home .oral-floating-02 { rotate: -3deg; }
+  .oral-home .oral-floating-03 { rotate: 2deg; }
+  .oral-home .oral-floating-04 { rotate: -2deg; }
+}
+.oral-home .oral-enamel > div > div:first-child { width: 100%; height: 100%; opacity: .16; }
+.oral-home .oral-enamel > div > div:not(:first-child) { display: none; }
+.oral-home .oral-pedestal { bottom: 35px; width: 100%; }
+.oral-home .oral-pedestal > div { max-width: 70%; }
+.oral-home .oral-pedestal > div:first-child { max-width: 35%; }
+.oral-home .oral-pedestal > div:nth-child(2) { width: 82%; max-width: 82%; height: 115px; border-bottom-color: #ac73ff; box-shadow: 0 0 16px #00dfff44, 0 15px 45px #0077c944, inset 0 0 35px #03d9ee22 !important; }
+.oral-home .oral-pedestal > div:nth-child(3) { width: 73%; max-width: 73%; height: 100px; }
+.oral-home .oral-pedestal > div:nth-child(5) { width: 62%; max-width: 62%; height: 86px; border-bottom: 7px solid #008dc3; background: linear-gradient(175deg, #12516b 0%, #072b43 29%, #031321 58%, #082b46 82%, #035b7e 100%) !important; box-shadow: inset 0 2px 1px #8bebff70, inset 0 -8px 12px #020c1f99, 0 8px 0 #001b36, 0 11px 2px #00b9ed, 0 12px 28px #00c9ed66; }
+.oral-home .oral-pedestal > div:nth-child(6) { width: 49%; bottom: 42px; height: 67px; }
+.oral-home .oral-pedestal > div:nth-child(7) { width: 33%; bottom: 55px; height: 42px; }
+.oral-home .oral-tooth-scene > div:nth-child(2), .oral-home .oral-tooth-scene > div:nth-child(3) { width: 40%; }
+.oral-home .oral-tooth-scene > div:nth-child(2) > div, .oral-home .oral-tooth-scene > div:nth-child(3) > div { width: 100%; height: auto; aspect-ratio: 1; flex-shrink: 0; }
+.oral-feature-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid #16b5dd88; border-radius: 22px; padding: 18px 12px; background: linear-gradient(110deg, #033448b8, #0b2845df, #06374bb8); box-shadow: inset 0 1px 18px #00beee16, 0 18px 40px #0003; backdrop-filter: blur(18px); }
+.oral-strip-item { display: flex; align-items: center; gap: 15px; padding: 0 20px; min-width: 0; transition: transform .25s; }
+.oral-strip-item + .oral-strip-item { border-left: 1px solid #3485b044; }
+.oral-strip-icon { flex: 0 0 55px; height: 60px; display: grid; place-items: center; border: 1px solid #00d9f2; border-radius: 17px; background: linear-gradient(145deg, #00789c70, #03253c); color: #4dedff; box-shadow: 0 0 22px #00d2ea12; }
+.oral-strip-icon svg { width: 29px; height: 29px; }
+.oral-strip-icon.oral-violet { background: linear-gradient(145deg, #7d357970, #282153); border-color: #e35bd4; color: #ecadff; }
+.oral-strip-icon.oral-blue { border-color: #079cfa; color: #5edcff; }
+.oral-strip-icon.oral-teal { border-color: #00d7a8; color: #2eeac9; }
+.oral-strip-item h2 { font-family: Outfit, sans-serif; color: #f3fbff; font-weight: 600; font-size: 14px; line-height: 1.4; }
+.oral-strip-item p { margin-top: 6px; color: #adcae6; font-size: 11px; line-height: 1.6; }
+.oral-arrow { color: #3ce7ff; font-size: 23px; margin-left: auto; }
+.oral-strip-item:hover { transform: translateY(-3px); }
+.oral-categories { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin: 20px 0 0; color: #8aaec9; font-size: 10px; line-height: 1.6; text-align: center; }
+.oral-categories > span { color: #35d5e9; }
+/* Navbar changes are restricted to the homepage. All controls retain their handlers. */
+.oral-home > header { padding: 18px 32px 8px; }
+.oral-home > header > nav { max-width: 1800px; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; gap: 22px; backdrop-filter: none; }
+.oral-home > header > nav > div:first-child > a > div:first-child { width: 51px; height: 51px; border-radius: 21px; background: #00243c; }
+.oral-home > header > nav > div:first-child > a svg { width: 34px; height: 34px; }
+.oral-home > header > nav > div:first-child > a > div:last-child > span:first-child { font-size: 30px; }
+.oral-home > header > nav > div:first-child > a > div:last-child > span:last-child { font-size: 11px; }
+.oral-home > header > nav > div:nth-child(2) { border-radius: 40px; border-color: #00bdd754; padding: 5px 10px; background: #031d2d8a; }
+.oral-home > header nav a { font-size: 11px; }
+.oral-home > header nav > div:nth-child(2) > a { padding: 11px 10px; border-radius: 30px; }
+.oral-home > header nav > div:nth-child(2) > a[aria-current='page'] { color: #08e4f3; box-shadow: none; }
+.oral-home > header nav > div:nth-child(2) > a[aria-current='page'] > span:last-child { background: linear-gradient(90deg, #00c9e52b, #00d9ed0a) !important; border-top: 1px solid #00dded; border-bottom: 1px solid #00dded; border-radius: 24px; box-shadow: none !important; }
+.oral-home > header nav > div:last-child > div[aria-live] { display: none; }
+.oral-home > header nav > div:last-child > button { min-height: 40px; border-radius: 16px; }
+.oral-home > header nav > div:last-child > button:nth-last-child(2) { color: #002030; background: #00d4ed !important; padding-inline: 18px; }
+.oral-home > header nav > div:last-child > button[aria-label^='Switch to'] { border-radius: 24px; border-color: #1da8d166; box-shadow: inset 0 1px 6px #1da8d122; }
+.oral-home > header nav > div:last-child > button[aria-label^='Switch to'] + button { border: 1px solid #11a4c755; padding-inline: 17px; background: #05223766; color: #e1f3ff; }
+.oral-home :is(a, button, [role='button']):focus-visible { outline: 2px solid #18d7eb; outline-offset: 5px; }
+[data-theme='light'] .oral-home { --oral-glass: linear-gradient(125deg, #ffffffed, #edf6ffe8); background: radial-gradient(ellipse at 70% 42%, #e6f5fb 0, #f2f8fd 44%, #fbfdff 85%); color: #16364e; }
+[data-theme='light'] .oral-home :is(h1, h2, h4, .oral-capability strong, .oral-care-note) { color: #092d49; }
+[data-theme='light'] .oral-home :is(.oral-description, .oral-floating p, .oral-strip-item p, .oral-capability > span > span, .oral-care-note small, .oral-medical-note, .oral-categories) { color: #34536f; }
+[data-theme='light'] .oral-home .oral-copy h1 > span { background-image: linear-gradient(100deg, #00aacb, #008a9d); }
+[data-theme='light'] .oral-home .oral-eyebrow { color: #006e86; background: #e2f8ff; border-color: #009ab9; }
+[data-theme='light'] .oral-home .oral-feature-strip { background: linear-gradient(120deg, #ffffffed, #ebf7ffeb); border-color: #83cde3; box-shadow: inset 0 1px 0 white, 0 10px 26px #2e749614; }
+[data-theme='light'] .oral-home .oral-floating { border-color: #73c5de; border-bottom-color: #b3b9e6; box-shadow: inset 0 1px #fff, 0 5px 10px #255c7510, 0 16px 30px #346d8b1a; }
+[data-theme='light'] .oral-home .oral-enamel img { mix-blend-mode: normal; border-radius: 48%; mask-image: radial-gradient(ellipse 48% 50%, black 60%, transparent 100%); filter: brightness(.94) contrast(1.18) saturate(.72) drop-shadow(0 9px 13px #31647c20) !important; }
+[data-theme='light'] .oral-home .oral-tooth-viewport > div:first-child { opacity: .22; }
+[data-theme='light'] .oral-home .oral-enamel > div > div:first-child { opacity: .04; }
+[data-theme='light'] .oral-home .oral-pedestal > div:first-child { opacity: .2; }
+[data-theme='light'] .oral-home .oral-pedestal > div:nth-child(4) { background: radial-gradient(ellipse, #81ccdf55, transparent 70%) !important; }
+[data-theme='light'] .oral-home .oral-pedestal > div:nth-child(2) { border-color: #65b9d5; border-bottom-color: #a599d1; box-shadow: inset 0 0 18px #70bfd522, 0 8px 18px #4c9abb22 !important; }
+[data-theme='light'] .oral-home .oral-pedestal > div:nth-child(3) { box-shadow: 0 0 12px #7ac8de44 !important; }
+[data-theme='light'] .oral-home .oral-pedestal > div:nth-child(5) { background: linear-gradient(175deg, #92c4d8 0%, #47758c 18%, #123e59 42%, #06263f 65%, #205e7e 100%) !important; box-shadow: inset 0 2px 1px #f4ffffcc, inset 0 -5px 10px #031b3866, 0 6px 0 #b4d9e9, 0 8px 1px #3aabc9, 0 12px 25px #2b6d8d33; }
+[data-theme='light'] .oral-home .oral-pedestal > div:nth-child(6) { background: linear-gradient(180deg, #5fa4bf, #154f6b) !important; box-shadow: 0 0 14px #50bddb66 !important; }
+[data-theme='light'] .oral-home .oral-pedestal > div:nth-child(7) { background: radial-gradient(ellipse, #ecfdff, #a1e3ee 40%, #3e9fbd80 78%, transparent) !important; box-shadow: 0 0 18px #61bfd680 !important; }
+[data-theme='light'] .oral-home .oral-tooth-scene > div:nth-child(2) > div, [data-theme='light'] .oral-home .oral-tooth-scene > div:nth-child(3) > div { border-color: #2996b880; box-shadow: 0 0 14px #81c8da30 !important; }
+[data-theme='light'] .oral-home .oral-floating > div:first-of-type { background: linear-gradient(145deg, #e8fbff, #cce7f5); border-color: #79c6df; box-shadow: inset 0 1px 3px white, 0 5px 10px #417b9822; }
+[data-theme='light'] .oral-home .oral-floating > div:first-of-type svg { color: #0088a6; }
+[data-theme='light'] .oral-home .oral-floating-02 > div:first-of-type svg { color: #8052c8; }
+[data-theme='light'] .oral-home .oral-floating-04 > div:first-of-type svg { color: #bd489f; }
+[data-theme='light'] .oral-home .oral-strip-icon { background: linear-gradient(145deg, #f0fdff, #cfecf7); color: #007d9e; border-color: #6dc1db; box-shadow: inset 0 1px 2px white, 0 4px 10px #397d9816; }
+[data-theme='light'] .oral-home .oral-strip-icon svg { color: inherit; }
+[data-theme='light'] .oral-home .oral-violet { background: linear-gradient(145deg, #fbf4ff, #e5ddfa); color: #8651ba; border-color: #cbb5df; }
+[data-theme='light'] .oral-home .oral-teal { background: linear-gradient(145deg, #effffb, #d5f2ed); color: #007f75; border-color: #79cabc; }
+[data-theme='light'] .oral-home .oral-arrow { color: #0087a4; }
+[data-theme='light'] .oral-home .oral-light-columns { opacity: .3; }
+[data-theme='light'] .oral-home .oral-floor { opacity: .6; }
+[data-theme='light'] .oral-home .oral-capability-icon { background: #e4f6ff; }
+[data-theme='light'] .oral-home .oral-capability-icon svg { color: #007d9c; }
+[data-theme='light'] .oral-home .oral-secondary { color: #00778e; background: #effbff !important; }
+[data-theme='light'] .oral-home > header > nav > div:nth-child(2) { background: #ffffffa0; }
+[data-theme='light'] .oral-home > header nav > div:nth-child(2) > a[aria-current='page'] { color: #00788f; }
+[data-theme='light'] .oral-home > header nav > div:last-child > button[aria-label^='Switch to'] { background: #f7fcff; border-color: #8bcede; box-shadow: inset 0 1px white, 0 3px 8px #3983a012; }
+[data-theme='light'] .oral-home > header nav > div:last-child > button[aria-label^='Switch to'] + button { color: #143d5d; background: #ffffffb0; border-color: #9dcfe0; }
+[data-theme='light'] .oral-home .oral-categories > span { color: #00788e; }
+@media (min-width: 1700px) { .oral-home .oral-tooth-viewport { height: 630px; } .oral-home .oral-floating { min-height: 170px; padding: 20px 18px; } .oral-home .oral-floating h4 { font-size: 19px; } .oral-home .oral-floating p { font-size: 13px; } .oral-home .oral-floating-03, .oral-home .oral-floating-04 { bottom: 185px; } .oral-home .oral-pedestal { bottom: 44px; } .oral-copy { padding-left: 20px; } }
+@media (max-width: 1279px) {
+  .oral-home > header nav > div:nth-child(2) { display: none; }
+  .oral-home > header nav > div:last-child > button[aria-label='Toggle mobile menu'] { display: block; }
+  .oral-home > header > div { display: block; }
+  .oral-main { width: calc(100% - 48px); }
+  .oral-hero { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
+  .oral-home .oral-tooth-viewport { height: 430px; }
+  .oral-home .oral-floating { display: none; }
+  .oral-home .oral-mobile-features { display: grid; padding: 0; max-width: none; margin-top: 0; gap: 16px; }
+  .oral-home .oral-mobile-features > div { padding: 20px 14px; background: var(--oral-glass); align-items: flex-start; }
+  .oral-home .oral-mobile-features h4 { font-size: 13px; color: var(--heading); line-height: 1.5; }
+  .oral-home .oral-mobile-features p { font-size: 11px; color: var(--muted); line-height: 1.6; margin-top: 5px; }
+  .oral-home .oral-enamel { width: 58%; margin-bottom: 60px; }
+  .oral-home .oral-tooth-scene > div:nth-child(2), .oral-home .oral-tooth-scene > div:nth-child(3) { width: 65%; }
+  .oral-home .oral-pedestal { bottom: 35px; }
+  .oral-capabilities { flex-wrap: wrap; gap: 12px 20px; }
+  .oral-feature-strip { margin-top: 35px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 0; }
+  .oral-strip-item:nth-child(3) { border-left: 0; }
+}
+@media (max-width: 767px) {
+  .oral-main { width: calc(100% - 36px); padding-top: 26px; }
+  .oral-home > header { padding: 14px 16px 0; }
+  .oral-home > header > nav { gap: 8px; }
+  .oral-home > header > nav > div:first-child > a { gap: 7px; }
+  .oral-home > header > nav > div:first-child > a > div:first-child { width: 36px; height: 40px; border-radius: 14px; }
+  .oral-home > header > nav > div:first-child > a > div:last-child > span:first-child { font-size: 23px; }
+  .oral-home > header > nav > div:first-child > a > div:last-child > span:last-child { font-size: 8px; }
+  .oral-home > header nav > div:last-child { gap: 5px; }
+  .oral-home > header nav > div:last-child > button:nth-last-child(2) { padding: 8px 10px; font-size: 10px; border-radius: 12px; }
+  .oral-hero { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .oral-copy { padding: 12px 0 0; }
+  .oral-eyebrow { font-size: 9px; padding: 7px 12px; }
+  .oral-copy h1 { font-size: clamp(43px, 10.5vw, 68px); margin: 22px 0 18px; }
+  .oral-description { font-size: 15px; line-height: 1.75; }
+  .oral-capabilities { gap: 12px; flex-wrap: nowrap; justify-content: space-between; margin-block: 23px; }
+  .oral-capability { gap: 6px; }
+  .oral-capability-icon { flex-basis: 30px; height: 35px; border-radius: 9px; }
+  .oral-capability strong, .oral-capability > span > span { font-size: 8px; }
+  .oral-actions { gap: 10px; }
+  .oral-home .oral-actions button { min-height: 54px; padding: 12px 10px; font-size: 11px; flex: 1; border-radius: 15px; gap: 7px; white-space: nowrap; }
+  .oral-actions button svg, .oral-play { flex-shrink: 0; }
+  .oral-care-note { margin-top: 25px; }
+  .oral-home .oral-tooth-viewport { height: 390px; }
+  .oral-home .oral-enamel { width: min(62%, 260px); }
+  .oral-home .oral-mobile-features { grid-template-columns: minmax(0, 1fr); margin-top: 10px; }
+  .oral-home .oral-mobile-features > div { padding: 20px; border-radius: 20px; }
+  .oral-home .oral-mobile-features h4 { font-size: 15px; }
+  .oral-home .oral-mobile-features p { font-size: 12px; }
+  .oral-home .oral-tooth-viewport > div:first-child { max-width: 100%; height: 340px; }
+  .oral-home .oral-enamel > div > div:not(:first-child) { display: none; }
+  .oral-feature-strip { grid-template-columns: minmax(0, 1fr); padding: 6px 20px; gap: 0; border-radius: 22px; }
+  .oral-strip-item { padding: 20px 0; gap: 16px; }
+  .oral-strip-item + .oral-strip-item { border-left: 0; border-top: 1px solid #3485b044; }
+  .oral-strip-icon { flex-basis: 49px; height: 54px; }
+  .oral-strip-item h2 { font-size: 15px; }
+  .oral-categories { gap: 7px; padding: 0 12px; }
+  .oral-light-columns { opacity: .25; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .oral-home *, .oral-home *::before, .oral-home *::after { animation: none !important; transition: none !important; }
+}

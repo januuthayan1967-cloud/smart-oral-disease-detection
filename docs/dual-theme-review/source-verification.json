@@ -1,0 +1,11 @@
+{
+  "sourceFilesCompared": 142,
+  "changedSourceFiles": [
+    "frontend/src/pages/Home.css"
+  ],
+  "allOtherExistingSourceUnchanged": true,
+  "cssAddedLines": 59,
+  "cssRemovedLines": 31,
+  "jsxAndHandlersUnchanged": true,
+  "backupVerified": "C:\\Users\\User\\AppData\\Local\\Temp\\OralAI-recovery-20261025-175228\\project-before-redesign.tar"
+}

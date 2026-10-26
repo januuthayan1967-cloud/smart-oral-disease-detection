@@ -222,12 +222,12 @@ function DentistBookingCard({ dentist, allAppointments, onBookSuccess }) {
                         setSelectedTime(slot);
                         setBookingError('');
                       }}
-                      className={`rounded-lg py-1.5 px-2 text-xs font-bold transition border text-center ${
+                      className={`rounded-lg py-1.5 px-2 text-xs font-bold transition-all duration-180 border text-center ${
                         isDisabled
                           ? 'bg-theme-surface-2/40 text-theme-muted border-theme-border/20 cursor-not-allowed line-through opacity-60'
                           : isSelected
-                          ? 'bg-theme-accent text-white border-theme-accent shadow-glow-sm'
-                          : 'bg-theme-surface text-theme-text border-theme-border/40 hover:border-theme-accent/50'
+                          ? 'bg-theme-accent text-white border-theme-accent shadow-glow-sm scale-[1.03]'
+                          : 'bg-theme-surface text-theme-text border-theme-border/40 hover:border-theme-accent/60 hover:bg-theme-accent/10 active:scale-95'
                       }`}
                     >
                       {slot} {booked ? '(Booked)' : past ? '(Passed)' : ''}

@@ -1,67 +1,56 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 import Navbar from '../components/Navbar';
 import Button from '../components/Button';
-import Card from '../components/Card';
 import ToothMascot from '../components/ToothMascot';
+import './Home.css';
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 24 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.55, delay, ease: 'easeOut' },
+  transition: { duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] },
 });
 
-const features = [
+/* 3 Concise Capability Highlights (Matching Reference Badges) */
+const capabilityHighlights = [
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" style={{ width: 28, height: 28 }}>
-        <circle cx="11" cy="11" r="8" stroke="#06B6D4" strokeWidth="1.8" />
-        <circle cx="11" cy="11" r="4" fill="#06B6D4" opacity="0.8" />
-        <path d="M16.5 16.5L20 20" stroke="#06B6D4" strokeWidth="2" strokeLinecap="round" />
+      <svg className="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="m9 12 2 2 4-4" />
       </svg>
     ),
-    iconBg: 'rgba(6,182,212,0.12)',
-    title: 'AI Detection',
-    desc: 'Upload oral images for instant disease classification powered by deep learning.',
-    step: '01',
+    iconBg: 'rgba(6,182,212,0.18)',
+    title: 'AI-Assisted',
+    subtitle: 'Detection',
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" style={{ width: 28, height: 28 }}>
-        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" stroke="#10B981" strokeWidth="1.8" strokeLinejoin="round" />
-        <path d="M8 10h8M8 14h5" stroke="#10B981" strokeWidth="1.5" strokeLinecap="round" />
+      <svg className="w-5 h-5 text-cyan-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
       </svg>
     ),
-    iconBg: 'rgba(16,185,129,0.12)',
-    title: 'Chat Assistant',
-    desc: 'Get answers about oral hygiene, prevention, and dental care tips.',
-    step: '02',
+    iconBg: 'rgba(34,211,238,0.18)',
+    title: 'Connected',
+    subtitle: 'Dental Care',
   },
   {
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" style={{ width: 28, height: 28 }}>
-        <circle cx="12" cy="8" r="4" stroke="#A78BFA" strokeWidth="1.8" />
-        <path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6" stroke="#A78BFA" strokeWidth="1.8" strokeLinecap="round" />
-        <path d="M17 3l1 1M17 7h1M20 5l-1 1" stroke="#A78BFA" strokeWidth="1.3" strokeLinecap="round" />
+      <svg className="w-5 h-5 text-teal-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
       </svg>
     ),
-    iconBg: 'rgba(167,139,250,0.12)',
-    title: 'Online Consultation',
-    desc: 'Book appointments and join video consultations with trusted dentists.',
-    step: '03',
+    iconBg: 'rgba(13,148,136,0.22)',
+    title: 'Prescription-Based',
+    subtitle: 'Services',
   },
-];
-
-const statChips = [
-  { label: '99.2% Accuracy', icon: '🎯' },
-  { label: '50k+ Scans', icon: '📊' },
-  { label: 'HIPAA Compliant', icon: '🔒' },
 ];
 
 export default function Home() {
-  const { isAuthenticated, getDashboardPath } = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const shouldReduceMotion = useReducedMotion();
 
   const handleStartDetection = () => {
     if (isAuthenticated) {
@@ -72,225 +61,53 @@ export default function Home() {
   };
 
   return (
-    <div className="page-gradient min-h-screen overflow-hidden">
+    <div className="oral-home min-h-screen text-theme-text">
+      <div className="oral-atmosphere" aria-hidden="true">
+        <div className="oral-light-columns" />
+        <div className="oral-floor" />
+        <div className="oral-stars" />
+      </div>
       <Navbar variant="public" />
-
-      {/* ── HERO ── */}
-      <section className="relative mx-auto max-w-7xl px-4 py-16 md:py-24">
-        {/* Decorative blobs */}
-        <div
-          className="pointer-events-none absolute -top-32 right-0 h-96 w-96 rounded-full opacity-20"
-          style={{ background: 'radial-gradient(circle, var(--accent) 0%, transparent 70%)', filter: 'blur(64px)' }}
-        />
-        <div
-          className="pointer-events-none absolute bottom-0 left-0 h-64 w-64 rounded-full opacity-10"
-          style={{ background: 'radial-gradient(circle, #0D9488 0%, transparent 70%)', filter: 'blur(48px)' }}
-        />
-
-        <div className="grid items-center gap-12 lg:grid-cols-2">
-          {/* Left column */}
-          <motion.div {...fadeUp(0)}>
-            {/* Badge */}
-            <motion.span
-              className="inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-medium"
-              style={{
-                background: 'var(--accent-dim)',
-                borderColor: 'rgba(6,182,212,0.25)',
-                color: 'var(--accent)',
-              }}
-              initial={{ opacity: 0, scale: 0.88 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.15 }}
-            >
-              <span className="h-1.5 w-1.5 rounded-full" style={{ background: 'var(--accent)' }} />
-              AI-Powered Dental Healthcare
-            </motion.span>
-
-            {/* Headline */}
-            <h1
-              className="mt-5 text-4xl font-extrabold leading-tight tracking-tight text-theme-heading md:text-5xl lg:text-6xl"
-              style={{ fontFamily: 'Outfit, sans-serif' }}
-            >
-              Smart Dental Health
-              <span
-                className="mt-1 block"
-                style={{
-                  background: 'var(--gradient-accent)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                }}
-              >
-                Powered by AI
-              </span>
-            </h1>
-
-            <p className="mt-5 max-w-lg text-lg leading-relaxed" style={{ color: 'var(--muted)' }}>
-              Detect oral conditions early, get personalized care guidance, and connect with
-              trusted dentists — all in one premium platform.
-            </p>
-
-            {/* Stat chips */}
-            <div className="mt-6 flex flex-wrap gap-3">
-              {statChips.map((chip, i) => (
-                <motion.span
-                  key={chip.label}
-                  className="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium"
-                  style={{
-                    background: 'color-mix(in srgb, var(--surface) 70%, transparent)',
-                    borderColor: 'var(--border-soft)',
-                    color: 'var(--text)',
-                  }}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.08 }}
-                >
-                  {chip.icon} {chip.label}
-                </motion.span>
+      <main className="oral-main">
+        <section className="oral-hero" aria-labelledby="oral-headline">
+          <motion.div className="oral-copy" {...(shouldReduceMotion ? { initial: false } : fadeUp(0))}>
+            <div className="oral-eyebrow"><span aria-hidden="true">&#10022;</span> AI-POWERED ORAL HEALTHCARE</div>
+            <h1 id="oral-headline">Healthy Smiles<span>Brighter Lives</span></h1>
+            <p className="oral-description">Explore AI-assisted oral disease detection, Gemini-powered health assistance, virtual dental consultations, and prescription-based pharmacy services &mdash; all in one intelligent platform.</p>
+            <div className="oral-capabilities">
+              {capabilityHighlights.map((item) => (
+                <div className="oral-capability" key={item.title}>
+                  <span className="oral-capability-icon">{item.icon}</span>
+                  <span><strong>{item.title}</strong><span>{item.subtitle}</span></span>
+                </div>
               ))}
             </div>
-
-            {/* CTA buttons */}
-            <div className="mt-8 flex flex-wrap gap-4">
-              <Button size="lg" onClick={handleStartDetection}>
-                🔬 Start Detection
+            <div className="oral-actions">
+              <Button size="lg" onClick={handleStartDetection} className="oral-primary">
+                <svg width="24" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M10 4C4 4 3 10 5 16c1 3 1 10 4 12 3 1 2-9 7-9s4 10 7 9c3-2 3-9 4-12 2-6 1-12-5-12-3 0-4 2-6 2s-3-2-6-2Z" fill="currentColor" /></svg>
+                Start Detection <span aria-hidden="true">&rarr;</span>
               </Button>
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => navigate(isAuthenticated ? '/education' : '/register')}
-              >
-                Explore Patient Education →
+              <Button variant="secondary" size="lg" onClick={() => navigate(isAuthenticated ? '/education' : '/register')} className="oral-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M12 5C8 2 4 3 2 4v15c4-2 7-1 10 1 3-2 6-3 10-1V4c-2-1-6-2-10 1Zm0 0v15" /></svg>
+                Learn More <span className="oral-play" aria-hidden="true">&#9654;</span>
               </Button>
             </div>
+            <div className="oral-care-note"><span className="oral-care-mark" aria-hidden="true">&#10023;</span><span>Intelligent assistance. Connected care.<small>Supporting your oral health journey.</small></span></div>
+            <p className="oral-medical-note">AI screening supports, and does not replace, assessment by a qualified dental professional.</p>
           </motion.div>
-
-          {/* Right column — mascot */}
-          <motion.div
-            className="relative flex justify-center"
-            initial={{ opacity: 0, scale: 0.88 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.65, delay: 0.2, ease: 'easeOut' }}
-          >
-            {/* Glow ring behind mascot */}
-            <div
-              className="absolute inset-0 mx-auto my-auto rounded-full"
-              style={{
-                width: 280,
-                height: 280,
-                background: 'radial-gradient(circle, rgba(6,182,212,0.18) 0%, transparent 70%)',
-                filter: 'blur(20px)',
-              }}
-            />
-            <ToothMascot size="xl" />
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ── FEATURES ── */}
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <motion.div
-          className="mb-12 text-center"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          <h2
-            className="text-3xl font-bold md:text-4xl"
-            style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}
-          >
-            Everything you need for oral health
-          </h2>
-          <p className="mt-3 text-base" style={{ color: 'var(--muted)' }}>
-            A complete AI-powered ecosystem — from detection to treatment
-          </p>
-        </motion.div>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          {features.map((feature, i) => (
-            <motion.div
-              key={feature.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.12 }}
-            >
-              <Card className="h-full">
-                <div className="flex items-start gap-4">
-                  <div
-                    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl"
-                    style={{ background: feature.iconBg }}
-                  >
-                    {feature.icon}
-                  </div>
-                  <span
-                    className="ml-auto text-3xl font-extrabold opacity-10"
-                    style={{ color: 'var(--accent)', fontFamily: 'Outfit, sans-serif' }}
-                  >
-                    {feature.step}
-                  </span>
-                </div>
-                <h3
-                  className="mt-4 text-lg font-semibold"
-                  style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}
-                >
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--muted)' }}>
-                  {feature.desc}
-                </p>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </section>
-
-      {/* ── CTA BANNER ── */}
-      <section className="mx-auto max-w-7xl px-4 py-16">
-        <motion.div
-          className="relative overflow-hidden rounded-3xl p-10 text-center"
-          style={{
-            background: 'linear-gradient(135deg, rgba(6,182,212,0.18) 0%, rgba(13,148,136,0.14) 50%, rgba(6,182,212,0.1) 100%)',
-            border: '1px solid rgba(6,182,212,0.2)',
-          }}
-          initial={{ opacity: 0, scale: 0.97 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Background accents */}
-          <div
-            className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(6,182,212,0.2) 0%, transparent 70%)', filter: 'blur(32px)' }}
-          />
-          <div
-            className="pointer-events-none absolute -bottom-16 -left-16 h-56 w-56 rounded-full"
-            style={{ background: 'radial-gradient(circle, rgba(13,148,136,0.2) 0%, transparent 70%)', filter: 'blur(32px)' }}
-          />
-
-          <div className="relative">
-            <span className="text-4xl">🦷</span>
-            <h2
-              className="mt-4 text-3xl font-bold md:text-4xl"
-              style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}
-            >
-              Ready to protect your smile?
-            </h2>
-            <p className="mx-auto mt-3 max-w-md text-base" style={{ color: 'var(--muted)' }}>
-              Join thousands using AI to stay ahead of dental health issues.
-            </p>
-            <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Link to="/register">
-                <Button size="lg">Get Started Free</Button>
-              </Link>
-              <Link to="/login">
-                <Button variant="secondary" size="lg">Sign In</Button>
-              </Link>
-            </div>
-          </div>
-        </motion.div>
-      </section>
+          <div className="oral-visual"><ToothMascot size="xl" showDecorations={true} /></div>
+        </section>
+        <section className="oral-feature-strip" aria-label="Explore OralAI services">
+          <Link to="/detect" className="oral-strip-item"><span className="oral-strip-icon">{capabilityHighlights[0].icon}</span><span><h2>AI Oral Disease Detection</h2><p>Oral image screening across six supported categories.</p></span><span className="oral-arrow" aria-hidden="true">&rarr;</span></Link>
+          <Link to="/chat" className="oral-strip-item"><span className="oral-strip-icon oral-violet"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 1 3 8 8 3-8 3-3 8-3-8-8-3 8-3Z" /></svg></span><span><h2>Gemini AI Assistant</h2><p>Explore oral health information with AI assistance.</p></span><span className="oral-arrow" aria-hidden="true">&rarr;</span></Link>
+          <Link to="/consultation" className="oral-strip-item"><span className="oral-strip-icon oral-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><rect x="2" y="5" width="13" height="14" rx="3"/><path d="m15 10 7-4v12l-7-4"/></svg></span><span><h2>Doctor Video Consultation</h2><p>Connect with dental professionals through video care.</p></span><span className="oral-arrow" aria-hidden="true">&rarr;</span></Link>
+          <Link to="/medicines" className="oral-strip-item"><span className="oral-strip-icon oral-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true"><rect x="6" y="1" width="12" height="22" rx="6" transform="rotate(38 12 12)"/><path d="m7 8 10 8"/></svg></span><span><h2>Prescription &amp; Pharmacy</h2><p>Medicine ordering through the prescription workflow.</p></span><span className="oral-arrow" aria-hidden="true">&rarr;</span></Link>
+        </section>
+        <section className="oral-categories" aria-label="Supported classification categories">
+          <span>6 supported categories</span>
+          <p>Dental Calculus &middot; Dental Caries &middot; Gingivitis &middot; Normal Teeth &middot; Mouth Ulcer &middot; Tooth Discoloration</p>
+        </section>
+      </main>
     </div>
   );
 }

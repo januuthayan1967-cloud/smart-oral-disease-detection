@@ -372,31 +372,50 @@ Do not provide a definitive medical diagnosis.`;
                 {croppedPreview ? (
                   <motion.div
                     key="croppedPreview"
-                    className="relative flex flex-col items-center gap-3"
-                    initial={{ opacity: 0, scale: 0.92 }}
+                    className="relative flex flex-col items-center gap-3 w-full"
+                    initial={{ opacity: 0, scale: 0.94 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.92 }}
+                    exit={{ opacity: 0, scale: 0.94 }}
                   >
-                    <div className="relative">
+                    <div className={`relative overflow-hidden rounded-xl w-full max-w-sm flex items-center justify-center ${loading ? 'ai-scan-container shadow-[0_0_24px_rgba(6,182,212,0.4)]' : ''}`}>
                       <img
                         src={croppedPreview}
                         alt="Cropped Teeth Preview"
-                        className="max-h-64 rounded-xl object-contain shadow-theme"
+                        className="max-h-64 rounded-xl object-contain shadow-theme w-full"
                       />
-                      <span
-                        className="absolute right-2 top-2 rounded-lg px-2.5 py-1 text-xs font-semibold text-white shadow"
-                        style={{ background: 'var(--gradient-accent)' }}
-                      >
-                        ✓ Teeth Cropped
-                      </span>
+
+                      {/* AI Laser Scanning Overlay Active during real loading */}
+                      {loading && (
+                        <>
+                          <span className="reticle-corner reticle-tl" />
+                          <span className="reticle-corner reticle-tr" />
+                          <span className="reticle-corner reticle-bl" />
+                          <span className="reticle-corner reticle-br" />
+                          <div className="ai-scan-line" />
+                          <div className="ai-scan-trail" />
+                          <div className="absolute top-3 left-3 z-30 flex items-center gap-2 rounded-full border border-cyan-400/40 bg-slate-900/80 px-3 py-1 text-xs font-semibold text-cyan-300 shadow-glow backdrop-blur-md">
+                            <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping" />
+                            <span>AI Laser Scanning...</span>
+                          </div>
+                        </>
+                      )}
+
+                      {!loading && (
+                        <span
+                          className="absolute right-2 top-2 rounded-lg px-2.5 py-1 text-xs font-semibold text-white shadow"
+                          style={{ background: 'var(--gradient-accent)' }}
+                        >
+                          ✓ Teeth Cropped
+                        </span>
+                      )}
                     </div>
 
                     {/* Re-crop & Change Image Action Buttons */}
                     <div className="flex items-center gap-2 pt-2" onClick={(e) => e.stopPropagation()}>
-                      <Button size="sm" variant="secondary" onClick={handleRecrop}>
+                      <Button size="sm" variant="secondary" onClick={handleRecrop} disabled={loading}>
                         ✂️ Re-crop Teeth Area
                       </Button>
-                      <Button size="sm" variant="secondary" onClick={() => fileRef.current?.click()}>
+                      <Button size="sm" variant="secondary" onClick={() => fileRef.current?.click()} disabled={loading}>
                         📁 Upload Different Image
                       </Button>
                     </div>
@@ -474,7 +493,26 @@ Do not provide a definitive medical diagnosis.`;
 
         {/* ── RIGHT: Results Section ── */}
         <motion.div initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
-          {loading && <LoadingAnimation message="Analyzing cropped teeth area with MobileNetV3..." />}
+          {loading && (
+            <Card className="text-center py-10 shadow-glow border border-cyan-500/30">
+              <div className="flex flex-col items-center justify-center">
+                <LoadingAnimation message="Analyzing cropped dental area with MobileNetV3 deep learning..." />
+                <div className="mt-6 flex flex-col gap-2 max-w-sm w-full text-xs text-left">
+                  <div className="flex items-center gap-2.5 rounded-xl bg-theme-surface/70 border border-cyan-500/20 p-2.5 text-cyan-400">
+                    <span className="text-sm">🔬</span>
+                    <span>Oral cavity segmentation & feature extraction</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 rounded-xl bg-theme-surface/70 border border-teal-500/20 p-2.5 text-teal-400">
+                    <span className="text-sm">⚡</span>
+                    <span>MobileNetV3 neural inference classification</span>
+                  </div>
+                </div>
+                <p className="mt-4 text-xs text-theme-muted" role="status" aria-live="polite">
+                  AI diagnostic analysis in progress. Results will appear automatically.
+                </p>
+              </div>
+            </Card>
+          )}
 
           <AnimatePresence mode="wait">
             {result && !loading && (
@@ -487,7 +525,12 @@ Do not provide a definitive medical diagnosis.`;
               >
                 <Card variant="result">
                   {/* Result header */}
-                  <div className="mb-5 flex items-start justify-between gap-3">
+                  <motion.div
+                    className="mb-5 flex items-start justify-between gap-3"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.05 }}
+                  >
                     <div>
                       <p className="text-xs font-medium uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
                         AI Detection Result
@@ -500,16 +543,25 @@ Do not provide a definitive medical diagnosis.`;
                       </h2>
                     </div>
                     <SeverityBadge severity={currentRiskLevel === 'HIGH' ? 'High' : currentRiskLevel === 'MEDIUM' ? 'Moderate' : pred.severity || 'Low'} />
-                  </div>
+                  </motion.div>
 
                   {/* Confidence bar */}
-                  <ConfidenceBar value={pred.confidence || 0} />
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.12 }}
+                  >
+                    <ConfidenceBar value={pred.confidence || 0} />
+                  </motion.div>
 
                   {/* Description */}
                   {pred.description && (
-                    <div
+                    <motion.div
                       className="mt-5 rounded-xl p-4"
                       style={{ background: 'color-mix(in srgb, var(--surface-2) 60%, transparent)', border: '1px solid var(--border-soft)' }}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.18 }}
                     >
                       <p className="mb-1 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--accent)' }}>
                         Description
@@ -517,7 +569,7 @@ Do not provide a definitive medical diagnosis.`;
                       <p className="text-sm leading-relaxed" style={{ color: 'var(--text)' }}>
                         {pred.description}
                       </p>
-                    </div>
+                    </motion.div>
                   )}
 
                   {/* Sectioned details */}

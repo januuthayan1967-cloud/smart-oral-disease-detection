@@ -18,9 +18,15 @@ function AnimatedCounter({ value }) {
       setCount(value);
       return;
     }
+
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setCount(target);
+      return;
+    }
+
     let start = 0;
-    const duration = 800; // 0.8s
-    const stepTime = 16; // ~60fps
+    const duration = 650; // smooth 0.65s
+    const stepTime = 16;
     const increment = target / (duration / stepTime);
 
     const timer = setInterval(() => {
@@ -36,8 +42,12 @@ function AnimatedCounter({ value }) {
     return () => clearInterval(timer);
   }, [target, value]);
 
-  if (isNaN(target)) return <span>{value}</span>;
-  return <span>{count}{isPercent ? '%' : ''}</span>;
+  if (isNaN(target)) return <span aria-label={String(value)}>{value}</span>;
+  return (
+    <span aria-label={`${count}${isPercent ? '%' : ''}`}>
+      {count}{isPercent ? '%' : ''}
+    </span>
+  );
 }
 
 const statCards = [

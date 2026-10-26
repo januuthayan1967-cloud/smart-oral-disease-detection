@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 export default function Card({
   children,
@@ -9,9 +9,11 @@ export default function Card({
   variant = 'default', // 'default' | 'stat' | 'elevated' | 'result'
   ...props
 }) {
+  const shouldReduceMotion = useReducedMotion();
+
   const baseClass = (() => {
     if (variant === 'stat') {
-      return 'rounded-2xl overflow-hidden relative';
+      return 'rounded-2xl overflow-hidden relative border border-theme-border/50 bg-theme-surface shadow-theme';
     }
     if (variant === 'elevated') {
       return 'rounded-2xl shadow-card-hover border';
@@ -23,7 +25,6 @@ export default function Card({
   })();
 
   const paddingClass = padding ? 'p-6' : '';
-
   const combinedClass = [baseClass, paddingClass, className].filter(Boolean).join(' ');
 
   const variantStyle = (() => {
@@ -32,12 +33,18 @@ export default function Card({
     return {};
   })();
 
+  const hoverEffect = !hover || shouldReduceMotion ? {} : {
+    y: -4,
+    boxShadow: '0 16px 40px var(--shadow-accent), 0 6px 20px var(--shadow)',
+    transition: { duration: 0.24, ease: [0.16, 1, 0.3, 1] },
+  };
+
   return (
     <motion.div
       className={combinedClass}
       style={variantStyle}
-      whileHover={hover ? { y: -4, boxShadow: '0 20px 60px rgba(0,0,0,0.3)' } : {}}
-      transition={{ type: 'spring', stiffness: 300, damping: 24 }}
+      whileHover={hoverEffect}
+      transition={{ type: 'spring', stiffness: 320, damping: 25 }}
       {...props}
     >
       {children}

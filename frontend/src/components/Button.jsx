@@ -1,11 +1,11 @@
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 
 const variants = {
   primary: null,   // handled via inline style + gradient
   secondary: null, // handled via inline style
-  ghost: 'text-theme-muted hover:text-theme-accent hover:bg-theme-accent/10',
-  outline: 'border border-theme-border text-theme-text hover:border-theme-accent hover:text-theme-accent',
-  danger: 'text-white hover:opacity-90',
+  ghost: 'text-theme-muted hover:text-theme-accent hover:bg-theme-accent/10 focus-visible:ring-2 focus-visible:ring-theme-accent',
+  outline: 'border border-theme-border text-theme-text hover:border-theme-accent hover:text-theme-accent focus-visible:ring-2 focus-visible:ring-theme-accent',
+  danger: 'text-white hover:opacity-90 focus-visible:ring-2 focus-visible:ring-red-400',
 };
 
 const sizes = {
@@ -34,10 +34,11 @@ export default function Button({
   as,
   ...props
 }) {
+  const shouldReduceMotion = useReducedMotion();
   const isDisabled = disabled || loading;
 
   const baseClasses = [
-    'inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200',
+    'inline-flex items-center justify-center gap-2 font-semibold transition-all duration-200 select-none outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-cyan-400 focus-visible:ring-offset-theme-background',
     'disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none',
     sizes[size],
     className,
@@ -45,10 +46,9 @@ export default function Button({
 
   /* variant-specific styles applied inline for gradient support */
   let inlineStyle = {};
-  let extraClasses = '';
 
   if (variant === 'primary') {
-    baseClasses.push('text-white relative overflow-hidden');
+    baseClasses.push('text-white relative overflow-hidden shadow-glow');
     inlineStyle = { background: 'var(--gradient-accent)', boxShadow: '0 0 20px var(--shadow-accent)' };
   } else if (variant === 'secondary') {
     baseClasses.push('border text-theme-text');
@@ -66,9 +66,9 @@ export default function Button({
   const classes = baseClasses.filter(Boolean).join(' ');
 
   const motionProps = {
-    whileHover: isDisabled ? {} : { y: variant === 'ghost' ? 0 : -2, scale: variant === 'ghost' ? 1.02 : 1 },
-    whileTap: isDisabled ? {} : { scale: 0.97 },
-    transition: { type: 'spring', stiffness: 420, damping: 22 },
+    whileHover: isDisabled || shouldReduceMotion ? {} : { y: variant === 'ghost' ? 0 : -2, scale: variant === 'ghost' ? 1.01 : 1 },
+    whileTap: isDisabled || shouldReduceMotion ? {} : { scale: 0.98 },
+    transition: { type: 'spring', stiffness: 420, damping: 24 },
   };
 
   const hoverStyle = variant === 'secondary' ? {

@@ -1,0 +1,22 @@
+{
+  "backup": "C:\\Users\\User\\AppData\\Local\\Temp\\OralAI-recovery-20261025-175228\\project-before-redesign.tar",
+  "backupBytes": 2064715776,
+  "sourceFilesCompared": 141,
+  "changedExistingSource": [
+    {
+      "file": "frontend/src/pages/Home.jsx",
+      "added": 45,
+      "removed": 302
+    },
+    {
+      "file": "frontend/src/components/ToothMascot.jsx",
+      "added": 26,
+      "removed": 28
+    }
+  ],
+  "existingHandlersPreserved": {
+    "frontend/src/pages/Home.jsx": true,
+    "frontend/src/components/ToothMascot.jsx": true
+  },
+  "newPresentationFile": "frontend/src/pages/Home.css"
+}
