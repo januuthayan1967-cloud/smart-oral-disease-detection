@@ -92,8 +92,19 @@ export default function Navbar({ onMenuToggle, showMenuButton = false, variant =
     const handleScroll = () => {
       setScrolled(window.scrollY > 15);
     };
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        const input = document.getElementById('global-search-input');
+        if (input) input.focus();
+      }
+    };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
   }, []);
 
   const handleLogout = async () => {
@@ -171,8 +182,40 @@ export default function Navbar({ onMenuToggle, showMenuButton = false, variant =
           </Link>
         </div>
 
-        {/* Center: desktop nav links */}
-        {variant === 'public' && (
+        {/* Center: Search input in app mode / links in public mode */}
+        {variant === 'app' ? (
+          <div className="hidden md:flex flex-1 max-w-md mx-4 items-center">
+            <div className="relative w-full">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-theme-muted">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <input
+                id="global-search-input"
+                type="text"
+                placeholder="Search anything (patients, appointments, reports...)"
+                className="w-full pl-10 pr-16 py-2 text-xs rounded-xl bg-theme-surface/70 border border-theme-border/40 text-theme-heading placeholder:text-theme-muted/70 focus:outline-none focus:border-[#D9AD56]/70 focus:ring-1 focus:ring-[#D9AD56]/50 transition-all shadow-inner"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && e.target.value.trim()) {
+                    const val = e.target.value.trim().toLowerCase();
+                    if (val.includes('patient') || val.includes('user')) navigate('/admin?tab=users');
+                    else if (val.includes('appoint')) navigate(isAdmin ? '/admin?tab=appointments' : '/consultation');
+                    else if (val.includes('detect') || val.includes('ai')) navigate('/detect');
+                    else if (val.includes('order')) navigate(isAdmin ? '/admin?tab=marketplace-orders' : '/orders');
+                    else if (val.includes('med')) navigate('/medicines');
+                    else if (val.includes('dentist')) navigate(isAdmin ? '/admin?tab=dentists' : '/consultation');
+                  }
+                }}
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-2.5 pointer-events-none">
+                <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-[10px] font-mono font-semibold text-theme-muted bg-theme-surface border border-theme-border/60 rounded">
+                  Ctrl + K
+                </kbd>
+              </div>
+            </div>
+          </div>
+        ) : (
           <div className="hidden items-center gap-0.5 xl:gap-1 lg:flex bg-theme-surface/60 p-1.5 rounded-2xl border border-theme-border/40 backdrop-blur-xl shadow-sm">
             {publicLinks.map((link) => (
               <NavLink
@@ -225,22 +268,27 @@ export default function Navbar({ onMenuToggle, showMenuButton = false, variant =
 
           {isAuthenticated ? (
             <>
-              {/* Avatar pill */}
+              {/* Avatar card */}
               <Link
                 to="/profile"
-                className="hidden items-center gap-2 rounded-xl px-2.5 py-1.5 transition hover:bg-theme-accent/8 sm:flex"
+                className="hidden items-center gap-2.5 rounded-xl px-2.5 py-1.5 transition hover:bg-theme-surface/80 border border-transparent hover:border-[#D9AD56]/30 sm:flex"
               >
                 <div
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-glow-sm"
-                  style={{ background: 'var(--gradient-accent)' }}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-[#050B16] shadow-sm"
+                  style={{ background: 'linear-gradient(135deg, #F4D58D 0%, #D9AD56 100%)' }}
                 >
                   {initials}
                 </div>
-                <span className="max-w-[90px] truncate text-sm font-medium text-theme-muted transition group-hover:text-theme-accent">
-                  {displayName}
-                </span>
+                <div className="flex flex-col text-left">
+                  <span className="max-w-[110px] truncate text-xs font-bold text-theme-heading leading-tight">
+                    {displayName}
+                  </span>
+                  <span className="text-[10px] text-theme-muted capitalize leading-tight">
+                    {user?.role || 'User'}
+                  </span>
+                </div>
               </Link>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="text-xs">
                 Logout
               </Button>
             </>

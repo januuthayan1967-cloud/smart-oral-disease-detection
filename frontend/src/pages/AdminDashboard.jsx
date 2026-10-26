@@ -7,6 +7,7 @@ import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SeverityBadge from '../components/SeverityBadge';
 import { adminAPI, predictionAPI, reportAPI, appointmentAPI, educationAPI } from '../services/api';
+import SparklineWave from '../components/dashboard/SparklineWave';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -193,7 +194,13 @@ export default function AdminDashboard() {
     }
   };
 
-  useEffect(() => { loadDashboard(); }, []);
+  useEffect(() => {
+    loadDashboard();
+    // Prefetch preview tables data for the Overview tab
+    adminAPI.getUsers().then(({ data: res }) => setUsers(res.data || [])).catch(() => {});
+    appointmentAPI.getAll().then(({ data: res }) => setAppointments(res.data || [])).catch(() => {});
+    adminAPI.getMarketplaceOrders().then(({ data: res }) => setMarketplaceOrders(res.data || [])).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (activeTab !== 'overview') loadTabData(activeTab);
@@ -393,20 +400,42 @@ export default function AdminDashboard() {
   const stats = data?.stats || {};
   const charts = data?.charts || {};
 
+  const totalPredCount = stats.totalPredictions || charts.diseaseDistribution?.reduce((acc, d) => acc + (d.count || 0), 0) || 0;
+
+  const diseaseColors = [
+    '#FF6475', // Dental Calculus (Coral Red)
+    '#00C9E8', // Normal Teeth (Cyan)
+    '#F5B942', // Tooth Discoloration (Amber)
+    '#18D99B', // Gingivitis (Emerald)
+    '#3B82F6', // Dental Caries (Blue)
+    '#A855F7', // Mouth Ulcer (Purple)
+    '#EC4899', // Pink
+    '#EAB308', // Yellow
+  ];
+
   const diseaseChart = {
     labels: charts.diseaseDistribution?.map((d) => d.disease) || [],
     datasets: [{
       data: charts.diseaseDistribution?.map((d) => d.count) || [],
-      backgroundColor: ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6'],
+      backgroundColor: diseaseColors.slice(0, charts.diseaseDistribution?.length || 6),
+      borderColor: '#0B1B2D',
+      borderWidth: 2,
+      hoverOffset: 6,
     }],
   };
 
+  const monthlyLabels = charts.monthlyPredictions?.map((m) => m.month) || [];
+  const monthlyData = charts.monthlyPredictions?.map((m) => m.count) || [];
+  const barColors = ['#3B82F6', '#A855F7', '#00C9E8', '#18D99B', '#F5B942', '#FF6475', '#EC4899', '#6366F1'];
+
   const monthlyChart = {
-    labels: charts.monthlyPredictions?.map((m) => m.month) || [],
+    labels: monthlyLabels,
     datasets: [{
       label: 'Predictions',
-      data: charts.monthlyPredictions?.map((m) => m.count) || [],
-      backgroundColor: '#14b8a6',
+      data: monthlyData,
+      backgroundColor: monthlyData.map((_, i) => barColors[i % barColors.length]),
+      borderRadius: 6,
+      borderSkipped: false,
     }],
   };
 
@@ -414,9 +443,9 @@ export default function AdminDashboard() {
     {
       label: 'Total Users',
       value: stats.totalUsers,
-      color: '#06B6D4',
+      color: '#00C9E8',
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-cyan-400 animate-pulse-glow" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-cyan-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
           <circle cx="9" cy="7" r="4" />
           <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -427,9 +456,9 @@ export default function AdminDashboard() {
     {
       label: 'Total Dentists',
       value: stats.totalDentists,
-      color: '#0D9488',
+      color: '#A855F7',
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-teal-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-purple-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
           <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
         </svg>
@@ -438,9 +467,9 @@ export default function AdminDashboard() {
     {
       label: 'Approved Pharmacies',
       value: stats.totalPharmacies,
-      color: '#10B981',
+      color: '#18D99B',
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-emerald-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-emerald-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="3" width="18" height="18" rx="2" />
           <path d="M9 12h6m-3-3v6" />
         </svg>
@@ -449,9 +478,9 @@ export default function AdminDashboard() {
     {
       label: 'Pending Pharmacies',
       value: stats.pendingPharmacies,
-      color: '#F59E0B',
+      color: '#F5B942',
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-amber-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-amber-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="12" cy="12" r="10" />
           <polyline points="12 6 12 12 16 14" />
         </svg>
@@ -460,9 +489,9 @@ export default function AdminDashboard() {
     {
       label: 'Total Predictions',
       value: stats.totalPredictions,
-      color: '#6366F1',
+      color: '#EC4899',
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-indigo-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-pink-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M3 7V5a2 2 0 0 1 2-2h2m10 0h2a2 2 0 0 1 2 2v2m0 10v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2" />
           <path d="M12 9v6m-3-3h6" />
         </svg>
@@ -473,7 +502,7 @@ export default function AdminDashboard() {
       value: stats.totalOrders,
       color: '#F97316',
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-orange-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-orange-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <polyline points="21 16 12 21 3 16 3 8 12 3 21 8 21 16" />
           <polyline points="3 8 12 13 21 8" />
           <line x1="12" y1="13" x2="12" y2="21" />
@@ -483,9 +512,9 @@ export default function AdminDashboard() {
     {
       label: 'Appointments',
       value: stats.totalAppointments,
-      color: '#0EA5E9',
+      color: '#00C9E8',
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-sky-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-cyan-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
           <line x1="16" y1="2" x2="16" y2="6" />
           <line x1="8" y1="2" x2="8" y2="6" />
@@ -498,7 +527,7 @@ export default function AdminDashboard() {
       value: stats.totalContent,
       color: '#8B5CF6',
       icon: (
-        <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-purple-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-purple-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
           <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
         </svg>
@@ -508,127 +537,555 @@ export default function AdminDashboard() {
 
   return (
     <Layout>
-      <h1 className="text-3xl font-bold text-theme-heading font-heading">Admin Dashboard</h1>
-      <p className="mt-1 text-theme-muted">System overview and management</p>
+      {/* ── Ultra-Premium Welcome Banner ─────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="relative overflow-hidden rounded-2xl mb-6 p-6 sm:p-7"
+        style={{
+          background: 'linear-gradient(135deg, rgba(8, 21, 37, 0.95) 0%, rgba(11, 27, 45, 0.95) 100%)',
+          border: '1px solid rgba(217, 173, 86, 0.35)',
+          boxShadow: '0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(244, 213, 141, 0.2)',
+        }}
+      >
+        {/* Background glow flares */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-72 h-72 bg-[#D9AD56]/10 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="mt-6 flex flex-wrap gap-2 border-b border-theme-border/40 pb-4 relative">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          let countVal = 0;
-          let countColor = 'bg-red-500 text-white';
-          if (tab.id === 'pharmacies') {
-            countVal = stats.pendingPharmacies || 0;
-          } else if (tab.id === 'dentist-approvals') {
-            countVal = pendingDentists.length || 0;
-            countColor = 'bg-amber-500 text-white';
-          } else if (tab.id === 'marketplace-orders') {
-            countVal = marketplaceOrders.filter((o) => o.status === 'pending').length;
-            countColor = 'bg-blue-500 text-white';
-          } else if (tab.id === 'education') {
-            countVal = educationList.length || stats.totalContent || 0;
-            countColor = 'bg-purple-500 text-white';
-          }
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-1.5 max-w-xl">
+            <span className="text-xs font-semibold tracking-wider uppercase text-[#D9AD56]">
+              Welcome Back,
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-heading flex items-center gap-2">
+              System Admin <span className="animate-wave inline-block origin-bottom-right">👋</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-theme-muted leading-relaxed">
+              Manage your dental AI platform, patients, appointments and insights all in one place.
+            </p>
+          </div>
 
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`relative rounded-xl px-4 py-2.5 text-sm font-semibold transition duration-200 ${
-                isActive ? 'text-theme-primary z-10 font-bold shadow-glow-sm' : 'text-theme-muted hover:text-theme-text hover:bg-theme-surface/30'
-              }`}
+          <div className="flex items-center gap-4 shrink-0">
+            {/* Quote Pill */}
+            <div
+              className="hidden sm:flex flex-col items-end px-4 py-2.5 rounded-xl text-right backdrop-blur-md"
+              style={{
+                background: 'rgba(16, 36, 58, 0.65)',
+                border: '1px solid rgba(217, 173, 86, 0.25)',
+              }}
             >
-              {isActive && (
-                <motion.div
-                  layoutId="admin-active-tab"
-                  className="absolute inset-0 rounded-xl"
-                  style={{ background: 'var(--gradient-accent)' }}
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-              <span className="relative z-20 flex items-center gap-1.5">
-                {tab.label}
-                {countVal > 0 && (
-                  <span className={`rounded-full px-1.5 py-0.5 text-[9px] font-bold ${countColor}`}>
-                    {countVal}
-                  </span>
-                )}
+              <span className="text-xs font-serif italic text-[#F4D58D]">
+                "Better Oral Health
               </span>
-            </button>
-          );
-        })}
+              <span className="text-xs font-serif italic text-white/90">
+                Brighter Smiles"
+              </span>
+            </div>
+
+            {/* 3D Tooth Artwork */}
+            <div
+              className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl"
+              style={{
+                background: 'radial-gradient(ellipse at center, rgba(0, 201, 232, 0.15) 0%, rgba(5, 11, 22, 0.7) 100%)',
+                border: '1px solid rgba(0, 201, 232, 0.35)',
+                boxShadow: '0 0 25px rgba(0, 201, 232, 0.25)',
+              }}
+            >
+              <img
+                src="/assets/3d-tooth.png"
+                alt="3D Dental AI Model"
+                className="h-16 w-16 object-contain drop-shadow-[0_0_12px_rgba(0,201,232,0.5)]"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            </div>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* ── Luxury Navigation Pill Tabs & Export Button ───────────────── */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 pb-2 border-b border-theme-border/30">
+        <div className="flex flex-wrap items-center gap-1.5 overflow-x-auto py-1">
+          {tabs.map((tab) => {
+            const isActive = activeTab === tab.id;
+            let countVal = 0;
+            let countColor = 'bg-red-500 text-white';
+            if (tab.id === 'pharmacies') {
+              countVal = stats.pendingPharmacies || 0;
+            } else if (tab.id === 'dentist-approvals') {
+              countVal = pendingDentists.length || 0;
+              countColor = 'bg-amber-500 text-white';
+            } else if (tab.id === 'marketplace-orders') {
+              countVal = marketplaceOrders.filter((o) => o.status === 'pending').length;
+              countColor = 'bg-blue-500 text-white';
+            } else if (tab.id === 'education') {
+              countVal = educationList.length || stats.totalContent || 0;
+              countColor = 'bg-purple-500 text-white';
+            }
+
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative rounded-xl px-4 py-2 text-xs font-bold transition-all duration-200 whitespace-nowrap ${
+                  isActive
+                    ? 'text-[#050B16] shadow-[0_0_16px_rgba(217,173,86,0.45)]'
+                    : 'text-theme-muted hover:text-theme-heading hover:bg-theme-surface/60'
+                }`}
+                style={{
+                  background: isActive
+                    ? 'linear-gradient(135deg, #F4D58D 0%, #D9AD56 100%)'
+                    : 'transparent',
+                }}
+              >
+                <span className="relative z-10 flex items-center gap-1.5">
+                  {tab.label}
+                  {countVal > 0 && (
+                    <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${countColor}`}>
+                      {countVal}
+                    </span>
+                  )}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Functional Export Report Button */}
+        <button
+          onClick={() => window.print()}
+          className="inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all shrink-0 hover:bg-[#D9AD56]/10 text-[#F4D58D] border border-[#D9AD56]/50 shadow-[0_0_12px_rgba(217,173,86,0.15)]"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          <span>Export Report</span>
+        </button>
       </div>
 
       <AnimatePresence mode="wait">
         {activeTab === 'overview' && data && (
           <motion.div
             key="overview"
-            initial={{ opacity: 0, y: 15 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -15 }}
+            exit={{ opacity: 0, y: -12 }}
+            className="space-y-6"
           >
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* ── 8 KPI Statistics Grid ─────────────────────────────── */}
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
               {statCards.map((card, i) => (
                 <motion.div
                   key={card.label}
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="card flex items-center gap-4 border border-theme-border/40 hover:border-theme-accent/20 transition duration-150"
-                  whileHover={{ y: -3 }}
+                  transition={{ delay: i * 0.04 }}
+                  className="relative overflow-hidden rounded-2xl p-4 transition-all duration-200"
+                  style={{
+                    background: 'rgba(11, 27, 45, 0.85)',
+                    border: '1px solid rgba(217, 173, 86, 0.28)',
+                    boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                  }}
+                  whileHover={{
+                    y: -3,
+                    borderColor: 'rgba(217, 173, 86, 0.65)',
+                    boxShadow: '0 12px 36px rgba(0,0,0,0.6), 0 0 20px rgba(217, 173, 86, 0.2)',
+                  }}
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-theme-surface-2 border border-theme-border/40">
-                    {card.icon}
-                  </div>
-                  <div>
-                    <p className="text-xs text-theme-muted font-semibold uppercase tracking-wider">{card.label}</p>
-                    <p className="text-2xl font-extrabold text-theme-heading mt-0.5">
-                      <AnimatedCounter value={card.value} />
-                    </p>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div
+                        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                        style={{
+                          background: `color-mix(in srgb, ${card.color} 15%, transparent)`,
+                          border: `1px solid color-mix(in srgb, ${card.color} 35%, transparent)`,
+                          boxShadow: `0 0 14px color-mix(in srgb, ${card.color} 25%, transparent)`,
+                        }}
+                      >
+                        {card.icon}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-semibold text-theme-muted uppercase tracking-wider truncate">
+                          {card.label}
+                        </p>
+                        <p className="text-2xl font-black text-theme-heading font-heading mt-0.5">
+                          <AnimatedCounter value={card.value} />
+                        </p>
+                      </div>
+                    </div>
+                    {/* Real SVG sparkline wave */}
+                    <SparklineWave color={card.color} id={card.label} />
                   </div>
                 </motion.div>
               ))}
             </div>
 
-            <div className="mt-8 grid gap-6 lg:grid-cols-2">
-              <div className="card border border-theme-border/50">
-                <h2 className="mb-4 text-base font-bold text-theme-heading uppercase tracking-wider">Disease Distribution</h2>
+            {/* ── Analytics Section: Disease Distribution & Monthly Predictions ── */}
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+              {/* Disease Distribution Card */}
+              <div
+                className="rounded-2xl p-5"
+                style={{
+                  background: 'rgba(11, 27, 45, 0.85)',
+                  border: '1px solid rgba(217, 173, 86, 0.28)',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                }}
+              >
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-theme-border/30">
+                  <h2 className="text-sm font-bold text-theme-heading uppercase tracking-wider font-heading flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-[#FF6475]" />
+                    Disease Distribution
+                  </h2>
+                  <span className="text-[11px] font-semibold text-[#D9AD56] bg-theme-surface px-2.5 py-1 rounded-lg border border-theme-border/40">
+                    All-Time Live Data
+                  </span>
+                </div>
+
                 {charts.diseaseDistribution?.length > 0 ? (
-                  <div className="max-h-[300px] flex justify-center">
-                    <Doughnut data={diseaseChart} options={{ responsive: true, maintainAspectRatio: true }} />
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-2">
+                    {/* Donut with center total */}
+                    <div className="relative h-56 w-56 shrink-0 flex items-center justify-center">
+                      <Doughnut
+                        data={diseaseChart}
+                        options={{
+                          responsive: true,
+                          maintainAspectRatio: false,
+                          cutout: '72%',
+                          plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                              backgroundColor: '#0B1B2D',
+                              borderColor: 'rgba(217, 173, 86, 0.5)',
+                              borderWidth: 1,
+                              titleColor: '#F4D58D',
+                              bodyColor: '#F8FAFC',
+                              padding: 8,
+                            },
+                          },
+                        }}
+                      />
+                      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                        <span className="text-2xl font-black text-theme-heading font-heading leading-tight">
+                          {totalPredCount}
+                        </span>
+                        <span className="text-[10px] text-theme-muted font-semibold uppercase tracking-wider">
+                          Predictions
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Breakdown Legend with Real Percentages */}
+                    <div className="flex-1 w-full space-y-2 overflow-y-auto max-h-[220px] pr-1">
+                      {charts.diseaseDistribution.map((d, idx) => {
+                        const count = d.count || 0;
+                        const pct = totalPredCount > 0 ? Math.round((count / totalPredCount) * 100) : 0;
+                        const col = diseaseColors[idx % diseaseColors.length];
+                        return (
+                          <div
+                            key={d.disease || idx}
+                            className="flex items-center justify-between text-xs py-1.5 px-2.5 rounded-xl border border-theme-border/20 bg-theme-surface/40 hover:border-[#D9AD56]/40 transition"
+                          >
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className="h-2.5 w-2.5 rounded-full shrink-0 shadow-sm" style={{ backgroundColor: col }} />
+                              <span className="truncate text-theme-text font-medium">{d.disease || 'Unknown'}</span>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0 pl-2">
+                              <span className="font-bold text-theme-heading font-mono">{count}</span>
+                              <span className="text-[10px] text-theme-muted font-semibold">({pct}%)</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-theme-muted italic">No prediction data yet.</p>
+                  <p className="text-sm text-theme-muted italic text-center py-12">No prediction data yet.</p>
                 )}
               </div>
-              <div className="card border border-theme-border/50">
-                <h2 className="mb-4 text-base font-bold text-theme-heading uppercase tracking-wider">Monthly Predictions</h2>
+
+              {/* Monthly Predictions Card */}
+              <div
+                className="rounded-2xl p-5"
+                style={{
+                  background: 'rgba(11, 27, 45, 0.85)',
+                  border: '1px solid rgba(217, 173, 86, 0.28)',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                }}
+              >
+                <div className="flex items-center justify-between mb-4 pb-2 border-b border-theme-border/30">
+                  <h2 className="text-sm font-bold text-theme-heading uppercase tracking-wider font-heading flex items-center gap-2">
+                    <span className="h-2 w-2 rounded-full bg-[#00C9E8]" />
+                    Monthly Predictions
+                  </h2>
+                  <span className="text-[11px] font-semibold text-[#D9AD56] bg-theme-surface px-2.5 py-1 rounded-lg border border-theme-border/40">
+                    Live Monthly Volume
+                  </span>
+                </div>
+
                 {charts.monthlyPredictions?.length > 0 ? (
-                  <Bar data={monthlyChart} options={{ responsive: true, plugins: { legend: { display: false } } }} />
+                  <div className="h-56 pt-2">
+                    <Bar
+                      data={monthlyChart}
+                      options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                          legend: { display: false },
+                          tooltip: {
+                            backgroundColor: '#0B1B2D',
+                            borderColor: 'rgba(217, 173, 86, 0.5)',
+                            borderWidth: 1,
+                            titleColor: '#F4D58D',
+                            bodyColor: '#F8FAFC',
+                            padding: 8,
+                          },
+                        },
+                        scales: {
+                          x: {
+                            grid: { display: false },
+                            ticks: { color: '#94A9BF', font: { size: 10 } },
+                          },
+                          y: {
+                            grid: { color: 'rgba(217, 173, 86, 0.08)' },
+                            ticks: { color: '#94A9BF', font: { size: 10 } },
+                          },
+                        },
+                      }}
+                    />
+                  </div>
                 ) : (
-                  <p className="text-sm text-theme-muted italic">No monthly data yet.</p>
+                  <p className="text-sm text-theme-muted italic text-center py-12">No monthly data yet.</p>
                 )}
               </div>
-              <div className="card border border-theme-border/50">
-                <h2 className="mb-4 text-base font-bold text-theme-heading uppercase tracking-wider">Order Statistics</h2>
-                <div className="space-y-3">
+            </div>
+
+            {/* ── Order & Consultation Status Secondary Metrics ─────────── */}
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+              <div
+                className="rounded-2xl p-5"
+                style={{
+                  background: 'rgba(11, 27, 45, 0.85)',
+                  border: '1px solid rgba(217, 173, 86, 0.28)',
+                }}
+              >
+                <h3 className="text-xs font-bold text-theme-heading uppercase tracking-wider font-heading mb-3">
+                  Order Status Breakdown
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {charts.orderStats?.map((o) => (
-                    <div key={o.status} className="flex items-center justify-between rounded-xl bg-theme-surface/50 border border-theme-border/20 p-3.5">
-                      <span className="capitalize text-theme-text font-medium">{o.status?.replace(/_/g, ' ')}</span>
-                      <span className="font-bold text-theme-heading text-base"><AnimatedCounter value={o.count} /></span>
+                    <div
+                      key={o.status}
+                      className="rounded-xl bg-theme-surface/60 border border-theme-border/30 p-3 text-center"
+                    >
+                      <span className="block text-[11px] text-theme-muted capitalize truncate font-medium">
+                        {o.status?.replace(/_/g, ' ')}
+                      </span>
+                      <span className="text-lg font-bold text-theme-heading mt-0.5 block">
+                        <AnimatedCounter value={o.count} />
+                      </span>
                     </div>
                   ))}
-                  {!charts.orderStats?.length && <p className="text-sm text-theme-muted italic">No order data yet.</p>}
+                  {!charts.orderStats?.length && (
+                    <p className="text-xs text-theme-muted italic col-span-4">No order status data yet.</p>
+                  )}
                 </div>
               </div>
-              <div className="card border border-theme-border/50">
-                <h2 className="mb-4 text-base font-bold text-theme-heading uppercase tracking-wider">Consultation Statistics</h2>
-                <div className="space-y-3">
+
+              <div
+                className="rounded-2xl p-5"
+                style={{
+                  background: 'rgba(11, 27, 45, 0.85)',
+                  border: '1px solid rgba(217, 173, 86, 0.28)',
+                }}
+              >
+                <h3 className="text-xs font-bold text-theme-heading uppercase tracking-wider font-heading mb-3">
+                  Consultation Status Breakdown
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {charts.consultationStats?.map((c) => (
-                    <div key={c.status} className="flex items-center justify-between rounded-xl bg-theme-surface/50 border border-theme-border/20 p-3.5">
-                      <span className="capitalize text-theme-text font-medium">{c.status}</span>
-                      <span className="font-bold text-theme-heading text-base"><AnimatedCounter value={c.count} /></span>
+                    <div
+                      key={c.status}
+                      className="rounded-xl bg-theme-surface/60 border border-theme-border/30 p-3 text-center"
+                    >
+                      <span className="block text-[11px] text-theme-muted capitalize truncate font-medium">
+                        {c.status}
+                      </span>
+                      <span className="text-lg font-bold text-theme-heading mt-0.5 block">
+                        <AnimatedCounter value={c.count} />
+                      </span>
                     </div>
                   ))}
+                  {!charts.consultationStats?.length && (
+                    <p className="text-xs text-theme-muted italic col-span-4">No consultation data yet.</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* ── 3 Bottom Quick Preview Tables ─────────────────────────── */}
+            <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
+              {/* Card 1: Recent Patients */}
+              <div
+                className="rounded-2xl p-5 flex flex-col"
+                style={{
+                  background: 'rgba(11, 27, 45, 0.85)',
+                  border: '1px solid rgba(217, 173, 86, 0.28)',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-bold text-theme-heading font-heading">Recent Patients</h3>
+                  <button
+                    onClick={() => setActiveTab('users')}
+                    className="text-xs font-semibold text-[#D9AD56] hover:underline"
+                  >
+                    View All →
+                  </button>
+                </div>
+                <div className="overflow-x-auto flex-1">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-theme-border/40 text-theme-muted">
+                        <th className="py-2 font-semibold">#</th>
+                        <th className="py-2 font-semibold">Name</th>
+                        <th className="py-2 font-semibold">Role</th>
+                        <th className="py-2 font-semibold text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-theme-border/20">
+                      {(users.length ? users.slice(0, 4) : (data?.recent?.users || []).slice(0, 4)).map((u, idx) => (
+                        <tr key={u._id || idx} className="hover:bg-theme-surface/40 transition">
+                          <td className="py-2 font-mono text-theme-muted">{idx + 1}</td>
+                          <td className="py-2 font-semibold text-theme-heading truncate max-w-[100px]">{u.name}</td>
+                          <td className="py-2 text-theme-muted capitalize">{u.role || 'user'}</td>
+                          <td className="py-2 text-right">
+                            <span className="inline-block rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-400">
+                              Active
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                      {!users.length && !(data?.recent?.users?.length) && (
+                        <tr>
+                          <td colSpan="4" className="py-4 text-center text-theme-muted italic">No patients registered.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Card 2: Recent Appointments */}
+              <div
+                className="rounded-2xl p-5 flex flex-col"
+                style={{
+                  background: 'rgba(11, 27, 45, 0.85)',
+                  border: '1px solid rgba(217, 173, 86, 0.28)',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-bold text-theme-heading font-heading">Recent Appointments</h3>
+                  <button
+                    onClick={() => setActiveTab('appointments')}
+                    className="text-xs font-semibold text-[#D9AD56] hover:underline"
+                  >
+                    View All →
+                  </button>
+                </div>
+                <div className="overflow-x-auto flex-1">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-theme-border/40 text-theme-muted">
+                        <th className="py-2 font-semibold">#</th>
+                        <th className="py-2 font-semibold">Patient</th>
+                        <th className="py-2 font-semibold">Date</th>
+                        <th className="py-2 font-semibold text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-theme-border/20">
+                      {appointments.slice(0, 4).map((a, idx) => (
+                        <tr key={a._id || idx} className="hover:bg-theme-surface/40 transition">
+                          <td className="py-2 font-mono text-theme-muted">{idx + 1}</td>
+                          <td className="py-2 font-semibold text-theme-heading truncate max-w-[100px]">
+                            {a.patientName || a.userId?.name || 'Patient'}
+                          </td>
+                          <td className="py-2 text-theme-muted">
+                            {a.appointmentDate ? new Date(a.appointmentDate).toLocaleDateString() : 'Pending'}
+                          </td>
+                          <td className="py-2 text-right">
+                            <span className="inline-block rounded-full bg-cyan-500/15 border border-cyan-500/30 px-2 py-0.5 text-[10px] font-semibold text-cyan-400 capitalize">
+                              {a.status || 'Pending'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                      {!appointments.length && (
+                        <tr>
+                          <td colSpan="4" className="py-4 text-center text-theme-muted italic">No appointments recorded.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Card 3: Recent Orders */}
+              <div
+                className="rounded-2xl p-5 flex flex-col"
+                style={{
+                  background: 'rgba(11, 27, 45, 0.85)',
+                  border: '1px solid rgba(217, 173, 86, 0.28)',
+                  boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-sm font-bold text-theme-heading font-heading">Recent Orders</h3>
+                  <button
+                    onClick={() => setActiveTab('marketplace-orders')}
+                    className="text-xs font-semibold text-[#D9AD56] hover:underline"
+                  >
+                    View All →
+                  </button>
+                </div>
+                <div className="overflow-x-auto flex-1">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-theme-border/40 text-theme-muted">
+                        <th className="py-2 font-semibold">#</th>
+                        <th className="py-2 font-semibold">Order</th>
+                        <th className="py-2 font-semibold">Amount</th>
+                        <th className="py-2 font-semibold text-right">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-theme-border/20">
+                      {marketplaceOrders.slice(0, 4).map((o, idx) => (
+                        <tr key={o._id || idx} className="hover:bg-theme-surface/40 transition">
+                          <td className="py-2 font-mono text-theme-muted">{idx + 1}</td>
+                          <td className="py-2 font-semibold text-theme-heading truncate max-w-[110px]">
+                            {o.items?.[0]?.medicineName || `Order #${o._id.slice(-5)}`}
+                          </td>
+                          <td className="py-2 text-theme-muted">
+                            ₹{o.totalAmount || o.orderAmount || 0}
+                          </td>
+                          <td className="py-2 text-right">
+                            <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize ${
+                              o.status === 'delivered' ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' :
+                              o.status === 'cancelled' ? 'bg-red-500/15 text-red-400 border border-red-500/30' :
+                              'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                            }`}>
+                              {o.status || 'Pending'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                      {!marketplaceOrders.length && (
+                        <tr>
+                          <td colSpan="4" className="py-4 text-center text-theme-muted italic">No orders recorded.</td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>

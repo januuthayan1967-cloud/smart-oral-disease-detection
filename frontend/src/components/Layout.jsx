@@ -50,9 +50,9 @@ export default function Layout({ children }) {
         showMenuButton
         onMenuToggle={() => setSidebarOpen((o) => !o)}
       />
-      <div className="mx-auto flex max-w-7xl gap-6 px-4 py-6 md:px-6">
+      <div className="mx-auto flex max-w-[1720px] gap-6 px-3 py-5 sm:px-6 md:py-6">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="min-w-0 flex-1 pb-8">{children}</main>
+        <main className="min-w-0 flex-1 pb-10">{children}</main>
       </div>
     </div>
   );

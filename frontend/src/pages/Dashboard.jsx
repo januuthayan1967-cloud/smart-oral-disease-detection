@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
-import Card from '../components/Card';
 import { useAuth } from '../context/AuthContext';
 import { predictionAPI, appointmentAPI } from '../services/api';
+import SparklineWave from '../components/dashboard/SparklineWave';
 
 /* ── Animated Count Up ──────────────────────────────────────────────── */
 function AnimatedCounter({ value }) {
@@ -25,7 +25,7 @@ function AnimatedCounter({ value }) {
     }
 
     let start = 0;
-    const duration = 650; // smooth 0.65s
+    const duration = 650;
     const stepTime = 16;
     const increment = target / (duration / stepTime);
 
@@ -53,53 +53,47 @@ function AnimatedCounter({ value }) {
 const statCards = [
   {
     key: 'patients',
-    label: 'Total Patients',
-    iconBg: 'var(--stat-1)',
-    accentColor: '#06B6D4',
+    label: 'Profile Status',
+    accentColor: '#00C9E8',
+    colorName: 'Active',
     icon: (
-      <svg viewBox="0 0 20 20" fill="none" style={{ width: 22, height: 22 }}>
-        <circle cx="7" cy="6" r="3" fill="#06B6D4" opacity="0.9" />
-        <circle cx="14" cy="7" r="2" fill="#06B6D4" opacity="0.6" />
-        <path d="M1 17c0-3.3 2.7-6 6-6s6 2.7 6 6H1Z" fill="#06B6D4" opacity="0.9" />
-        <path d="M14 12c1.7.6 3 2.3 3 4.4V17h-3v-.6c0-1.7-.7-3.2-1.7-4.4Z" fill="#06B6D4" opacity="0.6" />
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-cyan-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
       </svg>
     ),
   },
   {
     key: 'reports',
     label: 'Detection Reports',
-    iconBg: 'var(--stat-2)',
-    accentColor: '#10B981',
+    accentColor: '#18D99B',
     icon: (
-      <svg viewBox="0 0 20 20" fill="none" style={{ width: 22, height: 22 }}>
-        <rect x="3" y="2" width="14" height="16" rx="2" fill="#10B981" opacity="0.6" />
-        <path d="M6 7h8M6 10h8M6 13h5" stroke="white" strokeWidth="1.3" strokeLinecap="round" />
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-emerald-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <path d="M9 12h6m-3-3v6" />
       </svg>
     ),
   },
   {
     key: 'appointments',
     label: 'Appointments',
-    iconBg: 'var(--stat-3)',
-    accentColor: '#818CF8',
+    accentColor: '#D9AD56',
     icon: (
-      <svg viewBox="0 0 20 20" fill="none" style={{ width: 22, height: 22 }}>
-        <rect x="2" y="4" width="16" height="14" rx="2" fill="#818CF8" opacity="0.6" />
-        <path d="M6 2v4M14 2v4M2 9h16" stroke="#818CF8" strokeWidth="1.5" strokeLinecap="round" />
-        <rect x="6" y="12" width="2" height="2" rx="0.5" fill="white" />
-        <rect x="10" y="12" width="2" height="2" rx="0.5" fill="white" />
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-[#D9AD56]" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+        <line x1="16" y1="2" x2="16" y2="6" />
+        <line x1="8" y1="2" x2="8" y2="6" />
+        <line x1="3" y1="10" x2="21" y2="10" />
       </svg>
     ),
   },
   {
     key: 'health',
-    label: 'Health Score',
-    iconBg: 'var(--stat-4)',
-    accentColor: '#14B8A6',
+    label: 'Oral Health Score',
+    accentColor: '#00C9E8',
     icon: (
-      <svg viewBox="0 0 20 20" fill="none" style={{ width: 22, height: 22 }}>
-        <path d="M10 17s-7-5.5-7-10a5 5 0 0 1 7-4.58A5 5 0 0 1 17 7c0 4.5-7 10-7 10Z" fill="#14B8A6" opacity="0.7" />
-        <path d="M7 10l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 text-cyan-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
       </svg>
     ),
   },
@@ -114,69 +108,70 @@ const quickActions = [
         <path d="M12 9v6m-3-3h6" />
       </svg>
     ),
-    title: 'Detect Disease',
-    desc: 'Upload an oral image for AI analysis',
-    color: 'rgba(6,182,212,0.12)'
+    title: 'AI Disease Detection',
+    desc: 'Upload oral image for instant MobileNetV3 diagnostic screening',
+    accent: '#00C9E8',
   },
   {
     to: '/chat',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-emerald-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-[#D9AD56]" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       </svg>
     ),
-    title: 'Chat Assistant',
-    desc: 'Ask oral health questions',
-    color: 'rgba(16,185,129,0.12)'
-  },
-  {
-    to: '/education',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-purple-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-      </svg>
-    ),
-    title: 'Patient Education',
-    desc: 'Clinical hygiene guides & oral health resources',
-    color: 'rgba(167,139,250,0.12)'
+    title: 'Gemini AI Assistant',
+    desc: 'Consult your intelligent oral health assistant anytime',
+    accent: '#D9AD56',
   },
   {
     to: '/consultation',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-teal-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-emerald-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
       </svg>
     ),
-    title: 'Consultation',
-    desc: 'Book a dentist appointment',
-    color: 'rgba(20,184,166,0.12)'
+    title: 'Dentist Consultations',
+    desc: 'Book verified dental appointments & clinical care',
+    accent: '#18D99B',
   },
   {
     to: '/prescriptions',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-indigo-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-purple-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" />
         <path d="M9 12h6m-3-3v6" />
       </svg>
     ),
-    title: 'Prescriptions',
-    desc: 'View dentist prescriptions',
-    color: 'rgba(99,102,241,0.12)'
+    title: 'My Prescriptions',
+    desc: 'View & download verified prescriptions from dentists',
+    accent: '#A855F7',
+  },
+  {
+    to: '/education',
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-pink-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+      </svg>
+    ),
+    title: 'Patient Education',
+    desc: 'Explore clinical dental guides, videos & hygiene advice',
+    accent: '#EC4899',
   },
   {
     to: '/orders',
     icon: (
-      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-amber-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-orange-400" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <rect x="1" y="3" width="15" height="13" />
         <polygon points="16 8 20 8 23 11 23 16 16 16 16 8" />
         <circle cx="5.5" cy="18.5" r="2.5" />
         <circle cx="18.5" cy="18.5" r="2.5" />
       </svg>
     ),
-    title: 'Track Orders',
-    desc: 'Track medicine deliveries',
-    color: 'rgba(245,158,11,0.12)'
+    title: 'Orders & Tracking',
+    desc: 'Track pharmacy medicine orders and dispatch status',
+    accent: '#F97316',
   },
 ];
 
@@ -196,7 +191,7 @@ export default function Dashboard() {
     ]).then(([predRes, apptRes]) => {
       if (cancelled) return;
       const list = Array.isArray(predRes?.data?.data) ? predRes.data.data : [];
-      setPredictions(list.slice(0, 3));
+      setPredictions(list.slice(0, 4));
       const appts = Array.isArray(apptRes?.data?.data) ? apptRes.data.data : [];
       setAppointmentCount(appts.length);
     });
@@ -204,10 +199,10 @@ export default function Dashboard() {
   }, []);
 
   const stats = {
-    patients: 1,
+    patients: 'Active',
     reports: predictions.length,
     appointments: appointmentCount,
-    health: predictions.length > 0 ? '85%' : '—',
+    health: predictions.length > 0 ? '88%' : '—',
   };
 
   return (
@@ -219,224 +214,294 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Welcome header */}
+      {/* ── Ultra-Premium Patient Welcome Banner ─────────────────────── */}
       <motion.div
-        initial={{ opacity: 0, y: 12 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-8"
+        transition={{ duration: 0.4 }}
+        className="relative overflow-hidden rounded-2xl mb-8 p-6 sm:p-7"
+        style={{
+          background: 'linear-gradient(135deg, rgba(8, 21, 37, 0.95) 0%, rgba(11, 27, 45, 0.95) 100%)',
+          border: '1px solid rgba(217, 173, 86, 0.35)',
+          boxShadow: '0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(244, 213, 141, 0.2)',
+        }}
       >
-        <h1 className="text-3xl font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}>
-          Welcome back,{' '}
-          <span style={{ color: 'var(--accent)' }}>{user?.name ?? 'User'}</span> 👋
-        </h1>
-        <p className="mt-1.5 text-sm" style={{ color: 'var(--muted)' }}>
-          Here's your oral health overview for today
-        </p>
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-72 h-72 bg-[#D9AD56]/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="space-y-1.5 max-w-xl">
+            <span className="text-xs font-semibold tracking-wider uppercase text-[#D9AD56]">
+              Personal Dental Health
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-heading flex items-center gap-2">
+              Welcome back, <span className="text-[#F4D58D]">{user?.name ?? 'Patient'}</span> <span className="animate-wave inline-block origin-bottom-right">👋</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-theme-muted leading-relaxed">
+              Here is your oral health overview, recent diagnostic scans and clinical care options.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-4 shrink-0">
+            <div
+              className="hidden sm:flex flex-col items-end px-4 py-2.5 rounded-xl text-right backdrop-blur-md"
+              style={{
+                background: 'rgba(16, 36, 58, 0.65)',
+                border: '1px solid rgba(217, 173, 86, 0.25)',
+              }}
+            >
+              <span className="text-xs font-serif italic text-[#F4D58D]">
+                "Better Oral Health
+              </span>
+              <span className="text-xs font-serif italic text-white/90">
+                Brighter Smiles"
+              </span>
+            </div>
+
+            <div
+              className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl"
+              style={{
+                background: 'radial-gradient(ellipse at center, rgba(0, 201, 232, 0.15) 0%, rgba(5, 11, 22, 0.7) 100%)',
+                border: '1px solid rgba(0, 201, 232, 0.35)',
+                boxShadow: '0 0 25px rgba(0, 201, 232, 0.25)',
+              }}
+            >
+              <img
+                src="/assets/3d-tooth.png"
+                alt="Dental AI Model"
+                className="h-16 w-16 object-contain drop-shadow-[0_0_12px_rgba(0,201,232,0.5)] animate-float"
+                onError={(e) => { e.target.style.display = 'none'; }}
+              />
+            </div>
+          </div>
+        </div>
       </motion.div>
 
-      {/* Stat cards */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* ── 4 Patient Stat Cards ─────────────────────────────────────── */}
+      <div className="mb-8 grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {statCards.map((stat, i) => (
           <motion.div
             key={stat.key}
-            initial={{ opacity: 0, y: 16 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.08 }}
+            transition={{ delay: i * 0.05 }}
+            className="rounded-2xl p-5 relative overflow-hidden transition-all duration-200"
+            style={{
+              background: 'rgba(11, 27, 45, 0.85)',
+              border: '1px solid rgba(217, 173, 86, 0.28)',
+              boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+            }}
+            whileHover={{
+              y: -3,
+              borderColor: 'rgba(217, 173, 86, 0.65)',
+              boxShadow: '0 12px 36px rgba(0,0,0,0.6), 0 0 20px rgba(217, 173, 86, 0.2)',
+            }}
           >
-            <motion.div
-              className="rounded-2xl p-5 shadow-theme"
-              style={{
-                background: 'var(--surface)',
-                border: '1px solid var(--border-soft)',
-                overflow: 'hidden',
-                position: 'relative',
-              }}
-              whileHover={{ y: -4, boxShadow: '0 16px 48px rgba(0,0,0,0.25)' }}
-              transition={{ type: 'spring', stiffness: 300, damping: 24 }}
-            >
-              {/* Gradient top strip */}
+            <div className="flex items-center justify-between mb-2">
               <div
-                className="absolute left-0 right-0 top-0 h-0.5"
-                style={{ background: `linear-gradient(90deg, ${stat.accentColor}, transparent)` }}
-              />
-              <div className="flex items-center justify-between">
-                <div
-                  className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl"
-                  style={{ background: stat.iconBg }}
-                >
-                  {stat.icon}
-                </div>
-                {stat.key === 'health' && stats.health !== '—' && (
-                  <div className="relative flex items-center justify-center h-12 w-12 mb-3">
-                    <svg className="w-12 h-12 -rotate-90">
-                      <circle
-                        className="text-theme-border/20"
-                        strokeWidth="3.5"
-                        stroke="currentColor"
-                        fill="transparent"
-                        r="18"
-                        cx="24"
-                        cy="24"
-                        style={{ color: 'var(--border-soft)' }}
-                      />
-                      <motion.circle
-                        className="text-theme-accent"
-                        strokeWidth="3.5"
-                        strokeDasharray={2 * Math.PI * 18}
-                        initial={{ strokeDashoffset: 2 * Math.PI * 18 }}
-                        animate={{ strokeDashoffset: 2 * Math.PI * 18 * (1 - parseInt(stats.health) / 100) }}
-                        transition={{ duration: 1.2, ease: "easeOut" }}
-                        strokeLinecap="round"
-                        stroke="currentColor"
-                        fill="transparent"
-                        r="18"
-                        cx="24"
-                        cy="24"
-                        style={{ color: 'var(--accent)' }}
-                      />
-                    </svg>
-                    <div className="absolute text-[11px] font-bold text-theme-heading">
-                      <AnimatedCounter value={stats.health} />
-                    </div>
-                  </div>
-                )}
-              </div>
-              <p className="text-sm" style={{ color: 'var(--muted)' }}>{stat.label}</p>
-              {stat.key !== 'health' ? (
-                <p
-                  className="mt-1 text-3xl font-bold"
-                  style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}
-                >
-                  <AnimatedCounter value={stats[stat.key]} />
-                </p>
-              ) : (
-                <p
-                  className="mt-1 text-3xl font-bold"
-                  style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}
-                >
-                  {stats.health === '—' ? '—' : <AnimatedCounter value={stats.health} />}
-                </p>
-              )}
-            </motion.div>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Quick actions */}
-      <h2 className="mb-4 text-lg font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}>
-        Quick Actions
-      </h2>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {quickActions.map((action, i) => (
-          <motion.div
-            key={action.to}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 + i * 0.06 }}
-          >
-            <Link to={action.to} className="block h-full">
-              <motion.div
-                className="group h-full rounded-2xl p-5 shadow-theme transition-all"
+                className="flex h-11 w-11 items-center justify-center rounded-xl"
                 style={{
-                  background: 'var(--surface)',
-                  border: '1px solid var(--border-soft)',
+                  background: `color-mix(in srgb, ${stat.accentColor} 15%, transparent)`,
+                  border: `1px solid color-mix(in srgb, ${stat.accentColor} 35%, transparent)`,
+                  boxShadow: `0 0 14px color-mix(in srgb, ${stat.accentColor} 20%, transparent)`,
                 }}
-                whileHover={{ y: -4, borderColor: 'var(--accent)', boxShadow: '0 16px 40px rgba(0,0,0,0.25)' }}
-                transition={{ type: 'spring', stiffness: 300, damping: 24 }}
               >
-                <div className="flex items-start justify-between">
-                  <div
-                    className="flex h-12 w-12 items-center justify-center rounded-xl text-2xl"
-                    style={{ background: action.color }}
-                  >
-                    {action.icon}
+                {stat.icon}
+              </div>
+
+              {stat.key === 'health' && stats.health !== '—' ? (
+                <div className="relative flex items-center justify-center h-12 w-12">
+                  <svg className="w-12 h-12 -rotate-90">
+                    <circle
+                      strokeWidth="3.5"
+                      stroke="rgba(217, 173, 86, 0.2)"
+                      fill="transparent"
+                      r="18"
+                      cx="24"
+                      cy="24"
+                    />
+                    <motion.circle
+                      strokeWidth="3.5"
+                      strokeDasharray={2 * Math.PI * 18}
+                      initial={{ strokeDashoffset: 2 * Math.PI * 18 }}
+                      animate={{ strokeDashoffset: 2 * Math.PI * 18 * (1 - parseInt(stats.health) / 100) }}
+                      transition={{ duration: 1.2, ease: "easeOut" }}
+                      strokeLinecap="round"
+                      stroke="#00C9E8"
+                      fill="transparent"
+                      r="18"
+                      cx="24"
+                      cy="24"
+                    />
+                  </svg>
+                  <div className="absolute text-[11px] font-black text-white font-mono">
+                    <AnimatedCounter value={stats.health} />
                   </div>
-                  <motion.span
-                    className="text-xl opacity-0 transition-opacity group-hover:opacity-100"
-                    style={{ color: 'var(--accent)' }}
-                  >
-                    →
-                  </motion.span>
                 </div>
-                <h3
-                  className="mt-3 font-semibold"
-                  style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}
-                >
-                  {action.title}
-                </h3>
-                <p className="mt-1 text-sm" style={{ color: 'var(--muted)' }}>{action.desc}</p>
-              </motion.div>
-            </Link>
+              ) : (
+                <SparklineWave color={stat.accentColor} id={stat.key} />
+              )}
+            </div>
+
+            <p className="text-xs font-semibold text-theme-muted uppercase tracking-wider">
+              {stat.label}
+            </p>
+            <p className="mt-1 text-2xl font-black text-theme-heading font-heading">
+              {stat.key === 'patients' ? (
+                <span className="text-emerald-400 text-lg">Active Verified</span>
+              ) : stat.key === 'health' ? (
+                stats.health === '—' ? '—' : <AnimatedCounter value={stats.health} />
+              ) : (
+                <AnimatedCounter value={stats[stat.key]} />
+              )}
+            </p>
           </motion.div>
         ))}
       </div>
 
-      {/* Recent detections */}
-      {predictions.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-8"
-        >
-          <div
-            className="rounded-2xl p-6 shadow-theme"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border-soft)' }}
-          >
-            <div className="mb-5 flex items-center justify-between">
-              <h2 className="text-lg font-semibold" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)' }}>
-                Recent Detections
-              </h2>
-              <Link
-                to="/history"
-                className="text-sm font-medium transition hover:underline"
-                style={{ color: 'var(--accent)' }}
-              >
-                View all →
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {predictions.map((p, i) => {
-                const pct = typeof p.confidence === 'number' ? p.confidence : 0;
-                return (
-                  <motion.div
-                    key={p._id}
-                    className="flex items-center justify-between rounded-xl p-4"
-                    style={{ background: 'color-mix(in srgb, var(--surface-2) 60%, transparent)', border: '1px solid var(--border-soft)' }}
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 + i * 0.06 }}
-                  >
-                    <div className="flex-1">
-                      <p className="font-medium" style={{ color: 'var(--heading)' }}>{p.diseaseName ?? 'Unknown'}</p>
-                      <p className="mt-0.5 text-xs" style={{ color: 'var(--muted)' }}>
-                        {p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''}
-                      </p>
-                    </div>
-                    <div className="ml-4 flex items-center gap-3">
-                      {/* Mini confidence bar */}
-                      <div className="hidden w-20 sm:block">
-                        <div
-                          className="h-1.5 overflow-hidden rounded-full"
-                          style={{ background: 'var(--border-soft)' }}
-                        >
-                          <motion.div
-                            className="h-full rounded-full"
-                            style={{ background: 'var(--gradient-accent)' }}
-                            initial={{ width: 0 }}
-                            animate={{ width: `${pct}%` }}
-                            transition={{ duration: 0.8, delay: 0.6 + i * 0.06 }}
-                          />
-                        </div>
+      {/* ── Quick Action Modules ─────────────────────────────────────── */}
+      <div className="mb-8">
+        <h2 className="mb-4 text-base font-bold text-theme-heading font-heading uppercase tracking-wider flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full bg-[#D9AD56]" />
+          Quick Actions & Clinical Care
+        </h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {quickActions.map((action, i) => (
+            <motion.div
+              key={action.to}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 + i * 0.04 }}
+            >
+              <Link to={action.to} className="block h-full group">
+                <div
+                  className="h-full rounded-2xl p-5 transition-all duration-200 flex flex-col justify-between"
+                  style={{
+                    background: 'rgba(11, 27, 45, 0.85)',
+                    border: '1px solid rgba(217, 173, 86, 0.28)',
+                    boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                  }}
+                >
+                  <div>
+                    <div className="flex items-start justify-between mb-3">
+                      <div
+                        className="flex h-12 w-12 items-center justify-center rounded-xl"
+                        style={{
+                          background: `color-mix(in srgb, ${action.accent} 15%, transparent)`,
+                          border: `1px solid color-mix(in srgb, ${action.accent} 35%, transparent)`,
+                          boxShadow: `0 0 16px color-mix(in srgb, ${action.accent} 25%, transparent)`,
+                        }}
+                      >
+                        {action.icon}
                       </div>
-                      <span className="text-sm font-semibold" style={{ color: 'var(--accent)' }}>
-                        {pct.toFixed(1)}%
+                      <span className="text-lg text-theme-muted group-hover:text-[#F4D58D] group-hover:translate-x-1 transition-all">
+                        →
                       </span>
                     </div>
-                  </motion.div>
-                );
-              })}
+                    <h3 className="font-bold text-base text-theme-heading font-heading group-hover:text-[#F4D58D] transition-colors">
+                      {action.title}
+                    </h3>
+                    <p className="mt-1 text-xs text-theme-muted leading-relaxed">
+                      {action.desc}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Recent AI Detections ─────────────────────────────────────── */}
+      {predictions.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35 }}
+          className="rounded-2xl p-6"
+          style={{
+            background: 'rgba(11, 27, 45, 0.85)',
+            border: '1px solid rgba(217, 173, 86, 0.28)',
+            boxShadow: '0 12px 36px rgba(0,0,0,0.45)',
+          }}
+        >
+          <div className="mb-5 flex items-center justify-between border-b border-theme-border/30 pb-3">
+            <div>
+              <h2 className="text-base font-bold text-theme-heading font-heading">
+                Recent AI Detections
+              </h2>
+              <p className="text-xs text-theme-muted mt-0.5">
+                Oral condition evaluations analyzed via MobileNetV3 AI model
+              </p>
             </div>
+            <Link
+              to="/history"
+              className="text-xs font-bold text-[#F4D58D] hover:underline flex items-center gap-1"
+            >
+              <span>View All History</span>
+              <span>→</span>
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {predictions.map((p, i) => {
+              const pct = typeof p.confidence === 'number' ? p.confidence : 0;
+              return (
+                <div
+                  key={p._id || i}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-xl p-4 transition border border-theme-border/20 bg-theme-surface/50 hover:border-[#D9AD56]/40"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    {p.imageUrl && (
+                      <img
+                        src={p.imageUrl}
+                        alt="Scan thumbnail"
+                        className="h-12 w-12 rounded-xl object-cover border border-theme-border/40 shrink-0"
+                        onError={(e) => { e.target.style.display = 'none'; }}
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <p className="font-bold text-sm text-theme-heading truncate">
+                        {p.displayName || p.diseaseName || 'Oral Condition'}
+                      </p>
+                      <p className="text-xs text-theme-muted mt-0.5">
+                        {p.createdAt ? new Date(p.createdAt).toLocaleDateString() : ''}
+                        {p.riskLevel && (
+                          <span className="ml-2 font-semibold text-[#D9AD56]">
+                            · Risk: {p.riskLevel}
+                          </span>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="w-24 sm:w-32">
+                      <div className="h-2 overflow-hidden rounded-full bg-theme-surface border border-theme-border/30">
+                        <motion.div
+                          className="h-full rounded-full"
+                          style={{
+                            background: 'linear-gradient(90deg, #00C9E8 0%, #18D99B 100%)',
+                          }}
+                          initial={{ width: 0 }}
+                          animate={{ width: `${pct}%` }}
+                          transition={{ duration: 0.8, delay: 0.2 + i * 0.05 }}
+                        />
+                      </div>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-[#00C9E8] w-12 text-right">
+                      {pct.toFixed(1)}%
+                    </span>
+                    <Link
+                      to="/consultation"
+                      className="hidden sm:inline-flex rounded-lg px-2.5 py-1 text-xs font-semibold border border-[#D9AD56]/40 text-[#F4D58D] hover:bg-[#D9AD56]/10 transition"
+                    >
+                      Consult Doctor
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </motion.div>
       )}

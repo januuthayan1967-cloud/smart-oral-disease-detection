@@ -1,209 +1,354 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
 
-/* ── SVG Icon Set ─────────────────────────────────────────────────────── */
+/* ── Refined SVG Icon Set ─────────────────────────────────────────────────── */
 const Icons = {
   Dashboard: () => (
-    <svg viewBox="0 0 20 20" fill="none" className="h-4.5 w-4.5 shrink-0" style={{ width: 18, height: 18 }} xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.9" />
-      <rect x="11" y="2" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.6" />
-      <rect x="2" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.6" />
-      <rect x="11" y="11" width="7" height="7" rx="1.5" fill="currentColor" opacity="0.9" />
-    </svg>
-  ),
-  Patients: () => (
-    <svg viewBox="0 0 20 20" fill="none" style={{ width: 18, height: 18 }} xmlns="http://www.w3.org/2000/svg">
-      <circle cx="7" cy="6" r="3" fill="currentColor" opacity="0.9" />
-      <circle cx="14" cy="7" r="2" fill="currentColor" opacity="0.6" />
-      <path d="M1 17c0-3.3 2.7-6 6-6s6 2.7 6 6H1Z" fill="currentColor" opacity="0.9" />
-      <path d="M14 12c1.7.6 3 2.3 3 4.4V17h-3v-.6c0-1.7-.7-3.2-1.7-4.4Z" fill="currentColor" opacity="0.6" />
-    </svg>
-  ),
-  Detect: () => (
-    <svg viewBox="0 0 20 20" fill="none" style={{ width: 18, height: 18 }} xmlns="http://www.w3.org/2000/svg">
-      <circle cx="9" cy="9" r="6" stroke="currentColor" strokeWidth="1.5" opacity="0.7" />
-      <circle cx="9" cy="9" r="3" fill="currentColor" opacity="0.9" />
-      <path d="M13.5 13.5L17 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  ),
-  Medicine: () => (
-    <svg viewBox="0 0 20 20" fill="none" style={{ width: 18, height: 18 }} xmlns="http://www.w3.org/2000/svg">
-      <rect x="3" y="8" width="14" height="9" rx="2" fill="currentColor" opacity="0.6" />
-      <rect x="7" y="4" width="6" height="5" rx="1" fill="currentColor" opacity="0.9" />
-      <path d="M8 11.5h4M10 9.5v4" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  ),
-  Appointments: () => (
-    <svg viewBox="0 0 20 20" fill="none" style={{ width: 18, height: 18 }} xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="4" width="16" height="14" rx="2" fill="currentColor" opacity="0.6" />
-      <path d="M6 2v4M14 2v4M2 9h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-      <rect x="6" y="12" width="2" height="2" rx="0.5" fill="white" opacity="0.9" />
-      <rect x="10" y="12" width="2" height="2" rx="0.5" fill="white" opacity="0.9" />
-      <rect x="14" y="12" width="2" height="2" rx="0.5" fill="white" opacity="0.9" />
-    </svg>
-  ),
-  Settings: () => (
-    <svg viewBox="0 0 20 20" fill="none" style={{ width: 18, height: 18 }} xmlns="http://www.w3.org/2000/svg">
-      <circle cx="10" cy="10" r="2.5" fill="currentColor" opacity="0.9" />
-      <path
-        d="M10 2c-.4 0-.8 0-1.2.1L8 4.2C7.4 4.4 6.9 4.7 6.4 5L4.3 4.3C3.6 5 3 5.6 2.3 6.3l.7 2.1c-.3.5-.6 1-.8 1.6L0 10.8c0 .4.1.8.1 1.2s0 .8-.1 1.2l2.2.8c.2.6.5 1.1.8 1.6l-.7 2.1c.7.7 1.3 1.3 2 1.9l2.1-.7c.5.3 1 .6 1.6.8l.8 2.2c.4.1.8.1 1.2.1s.8 0 1.2-.1l.8-2.2c.6-.2 1.1-.5 1.6-.8l2.1.7c.7-.6 1.3-1.2 1.9-2l-.7-2.1c.3-.5.6-1 .8-1.6l2.2-.8c.1-.4.1-.8.1-1.2s0-.8-.1-1.2l-2.2-.8c-.2-.6-.5-1.1-.8-1.6l.7-2.1c-.6-.7-1.2-1.3-2-1.9l-2.1.7c-.5-.3-1-.6-1.6-.8L11.2 2C10.8 2 10.4 2 10 2Z"
-        fill="currentColor"
-        opacity="0.6"
-      />
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+      <polyline points="9 22 9 12 15 12 15 22" />
     </svg>
   ),
   Admin: () => (
-    <svg viewBox="0 0 20 20" fill="none" style={{ width: 18, height: 18 }} xmlns="http://www.w3.org/2000/svg">
-      <path d="M10 2L3 5v5c0 4.4 3 8.5 7 9.5 4-1 7-5.1 7-9.5V5l-7-3Z" fill="currentColor" opacity="0.7" />
-      <path d="M7 10l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+    </svg>
+  ),
+  Patients: () => (
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+  Appointments: () => (
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+    </svg>
+  ),
+  Detect: () => (
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="3" />
+      <path d="M9 12h6m-3-3v6" />
+      <circle cx="12" cy="12" r="2" />
     </svg>
   ),
   Education: () => (
-    <svg viewBox="0 0 20 20" fill="none" style={{ width: 18, height: 18 }} xmlns="http://www.w3.org/2000/svg">
-      <path d="M3 4h5a3 3 0 0 1 3 3v10a2.5 2.5 0 0 0-2.5-2.5H3V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M17 4h-5a3 3 0 0 0-3 3v10a2.5 2.5 0 0 1 2.5-2.5H17V4Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </svg>
+  ),
+  Medicine: () => (
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10.5 20.5l10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z" />
+      <path d="m8.5 8.5 7 7" />
+    </svg>
+  ),
+  Reports: () => (
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="20" x2="18" y2="10" />
+      <line x1="12" y1="20" x2="12" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+  ),
+  Settings: () => (
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+  ),
+  Chat: () => (
+    <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5 shrink-0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  ),
+  ChevronRight: () => (
+    <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 shrink-0 opacity-40 group-hover:opacity-100 transition-opacity" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 18 15 12 9 6" />
     </svg>
   ),
 };
 
-const userLinks = [
-  { to: '/dashboard', label: 'Dashboard', Icon: Icons.Dashboard },
-  { to: '/history', label: 'History', Icon: Icons.Patients },
-  { to: '/detect', label: 'AI Detection', Icon: Icons.Detect },
-  { to: '/education', label: 'Patient Education', Icon: Icons.Education },
-  { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
-  { to: '/consultation', label: 'Appointments', Icon: Icons.Appointments },
-  { to: '/profile', label: 'Settings', Icon: Icons.Settings },
-];
-
-const dentistLinks = [
-  { to: '/dentist', label: 'Dashboard', Icon: Icons.Dashboard },
-  { to: '/education', label: 'Patient Education', Icon: Icons.Education },
-  { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
-  { to: '/consultation', label: 'Appointments', Icon: Icons.Appointments },
-  { to: '/profile', label: 'Settings', Icon: Icons.Settings },
-];
-
-const pharmacyLinks = [
-  { to: '/pharmacy', label: 'Dashboard', Icon: Icons.Dashboard },
-  { to: '/profile', label: 'Settings', Icon: Icons.Settings },
-];
-
-const adminLinks = [
-  { to: '/admin', label: 'Admin', Icon: Icons.Admin },
-  { to: '/admin?tab=users', label: 'Patients', Icon: Icons.Patients },
-  { to: '/admin?tab=appointments', label: 'Appointments', Icon: Icons.Appointments },
-  { to: '/detect', label: 'AI Detection', Icon: Icons.Detect },
-  { to: '/education', label: 'Patient Education', Icon: Icons.Education },
-  { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
-  { to: '/profile', label: 'Settings', Icon: Icons.Settings },
-];
-
 export default function Sidebar({ isOpen, onClose }) {
   const { user, isAdmin, isDentist, isPharmacy } = useAuth();
+  const location = useLocation();
 
-  let links = userLinks;
-  if (isAdmin) links = adminLinks;
-  else if (isDentist) links = dentistLinks;
-  else if (isPharmacy) links = pharmacyLinks;
+  // Primary active dashboard route
+  const dashboardPath = isAdmin ? '/admin' : isDentist ? '/dentist' : isPharmacy ? '/pharmacy' : '/dashboard';
 
-  const displayName = user?.name || user?.pharmacyName || 'User';
-  const initials = displayName.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
-  const roleLabel = user?.role || 'user';
+  // Role-specific main module links
+  const adminMainModules = [
+    { to: '/admin', label: 'Admin', Icon: Icons.Admin },
+    { to: '/admin?tab=users', label: 'Patients', Icon: Icons.Patients },
+    { to: '/admin?tab=appointments', label: 'Appointments', Icon: Icons.Appointments },
+    { to: '/detect', label: 'AI Detection', Icon: Icons.Detect },
+    { to: '/education', label: 'Patient Education', Icon: Icons.Education },
+    { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
+    { to: '/admin?tab=overview', label: 'Reports', Icon: Icons.Reports },
+  ];
+
+  const userMainModules = [
+    { to: '/detect', label: 'AI Detection', Icon: Icons.Detect },
+    { to: '/chat', label: 'Gemini Assistant', Icon: Icons.Chat },
+    { to: '/history', label: 'Detection History', Icon: Icons.Reports },
+    { to: '/consultation', label: 'Appointments', Icon: Icons.Appointments },
+    { to: '/prescriptions', label: 'Prescriptions', Icon: Icons.Education },
+    { to: '/medicines', label: 'Medicines Market', Icon: Icons.Medicine },
+    { to: '/orders', label: 'Track Orders', Icon: Icons.Reports },
+  ];
+
+  const dentistMainModules = [
+    { to: '/dentist', label: 'Consultations', Icon: Icons.Appointments },
+    { to: '/dentist', label: 'Patients', Icon: Icons.Patients },
+    { to: '/dentist', label: 'Prescriptions', Icon: Icons.Education },
+    { to: '/medicines', label: 'Medicines', Icon: Icons.Medicine },
+    { to: '/education', label: 'Education Hub', Icon: Icons.Education },
+  ];
+
+  const pharmacyMainModules = [
+    { to: '/pharmacy', label: 'Orders & Inventory', Icon: Icons.Medicine },
+    { to: '/medicines', label: 'Marketplace', Icon: Icons.Education },
+  ];
+
+  const mainModules = isAdmin
+    ? adminMainModules
+    : isDentist
+    ? dentistMainModules
+    : isPharmacy
+    ? pharmacyMainModules
+    : userMainModules;
+
+  const displayName = user?.name || user?.pharmacyName || 'System Admin';
+  const initials = displayName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
+
+  const roleTitle = isAdmin
+    ? 'Administrator'
+    : isDentist
+    ? 'Dentist'
+    : isPharmacy
+    ? 'Pharmacist'
+    : 'Patient';
+
+  const isDashboardActive =
+    location.pathname === dashboardPath &&
+    (!location.search || location.search === '' || location.search === '?tab=overview');
 
   const sidebarContent = (
     <aside
-      className="flex h-full flex-col"
+      className="flex h-full flex-col select-none overflow-y-auto overflow-x-hidden scrollbar-thin"
       style={{
-        background: 'var(--surface)',
-        borderRight: '1px solid var(--border-soft)',
+        background: 'linear-gradient(180deg, #071322 0%, #050B16 100%)',
+        borderRight: '1px solid rgba(217, 173, 86, 0.25)',
       }}
     >
-      {/* Brand header */}
-      <div className="p-5" style={{ borderBottom: '1px solid var(--border-soft)' }}>
+      {/* ── Brand Header ──────────────────────────────────────────────── */}
+      <div className="p-5 pb-4 border-b border-theme-border/30">
         <div className="flex items-center gap-3">
           <div
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-white shadow-glow-sm"
-            style={{ background: 'var(--gradient-accent)' }}
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-[0_0_20px_rgba(217,173,86,0.35)]"
+            style={{
+              background: 'linear-gradient(135deg, rgba(244, 213, 141, 0.25) 0%, rgba(217, 173, 86, 0.1) 100%)',
+              border: '1px solid rgba(217, 173, 86, 0.55)',
+            }}
           >
-            <svg viewBox="0 0 32 32" fill="none" style={{ width: 20, height: 20 }}>
+            {/* Golden Tooth Logo SVG */}
+            <svg viewBox="0 0 32 32" fill="none" className="h-6 w-6" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="goldToothGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#F4D58D" />
+                  <stop offset="100%" stopColor="#D9AD56" />
+                </linearGradient>
+              </defs>
               <path
                 d="M10 4C7 4 4 7 4 11c0 2.5 1 5 1.5 7.5C6 21 6.5 23 8 26c.5 1.5 1.5 2 2.5 1.5S12 26 12 24c0-1.5.5-3 1.5-3H18c1 0 1.5 1.5 1.5 3 0 2 .5 3.5 1.5 3.5s2-.5 2.5-1.5c1.5-3 2-5 2.5-7.5C26.5 16 27.5 13.5 27.5 11c0-4-3-7-6-7a5.5 5.5 0 0 0-5.5 4A5.5 5.5 0 0 0 10 4Z"
-                fill="white"
-                opacity="0.9"
+                fill="url(#goldToothGrad)"
+                stroke="rgba(244,213,141,0.6)"
+                strokeWidth="0.75"
               />
             </svg>
           </div>
-          <div>
-            <p className="font-bold" style={{ fontFamily: 'Outfit, sans-serif', color: 'var(--heading)', lineHeight: 1.2 }}>
-              Oral AI
+          <div className="min-w-0">
+            <h1
+              className="text-xl font-bold tracking-tight leading-tight"
+              style={{
+                fontFamily: 'Outfit, sans-serif',
+                background: 'linear-gradient(135deg, #FFFFFF 30%, #F4D58D 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}
+            >
+              OralAI
+            </h1>
+            <p className="text-[11px] font-medium tracking-wide text-theme-muted">
+              Smart Dental Health
             </p>
-            <p className="text-xs" style={{ color: 'var(--muted)' }}>Dental Platform</p>
           </div>
         </div>
       </div>
 
-      {/* Nav links */}
-      <nav className="flex-1 space-y-0.5 p-3" aria-label="Sidebar navigation">
-        {links.map((link, i) => (
+      {/* ── Navigation Items ─────────────────────────────────────────── */}
+      <div className="flex-1 px-3 py-4 space-y-5">
+        {/* Top Primary Dashboard Pill */}
+        <div>
           <NavLink
-            key={link.to}
-            to={link.to}
+            to={dashboardPath}
             onClick={onClose}
-            className={({ isActive }) =>
-              [
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
-                isActive
-                  ? 'text-theme-accent shadow-glow-sm'
-                  : 'text-theme-muted hover:text-theme-text',
-              ].join(' ')
-            }
-            style={({ isActive }) => ({
-              background: isActive ? 'var(--accent-dim)' : 'transparent',
-              boxShadow: isActive ? 'inset 3px 0 0 var(--accent)' : 'none',
-              paddingLeft: isActive ? '1rem' : undefined,
-            })}
+            className={`group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold transition-all duration-200 ${
+              isDashboardActive
+                ? 'shadow-[0_0_24px_rgba(217,173,86,0.35)] text-white'
+                : 'text-theme-muted hover:text-theme-text hover:bg-theme-surface/50'
+            }`}
+            style={{
+              background: isDashboardActive
+                ? 'linear-gradient(135deg, rgba(217, 173, 86, 0.3) 0%, rgba(244, 213, 141, 0.12) 100%)'
+                : 'transparent',
+              border: isDashboardActive
+                ? '1px solid rgba(244, 213, 141, 0.65)'
+                : '1px solid transparent',
+            }}
           >
-            {({ isActive }) => (
-              <>
-                <span
-                  className="shrink-0"
-                  style={{ color: isActive ? 'var(--accent)' : 'var(--muted)' }}
-                >
-                  <link.Icon />
-                </span>
-                <span>{link.label}</span>
-                {isActive && (
-                  <motion.span
-                    layoutId="sidebar-active"
-                    className="ml-auto h-1.5 w-1.5 rounded-full"
-                    style={{ background: 'var(--accent)' }}
-                  />
-                )}
-              </>
+            <span
+              className="shrink-0 transition-colors"
+              style={{ color: isDashboardActive ? '#F4D58D' : 'var(--muted)' }}
+            >
+              <Icons.Dashboard />
+            </span>
+            <span className="font-bold tracking-wide">Dashboard</span>
+            {isDashboardActive && (
+              <span className="ml-auto h-2 w-2 rounded-full bg-[#F4D58D] shadow-[0_0_8px_#F4D58D]" />
             )}
           </NavLink>
-        ))}
-      </nav>
+        </div>
 
-      {/* User footer */}
-      <div className="p-4" style={{ borderTop: '1px solid var(--border-soft)' }}>
-        <div className="flex items-center gap-3 rounded-xl p-2.5" style={{ background: 'var(--accent-dim)' }}>
+        {/* Section: MAIN MODULES */}
+        <div>
+          <p className="px-3 text-[10px] font-bold tracking-widest text-[#D9AD56]/80 uppercase mb-2">
+            Main Modules
+          </p>
+          <nav className="space-y-1" aria-label="Main modules">
+            {mainModules.map((item, idx) => {
+              const fullTarget = item.to;
+              const isMatch =
+                location.pathname === item.to.split('?')[0] &&
+                (!item.to.includes('?tab=') ||
+                  location.search === `?${item.to.split('?')[1]}`);
+              const isActive = isMatch && !isDashboardActive;
+
+              return (
+                <NavLink
+                  key={`${item.label}-${idx}`}
+                  to={item.to}
+                  onClick={onClose}
+                  className={`group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                    isActive
+                      ? 'text-[#F4D58D] bg-theme-surface border border-[#D9AD56]/40 shadow-[0_0_15px_rgba(217,173,86,0.18)]'
+                      : 'text-theme-muted hover:text-theme-text hover:bg-theme-surface/40'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span
+                      className="shrink-0 transition-colors"
+                      style={{ color: isActive ? '#F4D58D' : 'var(--muted)' }}
+                    >
+                      <item.Icon />
+                    </span>
+                    <span className="truncate">{item.label}</span>
+                  </div>
+                  <Icons.ChevronRight />
+                </NavLink>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Section: SETTINGS */}
+        <div>
+          <p className="px-3 text-[10px] font-bold tracking-widest text-[#D9AD56]/80 uppercase mb-2">
+            Settings
+          </p>
+          <NavLink
+            to="/profile"
+            onClick={onClose}
+            className={({ isActive }) =>
+              `group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                isActive
+                  ? 'text-[#F4D58D] bg-theme-surface border border-[#D9AD56]/40 shadow-[0_0_15px_rgba(217,173,86,0.18)]'
+                  : 'text-theme-muted hover:text-theme-text hover:bg-theme-surface/40'
+              }`
+            }
+          >
+            <div className="flex items-center gap-3">
+              <span className="shrink-0 text-theme-muted group-hover:text-theme-text transition-colors">
+                <Icons.Settings />
+              </span>
+              <span>Settings</span>
+            </div>
+            <Icons.ChevronRight />
+          </NavLink>
+        </div>
+      </div>
+
+      {/* ── Bottom 3D Glowing Tooth Artwork ─────────────────────────── */}
+      <div className="px-4 pb-2">
+        <div
+          className="relative overflow-hidden rounded-2xl p-4 flex flex-col items-center justify-center text-center"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(217, 173, 86, 0.12) 0%, rgba(5, 11, 22, 0.8) 100%)',
+            border: '1px solid rgba(217, 173, 86, 0.22)',
+          }}
+        >
+          {/* Ambient light ring */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050B16] via-transparent to-transparent pointer-events-none" />
+          
+          <img
+            src="/assets/3d-tooth.png"
+            alt="OralAI 3D AI Dental Model"
+            className="h-20 w-auto object-contain drop-shadow-[0_0_18px_rgba(217,173,86,0.4)] animate-float"
+            onError={(e) => {
+              e.target.style.display = 'none';
+            }}
+          />
+          <span className="text-[10px] font-semibold text-[#D9AD56]/90 tracking-wide mt-1">
+            AI Oral Diagnostic Engine
+          </span>
+        </div>
+      </div>
+
+      {/* ── User Profile Footer Card ─────────────────────────────────── */}
+      <div className="p-3 border-t border-theme-border/30">
+        <div
+          className="flex items-center gap-3 rounded-xl p-2.5"
+          style={{
+            background: 'linear-gradient(135deg, rgba(16, 36, 58, 0.9) 0%, rgba(11, 27, 45, 0.95) 100%)',
+            border: '1px solid rgba(217, 173, 86, 0.25)',
+          }}
+        >
           <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white shadow-glow-sm"
-            style={{ background: 'var(--gradient-accent)' }}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-[#050B16] shadow-sm"
+            style={{ background: 'linear-gradient(135deg, #F4D58D 0%, #D9AD56 100%)' }}
           >
             {initials}
           </div>
-          <div className="min-w-0">
-            <p className="truncate text-sm font-semibold" style={{ color: 'var(--heading)' }}>{displayName}</p>
-            <span
-              className="inline-block rounded-full px-2 py-0.5 text-xs font-medium capitalize"
-              style={{ background: 'rgba(6,182,212,0.15)', color: 'var(--accent)' }}
-            >
-              {roleLabel}
-            </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs font-bold text-theme-heading leading-tight">
+              {displayName}
+            </p>
+            <p className="text-[11px] text-theme-muted truncate leading-tight">
+              {roleTitle}
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0 pr-1">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10B981] animate-pulse" />
+            <span className="text-[10px] font-semibold text-emerald-400">Online</span>
           </div>
         </div>
       </div>
@@ -213,27 +358,33 @@ export default function Sidebar({ isOpen, onClose }) {
   return (
     <>
       {/* Desktop sidebar */}
-      <div className="hidden w-64 shrink-0 overflow-hidden rounded-2xl md:block shadow-theme" style={{ border: '1px solid var(--border-soft)' }}>
+      <div
+        className="hidden w-64 shrink-0 overflow-hidden rounded-2xl md:block shadow-[0_16px_48px_rgba(0,0,0,0.6)]"
+        style={{
+          border: '1px solid rgba(217, 173, 86, 0.35)',
+          boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(217, 173, 86, 0.1)',
+        }}
+      >
         {sidebarContent}
       </div>
 
-      {/* Mobile overlay sidebar */}
+      {/* Mobile drawer overlay */}
       <AnimatePresence>
         {isOpen && (
           <>
             <motion.div
-              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+              className="fixed inset-0 z-40 bg-black/75 backdrop-blur-md md:hidden"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={onClose}
             />
             <motion.div
-              className="fixed inset-y-0 left-0 z-50 w-72 overflow-hidden md:hidden"
-              initial={{ x: -288 }}
+              className="fixed inset-y-0 left-0 z-50 w-72 overflow-hidden md:hidden shadow-2xl"
+              initial={{ x: -300 }}
               animate={{ x: 0 }}
-              exit={{ x: -288 }}
-              transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+              exit={{ x: -300 }}
+              transition={{ type: 'spring', stiffness: 360, damping: 32 }}
             >
               {sidebarContent}
             </motion.div>
@@ -243,3 +394,4 @@ export default function Sidebar({ isOpen, onClose }) {
     </>
   );
 }
+

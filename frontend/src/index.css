@@ -6,39 +6,46 @@
    DESIGN TOKENS
    ═══════════════════════════════════════════════════════════════════════════ */
 :root {
-  /* Dark theme (default) — deep navy-teal */
-  --primary: #020D18;
-  --secondary: #0A3D4A;
-  --accent: #06B6D4;
-  --accent-soft: #22D3EE;
-  --accent-dim: rgba(6, 182, 212, 0.15);
-  --background: #020D18;
-  --surface: #061E2E;
-  --surface-2: #0A2D40;
-  --border: #0E4060;
-  --border-soft: rgba(14, 64, 96, 0.6);
-  --heading: #F0FAFF;
-  --text: #C8E8F4;
-  --muted: #7AAEC8;
-  --button: #06B6D4;
+  /* Ultra-Premium Dark Luxury (Default) */
+  --primary: #050B16;
+  --secondary: #081525;
+  --accent: #00C9E8;
+  --accent-soft: #5CE1E6;
+  --accent-dim: rgba(0, 201, 232, 0.15);
+  --background: #050B16;
+  --surface: #0B1B2D;
+  --surface-2: #10243A;
+  --border: rgba(217, 173, 86, 0.28);
+  --border-soft: rgba(217, 173, 86, 0.18);
+  --heading: #F8FAFC;
+  --text: #F8FAFC;
+  --muted: #94A9BF;
+  --button: #00C9E8;
   --button-hover: #0891B2;
-  --success: #10B981;
-  --warning: #F59E0B;
-  --shadow: rgba(0, 0, 0, 0.45);
-  --shadow-accent: rgba(6, 182, 212, 0.2);
-  --glass: rgba(6, 30, 46, 0.72);
-  --glass-border: rgba(6, 182, 212, 0.18);
-  --error: #F87171;
-  --error-bg: rgba(248, 113, 113, 0.1);
-  --success-bg: rgba(16, 185, 129, 0.1);
-  --warning-bg: rgba(245, 158, 11, 0.1);
-  --gradient-hero: linear-gradient(135deg, #020D18 0%, #061E2E 50%, #0A2D40 100%);
-  --gradient-accent: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
-  --gradient-teal: linear-gradient(135deg, #0891B2 0%, #0D9488 100%);
-  --stat-1: linear-gradient(135deg, rgba(6,182,212,0.2) 0%, rgba(8,145,178,0.08) 100%);
-  --stat-2: linear-gradient(135deg, rgba(16,185,129,0.2) 0%, rgba(5,150,105,0.08) 100%);
-  --stat-3: linear-gradient(135deg, rgba(99,102,241,0.2) 0%, rgba(79,70,229,0.08) 100%);
-  --stat-4: linear-gradient(135deg, rgba(20,184,166,0.2) 0%, rgba(13,148,136,0.08) 100%);
+  --success: #18D99B;
+  --warning: #F5B942;
+  --error: #FF6475;
+  --gold: #D9AD56;
+  --gold-champagne: #F4D58D;
+  --gold-light: #FCE7B0;
+  --gold-dim: rgba(217, 173, 86, 0.15);
+  --gold-glow: rgba(217, 173, 86, 0.32);
+  --shadow: rgba(0, 0, 0, 0.55);
+  --shadow-accent: rgba(0, 201, 232, 0.25);
+  --glass: rgba(11, 27, 45, 0.85);
+  --glass-border: rgba(217, 173, 86, 0.28);
+  --error-bg: rgba(255, 100, 117, 0.12);
+  --success-bg: rgba(24, 217, 155, 0.12);
+  --warning-bg: rgba(245, 185, 66, 0.12);
+  --gradient-hero: linear-gradient(135deg, #050B16 0%, #081525 50%, #0B1B2D 100%);
+  --gradient-accent: linear-gradient(135deg, #00C9E8 0%, #0891B2 100%);
+  --gradient-gold: linear-gradient(135deg, #F4D58D 0%, #D9AD56 100%);
+  --gradient-gold-subtle: linear-gradient(135deg, rgba(244, 213, 141, 0.15) 0%, rgba(217, 173, 86, 0.05) 100%);
+  --gradient-teal: linear-gradient(135deg, #00C9E8 0%, #0D9488 100%);
+  --stat-1: linear-gradient(135deg, rgba(0,201,232,0.2) 0%, rgba(8,145,178,0.08) 100%);
+  --stat-2: linear-gradient(135deg, rgba(24,217,155,0.2) 0%, rgba(5,150,105,0.08) 100%);
+  --stat-3: linear-gradient(135deg, rgba(217,173,86,0.2) 0%, rgba(184,134,11,0.08) 100%);
+  --stat-4: linear-gradient(135deg, rgba(168,85,247,0.2) 0%, rgba(147,51,234,0.08) 100%);
 
   /* Animation Design Tokens */
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -50,86 +57,56 @@
   --timing-modal: 300ms;
   --timing-page: 350ms;
   --timing-theme: 300ms;
-  --hero-glow: rgba(6, 182, 212, 0.22);
-  --hero-glow-secondary: rgba(13, 148, 136, 0.16);
-  --grid-line: rgba(6, 182, 212, 0.07);
+  --hero-glow: rgba(0, 201, 232, 0.22);
+  --hero-glow-secondary: rgba(217, 173, 86, 0.18);
+  --grid-line: rgba(217, 173, 86, 0.08);
 }
 
 [data-theme='light'] {
-  --primary: #F0F9FF;
-  --secondary: #E0F2FE;
+  --primary: #F8FAFC;
+  --secondary: #F1F5F9;
   --accent: #0284C7;
   --accent-soft: #0EA5E9;
   --accent-dim: rgba(2, 132, 199, 0.12);
-  --background: #F0F9FF;
-  --surface: rgba(255, 255, 255, 0.95);
-  --surface-2: rgba(240, 249, 255, 0.98);
-  --border: #BAE6FD;
-  --border-soft: rgba(147, 197, 253, 0.75);
-  --heading: #0A192F;
+  --background: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-2: #F1F5F9;
+  --border: rgba(184, 134, 11, 0.35);
+  --border-soft: rgba(184, 134, 11, 0.22);
+  --heading: #0F172A;
   --text: #1E293B;
-  --muted: #334E68;
+  --muted: #64748B;
   --button: #0284C7;
   --button-hover: #0369A1;
   --success: #059669;
   --warning: #D97706;
-  --shadow: rgba(10, 25, 47, 0.12);
-  --shadow-accent: rgba(2, 132, 199, 0.18);
-  --glass: rgba(255, 255, 255, 0.94);
-  --glass-border: rgba(2, 132, 199, 0.28);
   --error: #DC2626;
-  --error-bg: rgba(220, 38, 38, 0.07);
+  --gold: #B8860B;
+  --gold-champagne: #D9AD56;
+  --gold-light: #F4D58D;
+  --gold-dim: rgba(184, 134, 11, 0.12);
+  --gold-glow: rgba(184, 134, 11, 0.22);
+  --shadow: rgba(15, 23, 42, 0.12);
+  --shadow-accent: rgba(2, 132, 199, 0.18);
+  --glass: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(184, 134, 11, 0.3);
+  --error-bg: rgba(220, 38, 38, 0.08);
   --success-bg: rgba(5, 150, 105, 0.08);
   --warning-bg: rgba(217, 119, 6, 0.08);
-  --gradient-hero: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 50%, #F0FDFA 100%);
+  --gradient-hero: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 50%, #E2E8F0 100%);
   --gradient-accent: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+  --gradient-gold: linear-gradient(135deg, #D9AD56 0%, #B8860B 100%);
+  --gradient-gold-subtle: linear-gradient(135deg, rgba(217, 173, 86, 0.12) 0%, rgba(184, 134, 11, 0.04) 100%);
   --gradient-teal: linear-gradient(135deg, #0369A1 0%, #0D9488 100%);
   --stat-1: linear-gradient(135deg, rgba(2,132,199,0.12) 0%, rgba(3,105,161,0.04) 100%);
   --stat-2: linear-gradient(135deg, rgba(5,150,105,0.12) 0%, rgba(4,120,87,0.04) 100%);
-  --stat-3: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(79,70,229,0.04) 100%);
-  --stat-4: linear-gradient(135deg, rgba(13,148,136,0.12) 0%, rgba(15,118,110,0.04) 100%);
+  --stat-3: linear-gradient(135deg, rgba(184,134,11,0.12) 0%, rgba(161,117,10,0.04) 100%);
+  --stat-4: linear-gradient(135deg, rgba(147,51,234,0.12) 0%, rgba(126,34,206,0.04) 100%);
 
   /* Animation Design Tokens (Light Mode) */
   --hero-glow: rgba(2, 132, 199, 0.15);
-  --hero-glow-secondary: rgba(13, 148, 136, 0.10);
-  --grid-line: rgba(2, 132, 199, 0.07);
-}
-
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme='dark']) {
-    --primary: #F0F9FF;
-    --secondary: #E0F2FE;
-    --accent: #0284C7;
-    --accent-soft: #0EA5E9;
-    --accent-dim: rgba(2, 132, 199, 0.12);
-    --background: #F0F9FF;
-    --surface: rgba(255, 255, 255, 0.95);
-    --surface-2: rgba(240, 249, 255, 0.98);
-    --border: #BAE6FD;
-    --border-soft: rgba(147, 197, 253, 0.75);
-    --heading: #0A192F;
-    --text: #1E293B;
-    --muted: #334E68;
-    --button: #0284C7;
-    --button-hover: #0369A1;
-    --success: #059669;
-    --warning: #D97706;
-    --shadow: rgba(12, 26, 46, 0.12);
-    --shadow-accent: rgba(2, 132, 199, 0.18);
-    --glass: rgba(255, 255, 255, 0.94);
-    --glass-border: rgba(2, 132, 199, 0.28);
-    --error: #DC2626;
-    --error-bg: rgba(220, 38, 38, 0.07);
-    --success-bg: rgba(5, 150, 105, 0.08);
-    --warning-bg: rgba(217, 119, 6, 0.08);
-    --gradient-hero: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 50%, #F0FDFA 100%);
-    --gradient-accent: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
-    --gradient-teal: linear-gradient(135deg, #0369A1 0%, #0D9488 100%);
-    --stat-1: linear-gradient(135deg, rgba(2,132,199,0.12) 0%, rgba(3,105,161,0.04) 100%);
-    --stat-2: linear-gradient(135deg, rgba(5,150,105,0.12) 0%, rgba(4,120,87,0.04) 100%);
-    --stat-3: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(79,70,229,0.04) 100%);
-    --stat-4: linear-gradient(135deg, rgba(13,148,136,0.12) 0%, rgba(15,118,110,0.04) 100%);
-  }
+  --hero-glow-secondary: rgba(184, 134, 11, 0.12);
+  --grid-line: rgba(184, 134, 11, 0.08);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -231,7 +208,40 @@
       radial-gradient(ellipse 60% 50% at 10% 60%, rgba(20,184,166,0.08), transparent);
   }
 
-  /* ── Cards ──────────────────────────────────────────────────────────── */
+  /* ── Luxury Design System Utilities ────────────────────────────────── */
+  .luxury-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1.25rem;
+    box-shadow: 0 16px 48px var(--shadow), 0 0 24px rgba(217, 173, 86, 0.08);
+  }
+
+  .luxury-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    box-shadow: 0 8px 32px var(--shadow);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .luxury-card:hover {
+    border-color: rgba(217, 173, 86, 0.55);
+    box-shadow: 0 16px 40px var(--shadow), 0 0 25px rgba(217, 173, 86, 0.18);
+    transform: translateY(-2px);
+  }
+
+  .luxury-border-glow {
+    border: 1px solid rgba(217, 173, 86, 0.45);
+    box-shadow: 0 0 20px rgba(217, 173, 86, 0.2);
+  }
+
+  .luxury-gold-pill {
+    background: linear-gradient(135deg, #F4D58D 0%, #D9AD56 100%);
+    color: #050B16;
+    font-weight: 700;
+    box-shadow: 0 0 18px rgba(217, 173, 86, 0.45);
+  }
+
   .card {
     @apply glass-card p-6 shadow-theme;
   }
