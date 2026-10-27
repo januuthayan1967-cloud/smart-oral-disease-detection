@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 /* ── Refined SVG Icon Set ─────────────────────────────────────────────────── */
 const Icons = {
@@ -75,6 +76,8 @@ const Icons = {
 
 export default function Sidebar({ isOpen, onClose }) {
   const { user, isAdmin, isDentist, isPharmacy } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const location = useLocation();
 
   // Primary active dashboard route
@@ -110,8 +113,11 @@ export default function Sidebar({ isOpen, onClose }) {
   ];
 
   const pharmacyMainModules = [
-    { to: '/pharmacy', label: 'Orders & Inventory', Icon: Icons.Medicine },
+    { to: '/pharmacy?tab=direct-orders', label: 'Orders & Inventory', Icon: Icons.Medicine },
     { to: '/medicines', label: 'Marketplace', Icon: Icons.Education },
+    { to: '/pharmacy?tab=orders', label: 'Prescription Orders', Icon: Icons.Appointments },
+    { to: '/pharmacy?tab=history', label: 'Order History', Icon: Icons.Reports },
+    { to: '/pharmacy?tab=profile', label: 'Profile', Icon: Icons.Patients },
   ];
 
   const mainModules = isAdmin
@@ -135,7 +141,7 @@ export default function Sidebar({ isOpen, onClose }) {
     : isDentist
     ? 'Dentist'
     : isPharmacy
-    ? 'Pharmacist'
+    ? 'Pharmacy'
     : 'Patient';
 
   const isDashboardActive =
@@ -146,8 +152,12 @@ export default function Sidebar({ isOpen, onClose }) {
     <aside
       className="flex h-full flex-col select-none overflow-y-auto overflow-x-hidden scrollbar-thin"
       style={{
-        background: 'linear-gradient(180deg, #071322 0%, #050B16 100%)',
-        borderRight: '1px solid rgba(217, 173, 86, 0.25)',
+        background: isDark
+          ? 'linear-gradient(180deg, #071322 0%, #050B16 100%)'
+          : 'linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%)',
+        borderRight: isDark
+          ? '1px solid rgba(217, 173, 86, 0.25)'
+          : '1px solid rgba(198, 156, 72, 0.28)',
       }}
     >
       {/* ── Brand Header ──────────────────────────────────────────────── */}
@@ -157,7 +167,7 @@ export default function Sidebar({ isOpen, onClose }) {
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl shadow-[0_0_20px_rgba(217,173,86,0.35)]"
             style={{
               background: 'linear-gradient(135deg, rgba(244, 213, 141, 0.25) 0%, rgba(217, 173, 86, 0.1) 100%)',
-              border: '1px solid rgba(217, 173, 86, 0.55)',
+              border: isDark ? '1px solid rgba(217, 173, 86, 0.55)' : '1px solid rgba(198, 156, 72, 0.5)',
             }}
           >
             {/* Golden Tooth Logo SVG */}
@@ -178,12 +188,16 @@ export default function Sidebar({ isOpen, onClose }) {
           </div>
           <div className="min-w-0">
             <h1
-              className="text-xl font-bold tracking-tight leading-tight"
+              className="text-xl font-bold tracking-tight leading-tight bg-clip-text text-transparent"
               style={{
                 fontFamily: 'Outfit, sans-serif',
-                background: 'linear-gradient(135deg, #FFFFFF 30%, #F4D58D 100%)',
+                backgroundImage: isDark
+                  ? 'linear-gradient(135deg, #FFFFFF 30%, #F4D58D 100%)'
+                  : 'linear-gradient(135deg, #14243A 40%, #C69C48 100%)',
                 WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
+                color: 'transparent',
               }}
             >
               OralAI
@@ -204,39 +218,59 @@ export default function Sidebar({ isOpen, onClose }) {
             onClick={onClose}
             className={`group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold transition-all duration-200 ${
               isDashboardActive
-                ? 'shadow-[0_0_24px_rgba(217,173,86,0.35)] text-white'
+                ? isDark
+                  ? 'shadow-[0_0_24px_rgba(217,173,86,0.35)] text-white'
+                  : 'shadow-[0_4px_16px_rgba(198,156,72,0.25)] text-[#14243A] font-extrabold'
                 : 'text-theme-muted hover:text-theme-text hover:bg-theme-surface/50'
             }`}
             style={{
               background: isDashboardActive
-                ? 'linear-gradient(135deg, rgba(217, 173, 86, 0.3) 0%, rgba(244, 213, 141, 0.12) 100%)'
+                ? isDark
+                  ? 'linear-gradient(135deg, rgba(217, 173, 86, 0.3) 0%, rgba(244, 213, 141, 0.12) 100%)'
+                  : 'linear-gradient(135deg, rgba(198, 156, 72, 0.22) 0%, rgba(244, 213, 141, 0.35) 100%)'
                 : 'transparent',
               border: isDashboardActive
-                ? '1px solid rgba(244, 213, 141, 0.65)'
+                ? isDark
+                  ? '1px solid rgba(244, 213, 141, 0.65)'
+                  : '1px solid rgba(198, 156, 72, 0.55)'
                 : '1px solid transparent',
             }}
           >
             <span
               className="shrink-0 transition-colors"
-              style={{ color: isDashboardActive ? '#F4D58D' : 'var(--muted)' }}
+              style={{
+                color: isDashboardActive
+                  ? isDark
+                    ? '#F4D58D'
+                    : '#C69C48'
+                  : 'var(--muted)',
+              }}
             >
               <Icons.Dashboard />
             </span>
             <span className="font-bold tracking-wide">Dashboard</span>
             {isDashboardActive && (
-              <span className="ml-auto h-2 w-2 rounded-full bg-[#F4D58D] shadow-[0_0_8px_#F4D58D]" />
+              <span
+                className="ml-auto h-2 w-2 rounded-full"
+                style={{
+                  background: isDark ? '#F4D58D' : '#C69C48',
+                  boxShadow: `0 0 8px ${isDark ? '#F4D58D' : '#C69C48'}`,
+                }}
+              />
             )}
           </NavLink>
         </div>
 
         {/* Section: MAIN MODULES */}
         <div>
-          <p className="px-3 text-[10px] font-bold tracking-widest text-[#D9AD56]/80 uppercase mb-2">
+          <p
+            className="px-3 text-[10px] font-bold tracking-widest uppercase mb-2"
+            style={{ color: isDark ? 'rgba(217, 173, 86, 0.85)' : '#C69C48' }}
+          >
             Main Modules
           </p>
           <nav className="space-y-1" aria-label="Main modules">
             {mainModules.map((item, idx) => {
-              const fullTarget = item.to;
               const isMatch =
                 location.pathname === item.to.split('?')[0] &&
                 (!item.to.includes('?tab=') ||
@@ -250,14 +284,22 @@ export default function Sidebar({ isOpen, onClose }) {
                   onClick={onClose}
                   className={`group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                     isActive
-                      ? 'text-[#F4D58D] bg-theme-surface border border-[#D9AD56]/40 shadow-[0_0_15px_rgba(217,173,86,0.18)]'
-                      : 'text-theme-muted hover:text-theme-text hover:bg-theme-surface/40'
+                      ? isDark
+                        ? 'text-[#F4D58D] bg-theme-surface border border-[#D9AD56]/40 shadow-[0_0_15px_rgba(217,173,86,0.18)]'
+                        : 'text-[#087F9C] bg-[#FFFFFF] border border-[#087F9C]/30 shadow-[0_4px_16px_rgba(8,127,156,0.1)] font-bold'
+                      : 'text-theme-muted hover:text-theme-text hover:bg-theme-surface/50'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <span
                       className="shrink-0 transition-colors"
-                      style={{ color: isActive ? '#F4D58D' : 'var(--muted)' }}
+                      style={{
+                        color: isActive
+                          ? isDark
+                            ? '#F4D58D'
+                            : '#087F9C'
+                          : 'var(--muted)',
+                      }}
                     >
                       <item.Icon />
                     </span>
@@ -272,7 +314,10 @@ export default function Sidebar({ isOpen, onClose }) {
 
         {/* Section: SETTINGS */}
         <div>
-          <p className="px-3 text-[10px] font-bold tracking-widest text-[#D9AD56]/80 uppercase mb-2">
+          <p
+            className="px-3 text-[10px] font-bold tracking-widest uppercase mb-2"
+            style={{ color: isDark ? 'rgba(217, 173, 86, 0.85)' : '#C69C48' }}
+          >
             Settings
           </p>
           <NavLink
@@ -281,8 +326,10 @@ export default function Sidebar({ isOpen, onClose }) {
             className={({ isActive }) =>
               `group flex items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                 isActive
-                  ? 'text-[#F4D58D] bg-theme-surface border border-[#D9AD56]/40 shadow-[0_0_15px_rgba(217,173,86,0.18)]'
-                  : 'text-theme-muted hover:text-theme-text hover:bg-theme-surface/40'
+                  ? isDark
+                    ? 'text-[#F4D58D] bg-theme-surface border border-[#D9AD56]/40 shadow-[0_0_15px_rgba(217,173,86,0.18)]'
+                    : 'text-[#087F9C] bg-[#FFFFFF] border border-[#087F9C]/30 shadow-[0_4px_16px_rgba(8,127,156,0.1)] font-bold'
+                  : 'text-theme-muted hover:text-theme-text hover:bg-theme-surface/50'
               }`
             }
           >
@@ -297,44 +344,92 @@ export default function Sidebar({ isOpen, onClose }) {
         </div>
       </div>
 
-      {/* ── Bottom 3D Glowing Tooth Artwork ─────────────────────────── */}
+      {/* ── Bottom 3D Realistic Holographic Tooth Artwork ───────────── */}
       <div className="px-4 pb-2">
         <div
-          className="relative overflow-hidden rounded-2xl p-4 flex flex-col items-center justify-center text-center"
+          className="relative overflow-hidden rounded-2xl p-3.5 flex flex-col items-center justify-center text-center"
           style={{
-            background: 'radial-gradient(ellipse at center, rgba(217, 173, 86, 0.12) 0%, rgba(5, 11, 22, 0.8) 100%)',
-            border: '1px solid rgba(217, 173, 86, 0.22)',
+            background: isDark
+              ? 'radial-gradient(ellipse at center, rgba(0, 201, 232, 0.08) 0%, rgba(5, 11, 22, 0.85) 100%)'
+              : 'radial-gradient(ellipse at center, rgba(8, 127, 156, 0.08) 0%, rgba(248, 250, 252, 0.95) 100%)',
+            border: isDark
+              ? '1px solid rgba(217, 173, 86, 0.28)'
+              : '1px solid rgba(198, 156, 72, 0.28)',
+            boxShadow: isDark
+              ? '0 8px 24px rgba(0, 0, 0, 0.5), inset 0 0 16px rgba(0, 201, 232, 0.08)'
+              : '0 6px 18px rgba(20, 36, 58, 0.05), inset 0 0 16px rgba(8, 127, 156, 0.04)',
           }}
         >
-          {/* Ambient light ring */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050B16] via-transparent to-transparent pointer-events-none" />
-          
-          <img
-            src="/assets/3d-tooth.png"
-            alt="OralAI 3D AI Dental Model"
-            className="h-20 w-auto object-contain drop-shadow-[0_0_18px_rgba(217,173,86,0.4)] animate-float"
-            onError={(e) => {
-              e.target.style.display = 'none';
-            }}
+          {/* Subtle ambient core */}
+          <div
+            className={`absolute inset-0 pointer-events-none ${
+              isDark
+                ? 'bg-gradient-to-t from-[#050B16] via-transparent to-transparent'
+                : 'bg-gradient-to-t from-[#F8FAFC] via-transparent to-transparent'
+            }`}
           />
-          <span className="text-[10px] font-semibold text-[#D9AD56]/90 tracking-wide mt-1">
-            AI Oral Diagnostic Engine
+
+          <div className="relative w-24 h-24 flex items-center justify-center">
+            <img
+              src={isPharmacy ? '/assets/pharmacy-hero-composition.jpg' : '/assets/3d-tooth-realistic.jpg'}
+              alt={isPharmacy ? 'Pharmacy Decorative Medicine Artwork' : 'OralAI Anatomically Realistic 3D Dental Hologram'}
+              className={`w-full h-full object-contain ${isPharmacy ? 'rounded-xl' : 'rounded-full animate-float'} drop-shadow-[0_0_16px_rgba(217,173,86,0.35)]`}
+              style={{
+                filter: 'contrast(1.08) brightness(1.04)',
+                ...(!isPharmacy ? {
+                  mixBlendMode: isDark ? 'screen' : 'normal',
+                  maskImage: 'radial-gradient(circle at center, black 65%, transparent 95%)',
+                  WebkitMaskImage: 'radial-gradient(circle at center, black 65%, transparent 95%)',
+                } : {}),
+              }}
+              onError={(e) => {
+                e.currentTarget.src = '/assets/3d-tooth.png';
+              }}
+            />
+          </div>
+          <span
+            className="text-[10px] font-semibold tracking-wide mt-0.5"
+            style={{ color: isDark ? '#F4D58D' : '#14243A' }}
+          >
+            {isPharmacy ? 'Pharmacy Care Hub' : 'AI Oral Diagnostic Engine'}
           </span>
         </div>
       </div>
 
-      {/* ── User Profile Footer Card ─────────────────────────────────── */}
-      <div className="p-3 border-t border-theme-border/30">
+      {/* ── User Profile Footer Card with Flowing Golden Wave Backdrop ── */}
+      <div className="relative p-3 border-t border-theme-border/30 overflow-hidden">
+        {/* Golden Silk Light Wave Ribbon Accent */}
         <div
-          className="flex items-center gap-3 rounded-xl p-2.5"
+          className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(135deg, rgba(16, 36, 58, 0.9) 0%, rgba(11, 27, 45, 0.95) 100%)',
-            border: '1px solid rgba(217, 173, 86, 0.25)',
+            backgroundImage: "url('/assets/golden-wave-ribbon.jpg')",
+            backgroundPosition: 'bottom center',
+            backgroundSize: 'cover',
+            mixBlendMode: isDark ? 'screen' : 'multiply',
+            opacity: isDark ? 0.4 : 0.18,
+          }}
+        />
+
+        <div
+          className="relative z-10 flex items-center gap-3 rounded-xl p-2.5 backdrop-blur-sm"
+          style={{
+            background: isDark
+              ? 'linear-gradient(135deg, rgba(16, 36, 58, 0.88) 0%, rgba(11, 27, 45, 0.94) 100%)'
+              : 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 253, 248, 0.98) 100%)',
+            border: isDark
+              ? '1px solid rgba(217, 173, 86, 0.3)'
+              : '1px solid rgba(198, 156, 72, 0.28)',
+            boxShadow: isDark
+              ? '0 8px 24px rgba(0, 0, 0, 0.4), 0 0 12px rgba(217, 173, 86, 0.1)'
+              : '0 6px 20px rgba(20, 36, 58, 0.05), 0 0 12px rgba(198, 156, 72, 0.06)',
           }}
         >
           <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-[#050B16] shadow-sm"
-            style={{ background: 'linear-gradient(135deg, #F4D58D 0%, #D9AD56 100%)' }}
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold shadow-sm"
+            style={{
+              background: 'linear-gradient(135deg, #F4D58D 0%, #D9AD56 100%)',
+              color: '#050B16',
+            }}
           >
             {initials}
           </div>
@@ -347,8 +442,8 @@ export default function Sidebar({ isOpen, onClose }) {
             </p>
           </div>
           <div className="flex items-center gap-1.5 shrink-0 pr-1">
-            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10B981] animate-pulse" />
-            <span className="text-[10px] font-semibold text-emerald-400">Online</span>
+            <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10B981] animate-pulse" />
+            <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">Online</span>
           </div>
         </div>
       </div>
@@ -361,8 +456,12 @@ export default function Sidebar({ isOpen, onClose }) {
       <div
         className="hidden w-64 shrink-0 overflow-hidden rounded-2xl md:block shadow-[0_16px_48px_rgba(0,0,0,0.6)]"
         style={{
-          border: '1px solid rgba(217, 173, 86, 0.35)',
-          boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(217, 173, 86, 0.1)',
+          border: isDark
+            ? '1px solid rgba(217, 173, 86, 0.35)'
+            : '1px solid rgba(198, 156, 72, 0.28)',
+          boxShadow: isDark
+            ? '0 0 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(217, 173, 86, 0.1)'
+            : '0 10px 30px rgba(20, 36, 58, 0.06), 0 0 15px rgba(198, 156, 72, 0.06)',
         }}
       >
         {sidebarContent}

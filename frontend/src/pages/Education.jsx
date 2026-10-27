@@ -233,13 +233,13 @@ export default function Education() {
                 className="cursor-pointer group h-full"
               >
                 <div
-                  className="h-full flex flex-col justify-between rounded-2xl p-5 shadow-theme transition-all duration-200 hover:-translate-y-1 hover:shadow-theme-lg"
+                  className="h-full min-w-0 overflow-hidden flex flex-col justify-between rounded-2xl p-5 shadow-theme transition-all duration-200 hover:-translate-y-1 hover:shadow-theme-lg"
                   style={{
                     background: 'var(--surface)',
                     border: '1px solid var(--border-soft)',
                   }}
                 >
-                  <div>
+                  <div className="min-w-0">
                     {/* Category & Read time */}
                     <div className="flex items-center justify-between gap-2 mb-3">
                       <span className="inline-block rounded-md border border-theme-accent/30 bg-theme-accent/10 px-2.5 py-0.5 text-[11px] font-semibold capitalize tracking-wide text-theme-accent">
@@ -259,7 +259,7 @@ export default function Education() {
                     </h3>
 
                     {/* Source Organisation Badge */}
-                    <div className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-theme-surface/80 border border-theme-border/50 px-2.5 py-1 text-[11px] font-medium text-theme-heading">
+                    <div className="mt-2 inline-flex max-w-full min-w-0 items-center gap-1.5 rounded-lg bg-theme-surface/80 border border-theme-border/50 px-2.5 py-1 text-[11px] font-medium text-theme-heading">
                       <svg className="w-3 h-3 text-emerald-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                       </svg>

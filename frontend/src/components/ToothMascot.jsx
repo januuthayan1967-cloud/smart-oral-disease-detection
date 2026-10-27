@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 /* ── Professional SVG Feature Icons ── */
 const FeatureIcons = {
@@ -41,6 +42,8 @@ export default function ToothMascot({
   const [isTouch, setIsTouch] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -79,13 +82,13 @@ export default function ToothMascot({
         ref={containerRef}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className={`oral-tooth-viewport relative flex items-center justify-center select-none w-full max-w-[880px] h-[660px] md:h-[720px] lg:h-[760px] ${className}`}
+        className={`oral-tooth-viewport relative flex items-center justify-center select-none w-full ${showDecorations ? 'max-w-[880px] h-[660px] md:h-[720px] lg:h-[760px]' : 'max-w-[440px] h-[270px] sm:h-[330px] lg:h-[420px] xl:h-[460px]'} ${className}`}
         style={{ perspective: 1200 }}
         aria-label="Decorative holographic dental visualization"
       >
         {/* ── AMBIENT HOLOGRAPHIC GLOW BEHIND TOOTH ── */}
         <div
-          className="pointer-events-none absolute inset-0 m-auto h-[480px] w-[480px] rounded-full -z-10"
+          className={`pointer-events-none absolute inset-0 m-auto rounded-full -z-10 ${showDecorations ? 'h-[480px] w-[480px] max-w-[90vw]' : 'h-[260px] w-[260px] sm:h-[320px] sm:w-[320px] lg:h-[360px] lg:w-[360px]'}`}
           style={{
             background: 'radial-gradient(circle, rgba(34, 211, 238, 0.42) 0%, rgba(6, 182, 212, 0.22) 40%, rgba(8, 47, 73, 0.1) 65%, transparent 80%)',
             filter: 'blur(56px)',
@@ -104,27 +107,26 @@ export default function ToothMascot({
                 }
           }
           transition={{ type: 'spring', stiffness: 240, damping: 22 }}
-          style={{ transformStyle: 'preserve-3d' }}
         >
           {/* ── FULLY VISIBLE CYBERNETIC PEDESTAL PLATFORM ── */}
-          <div className="oral-pedestal absolute bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none z-10">
+          <div className={`oral-pedestal absolute ${showDecorations ? 'bottom-6 md:bottom-10' : 'bottom-3 sm:bottom-5 lg:bottom-6'} left-1/2 -translate-x-1/2 flex flex-col items-center pointer-events-none z-10`}>
             {/* Vertical Cyan Light Projection Column shooting upward into tooth */}
             <div
-              className="absolute -top-52 h-64 w-80 opacity-75 blur-xl pointer-events-none"
+              className={`absolute -top-52 h-64 w-80 ${isDark ? 'opacity-25' : 'opacity-15'} blur-2xl rounded-full pointer-events-none`}
               style={{
-                background: 'radial-gradient(ellipse at 50% 100%, rgba(34, 211, 238, 0.9) 0%, rgba(6, 182, 212, 0.4) 45%, transparent 75%)',
+                background: 'radial-gradient(ellipse at 50% 100%, rgba(34, 211, 238, 0.85) 0%, rgba(6, 182, 212, 0.35) 45%, transparent 70%)',
               }}
             />
 
             {/* Floor Concentric Perspective Light Rings (Fully contained) */}
             <div
-              className="absolute bottom-0 h-24 w-[480px] md:w-[560px] rounded-[50%] border border-cyan-400/35 pointer-events-none"
+              className={`absolute bottom-0 ${showDecorations ? 'h-24 w-[480px] md:w-[560px] max-w-[92vw]' : 'h-14 w-[250px] sm:h-16 sm:w-[310px] lg:h-20 lg:w-[370px]'} rounded-[50%] border border-cyan-400/35 pointer-events-none`}
               style={{
                 boxShadow: 'inset 0 0 35px rgba(6, 182, 212, 0.35), 0 0 45px rgba(6, 182, 212, 0.3)',
               }}
             />
             <div
-              className="absolute bottom-3 h-18 w-[400px] md:w-[470px] rounded-[50%] border border-cyan-300/45 pointer-events-none"
+              className={`absolute bottom-3 ${showDecorations ? 'h-18 w-[400px] md:w-[470px] max-w-[84vw]' : 'h-11 w-[210px] sm:h-13 sm:w-[260px] lg:h-15 lg:w-[310px]'} rounded-[50%] border border-cyan-300/45 pointer-events-none`}
               style={{
                 boxShadow: '0 0 25px rgba(34, 211, 238, 0.45)',
               }}
@@ -132,7 +134,7 @@ export default function ToothMascot({
 
             {/* Outer platform glow wave */}
             <motion.div
-              className="absolute bottom-4 h-16 w-[420px] rounded-[50%] blur-md"
+              className={`absolute bottom-4 ${showDecorations ? 'h-16 w-[420px] max-w-[85vw]' : 'h-10 w-[220px] sm:h-12 sm:w-[270px] lg:h-14 lg:w-[320px]'} rounded-[50%] blur-md`}
               style={{
                 background: 'radial-gradient(ellipse, rgba(6, 182, 212, 0.75) 0%, rgba(13, 148, 136, 0.4) 45%, transparent 75%)',
               }}
@@ -149,7 +151,7 @@ export default function ToothMascot({
 
             {/* Tier 1: Metallic Lower Bevel Base Disc */}
             <div
-              className="h-16 w-[380px] md:w-[430px] rounded-[50%] border-2 border-cyan-400/50 shadow-[0_0_38px_rgba(6,182,212,0.55)] relative flex items-center justify-center"
+              className={`${showDecorations ? 'h-16 w-[380px] md:w-[430px] max-w-[82vw]' : 'h-11 w-[200px] sm:h-13 sm:w-[250px] lg:h-14 lg:w-[295px]'} rounded-[50%] border-2 border-cyan-400/50 shadow-[0_0_38px_rgba(6,182,212,0.55)] relative flex items-center justify-center`}
               style={{
                 background: 'linear-gradient(180deg, rgba(8, 47, 73, 0.95) 0%, rgba(2, 13, 24, 0.98) 100%)',
                 backdropFilter: 'blur(10px)',
@@ -174,7 +176,7 @@ export default function ToothMascot({
 
             {/* Tier 2: Inner Stepped Metallic Ring with Cyan LED Track */}
             <div
-              className="absolute bottom-6 h-10 w-[300px] md:w-[350px] rounded-[50%] border-t-2 border-cyan-300 shadow-[0_0_30px_rgba(34,211,238,0.95)]"
+              className={`absolute ${showDecorations ? 'bottom-6 h-10 w-[300px] md:w-[350px] max-w-[70vw]' : 'bottom-4 h-7 w-[160px] sm:bottom-5 sm:h-8 sm:w-[200px] lg:h-9 lg:w-[235px]'} rounded-[50%] border-t-2 border-cyan-300 shadow-[0_0_30px_rgba(34,211,238,0.95)]`}
               style={{
                 background: 'linear-gradient(180deg, rgba(14, 116, 144, 0.85) 0%, rgba(8, 47, 73, 0.95) 100%)',
               }}
@@ -182,7 +184,7 @@ export default function ToothMascot({
 
             {/* Tier 3: Core Holographic Disc with Concentric Cyan Radiance */}
             <div
-              className="absolute bottom-9 h-7 w-[230px] md:w-[270px] rounded-[50%] border border-cyan-100 shadow-[0_0_50px_rgba(34,211,238,1)]"
+              className={`absolute ${showDecorations ? 'bottom-9 h-7 w-[230px] md:w-[270px] max-w-[56vw]' : 'bottom-6 h-5 w-[125px] sm:bottom-7 sm:h-6 sm:w-[155px] lg:w-[185px]'} rounded-[50%] border border-cyan-100 shadow-[0_0_50px_rgba(34,211,238,1)]`}
               style={{
                 background: 'radial-gradient(ellipse at 50% 50%, rgba(255, 255, 255, 0.98) 0%, rgba(34, 211, 238, 0.9) 35%, rgba(6, 182, 212, 0.45) 70%, transparent 95%)',
               }}
@@ -195,7 +197,7 @@ export default function ToothMascot({
             style={{ transform: 'rotateX(70deg) rotateY(-20deg) translateY(-25px)' }}
           >
             <motion.div
-              className="h-[430px] w-[430px] rounded-full border-2 border-dashed border-cyan-400/60 shadow-[0_0_30px_rgba(6,182,212,0.5)]"
+              className={`${showDecorations ? 'h-[430px] w-[430px] max-w-[85vw] max-h-[85vw]' : 'h-[230px] w-[230px] sm:h-[280px] sm:w-[280px] lg:h-[330px] lg:w-[330px]'} rounded-full border-2 border-dashed border-cyan-400/60 shadow-[0_0_30px_rgba(6,182,212,0.5)]`}
               animate={shouldReduceMotion ? {} : { rotate: 360 }}
               transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
             >
@@ -209,7 +211,7 @@ export default function ToothMascot({
             style={{ transform: 'rotateX(68deg) rotateY(16deg) translateY(-15px)' }}
           >
             <motion.div
-              className="h-[460px] w-[460px] rounded-full border border-cyan-300/40 shadow-[0_0_35px_rgba(13,148,136,0.35)]"
+              className={`${showDecorations ? 'h-[460px] w-[460px] max-w-[90vw] max-h-[90vw]' : 'h-[250px] w-[250px] sm:h-[300px] sm:w-[300px] lg:h-[355px] lg:w-[355px]'} rounded-full border border-cyan-300/40 shadow-[0_0_35px_rgba(13,148,136,0.35)]`}
               animate={shouldReduceMotion ? {} : { rotate: -360 }}
               transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
             >
@@ -220,7 +222,7 @@ export default function ToothMascot({
 
           {/* ── 3D TOOTH CENTERPIECE (ELEVATED TO SIT GRACEFULLY ABOVE PLATFORM) ── */}
           <motion.div
-            className="oral-enamel relative z-20 flex items-center justify-center mb-20 md:mb-24 lg:mb-28"
+            className={`oral-enamel relative z-20 flex items-center justify-center ${showDecorations ? 'mb-20 md:mb-24 lg:mb-28' : 'mb-10 sm:mb-14 lg:mb-16'}`}
             animate={
               shouldReduceMotion
                 ? {}
@@ -237,57 +239,61 @@ export default function ToothMascot({
           >
             <div className="relative flex items-center justify-center">
               <div
-                className="absolute inset-0 m-auto h-[320px] w-[320px] rounded-full blur-2xl opacity-80 pointer-events-none"
+                className={`absolute inset-0 m-auto h-[260px] w-[260px] rounded-full blur-3xl ${isDark ? 'opacity-20' : 'opacity-10'} pointer-events-none`}
                 style={{
-                  background: 'radial-gradient(circle, rgba(34, 211, 238, 0.85) 0%, rgba(6, 182, 212, 0.5) 50%, transparent 80%)',
+                  background: 'radial-gradient(circle, rgba(34, 211, 238, 0.75) 0%, rgba(6, 182, 212, 0.35) 45%, transparent 70%)',
                 }}
               />
 
               <img
                 src="/assets/3d-tooth.png"
                 alt="Illuminated tooth illustration"
-                className="relative z-20 h-[320px] w-[320px] md:h-[390px] md:w-[390px] object-contain drop-shadow-[0_25px_50px_rgba(6,182,212,0.75)] pointer-events-none"
+                className={`relative z-20 ${showDecorations ? 'h-[320px] w-[320px] md:h-[390px] md:w-[390px]' : 'h-[190px] w-[190px] sm:h-[235px] sm:w-[235px] lg:h-[285px] lg:w-[285px] xl:h-[310px] xl:w-[310px]'} object-contain drop-shadow-[0_20px_40px_rgba(6,182,212,0.55)] pointer-events-none`}
                 style={{
-                  filter: 'brightness(1.12) contrast(1.1)',
+                  filter: isDark ? 'brightness(1.06) contrast(1.08)' : 'brightness(0.98) contrast(1.08)',
                 }}
               />
 
               {/* Curved Holographic HUD Arc Displays */}
-              <div
-                className="pointer-events-none absolute -bottom-2 -left-6 z-25 hidden md:flex h-16 w-28 items-center justify-center rounded-xl border border-cyan-400/50 bg-cyan-950/40 backdrop-blur-md p-1.5 shadow-[0_0_20px_rgba(6,182,212,0.4)]"
-                style={{ transform: 'perspective(400px) rotateY(20deg) rotateX(10deg)' }}
-              >
-                <div className="flex flex-col w-full h-full justify-between">
-                  <div className="flex items-center justify-between text-[8px] text-cyan-300 font-mono">
-                    <span>DENTAL ARCH</span>
-                    <span className="text-emerald-400">DECORATIVE</span>
+              {showDecorations && (
+                <>
+                  <div
+                    className="pointer-events-none absolute -bottom-2 -left-6 z-25 hidden md:flex h-16 w-28 items-center justify-center rounded-xl border border-cyan-400/50 bg-cyan-950/40 backdrop-blur-md p-1.5 shadow-[0_0_20px_rgba(6,182,212,0.4)]"
+                    style={{ transform: 'perspective(400px) rotateY(20deg) rotateX(10deg)' }}
+                  >
+                    <div className="flex flex-col w-full h-full justify-between">
+                      <div className="flex items-center justify-between text-[8px] text-cyan-300 font-mono">
+                        <span>DENTAL ARCH</span>
+                        <span className="text-emerald-400">DECORATIVE</span>
+                      </div>
+                      <div className="flex items-end gap-0.5 h-6">
+                        {[0.5, 0.9, 0.7, 1.0, 0.6, 0.8, 0.4].map((v, idx) => (
+                          <div
+                            key={idx}
+                            className="flex-1 bg-cyan-400/80 rounded-t-sm"
+                            style={{ height: `${v * 100}%` }}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-end gap-0.5 h-6">
-                    {[0.5, 0.9, 0.7, 1.0, 0.6, 0.8, 0.4].map((v, idx) => (
-                      <div
-                        key={idx}
-                        className="flex-1 bg-cyan-400/80 rounded-t-sm"
-                        style={{ height: `${v * 100}%` }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
 
-              <div
-                className="pointer-events-none absolute -bottom-2 -right-6 z-25 hidden md:flex h-16 w-28 items-center justify-center rounded-xl border border-cyan-400/50 bg-cyan-950/40 backdrop-blur-md p-1.5 shadow-[0_0_20px_rgba(6,182,212,0.4)]"
-                style={{ transform: 'perspective(400px) rotateY(-20deg) rotateX(10deg)' }}
-              >
-                <div className="flex flex-col w-full h-full justify-between">
-                  <div className="flex items-center justify-between text-[8px] text-teal-300 font-mono">
-                    <span>TELEMETRY</span>
-                    <span className="text-cyan-300">DECORATIVE</span>
+                  <div
+                    className="pointer-events-none absolute -bottom-2 -right-6 z-25 hidden md:flex h-16 w-28 items-center justify-center rounded-xl border border-cyan-400/50 bg-cyan-950/40 backdrop-blur-md p-1.5 shadow-[0_0_20px_rgba(6,182,212,0.4)]"
+                    style={{ transform: 'perspective(400px) rotateY(-20deg) rotateX(10deg)' }}
+                  >
+                    <div className="flex flex-col w-full h-full justify-between">
+                      <div className="flex items-center justify-between text-[8px] text-teal-300 font-mono">
+                        <span>TELEMETRY</span>
+                        <span className="text-cyan-300">DECORATIVE</span>
+                      </div>
+                      <div className="flex items-center justify-center text-cyan-300 text-xs font-mono">
+                        6 CATEGORIES
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-center text-cyan-300 text-xs font-mono">
-                    6 CATEGORIES
-                  </div>
-                </div>
-              </div>
+                </>
+              )}
             </div>
           </motion.div>
 

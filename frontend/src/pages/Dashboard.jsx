@@ -3,8 +3,10 @@ import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/Layout';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { predictionAPI, appointmentAPI } from '../services/api';
 import SparklineWave from '../components/dashboard/SparklineWave';
+import DentalHeroVisual from '../components/dashboard/DentalHeroVisual';
 
 /* ── Animated Count Up ──────────────────────────────────────────────── */
 function AnimatedCounter({ value }) {
@@ -177,6 +179,8 @@ const quickActions = [
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const location = useLocation();
   const [predictions, setPredictions] = useState([]);
   const [appointmentCount, setAppointmentCount] = useState(0);
@@ -214,66 +218,64 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ── Ultra-Premium Patient Welcome Banner ─────────────────────── */}
+      {/* ── Ultra-Premium Patient Welcome Banner with Golden Waves & Holographic 3D Tooth ── */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative overflow-hidden rounded-2xl mb-8 p-6 sm:p-7"
-        style={{
-          background: 'linear-gradient(135deg, rgba(8, 21, 37, 0.95) 0%, rgba(11, 27, 45, 0.95) 100%)',
-          border: '1px solid rgba(217, 173, 86, 0.35)',
-          boxShadow: '0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(244, 213, 141, 0.2)',
-        }}
+        className="luxury-hero-banner relative overflow-hidden rounded-3xl mb-8 p-6 sm:p-8"
       >
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-10 w-72 h-72 bg-[#D9AD56]/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Flowing Golden Wave Silk Background Overlay */}
+        <div
+          className={`absolute inset-0 pointer-events-none ${isDark ? 'opacity-40 sm:opacity-50' : 'opacity-25'}`}
+          style={{
+            backgroundImage: "url('/assets/golden-wave-ribbon.jpg')",
+            backgroundPosition: 'center right',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            mixBlendMode: isDark ? 'screen' : 'multiply',
+          }}
+        />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-1.5 max-w-xl">
-            <span className="text-xs font-semibold tracking-wider uppercase text-[#D9AD56]">
-              Personal Dental Health
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-heading flex items-center gap-2">
-              Welcome back, <span className="text-[#F4D58D]">{user?.name ?? 'Patient'}</span> <span className="animate-wave inline-block origin-bottom-right">👋</span>
+        {/* Ambient Volumetric Lighting Flares */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-80 h-80 bg-[#D9AD56]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className={`absolute inset-0 pointer-events-none ${
+          isDark
+            ? 'bg-gradient-to-r from-[#050B16] via-[#050B16]/75 to-transparent'
+            : 'bg-gradient-to-r from-white via-white/80 to-transparent'
+        }`} />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-xl min-w-0 flex-1">
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase font-mono ${
+              isDark
+                ? 'bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 shadow-[0_0_12px_rgba(0,201,232,0.2)]'
+                : 'bg-[#087F9C]/10 border border-[#087F9C]/30 text-[#087F9C]'
+            }`}>
+              <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-cyan-400 animate-pulse' : 'bg-[#087F9C]'}`} />
+              <span>PATIENT DENTAL HEALTH</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-heading leading-tight">
+              Welcome Back,<br />
+              <span className={
+                isDark
+                  ? 'bg-gradient-to-r from-[#F4D58D] via-[#D9AD56] to-cyan-300 bg-clip-text text-transparent'
+                  : 'bg-gradient-to-r from-[#8C6D23] via-[#C69C48] to-[#087F9C] bg-clip-text text-transparent'
+              }>
+                {user?.name ?? 'Patient'}
+              </span>
             </h1>
             <p className="text-xs sm:text-sm text-theme-muted leading-relaxed">
-              Here is your oral health overview, recent diagnostic scans and clinical care options.
+              Here is your personal oral health overview, recent diagnostic scans and clinical care options.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 shrink-0">
-            <div
-              className="hidden sm:flex flex-col items-end px-4 py-2.5 rounded-xl text-right backdrop-blur-md"
-              style={{
-                background: 'rgba(16, 36, 58, 0.65)',
-                border: '1px solid rgba(217, 173, 86, 0.25)',
-              }}
-            >
-              <span className="text-xs font-serif italic text-[#F4D58D]">
-                "Better Oral Health
-              </span>
-              <span className="text-xs font-serif italic text-white/90">
-                Brighter Smiles"
-              </span>
-            </div>
-
-            <div
-              className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl"
-              style={{
-                background: 'radial-gradient(ellipse at center, rgba(0, 201, 232, 0.15) 0%, rgba(5, 11, 22, 0.7) 100%)',
-                border: '1px solid rgba(0, 201, 232, 0.35)',
-                boxShadow: '0 0 25px rgba(0, 201, 232, 0.25)',
-              }}
-            >
-              <img
-                src="/assets/3d-tooth.png"
-                alt="Dental AI Model"
-                className="h-16 w-16 object-contain drop-shadow-[0_0_12px_rgba(0,201,232,0.5)] animate-float"
-                onError={(e) => { e.target.style.display = 'none'; }}
-              />
-            </div>
-          </div>
+          {/* Realistic 3D Holographic Tooth Visualization + Floating Quote Card */}
+          <DentalHeroVisual
+            quoteLine1="Better Oral Health"
+            quoteLine2="Brighter Smiles"
+          />
         </div>
       </motion.div>
 
@@ -287,14 +289,16 @@ export default function Dashboard() {
             transition={{ delay: i * 0.05 }}
             className="rounded-2xl p-5 relative overflow-hidden transition-all duration-200"
             style={{
-              background: 'rgba(11, 27, 45, 0.85)',
-              border: '1px solid rgba(217, 173, 86, 0.28)',
-              boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+              background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+              border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+              boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.45)' : '0 8px 24px rgba(20, 36, 58, 0.06)',
             }}
             whileHover={{
               y: -3,
-              borderColor: 'rgba(217, 173, 86, 0.65)',
-              boxShadow: '0 12px 36px rgba(0,0,0,0.6), 0 0 20px rgba(217, 173, 86, 0.2)',
+              borderColor: isDark ? 'rgba(217, 173, 86, 0.65)' : 'rgba(198, 156, 72, 0.65)',
+              boxShadow: isDark
+                ? '0 12px 36px rgba(0,0,0,0.6), 0 0 20px rgba(217, 173, 86, 0.2)'
+                : '0 12px 30px rgba(20, 36, 58, 0.12)',
             }}
           >
             <div className="flex items-center justify-between mb-2">
@@ -314,7 +318,7 @@ export default function Dashboard() {
                   <svg className="w-12 h-12 -rotate-90">
                     <circle
                       strokeWidth="3.5"
-                      stroke="rgba(217, 173, 86, 0.2)"
+                      stroke={isDark ? 'rgba(217, 173, 86, 0.2)' : 'rgba(198, 156, 72, 0.25)'}
                       fill="transparent"
                       r="18"
                       cx="24"
@@ -327,14 +331,14 @@ export default function Dashboard() {
                       animate={{ strokeDashoffset: 2 * Math.PI * 18 * (1 - parseInt(stats.health) / 100) }}
                       transition={{ duration: 1.2, ease: "easeOut" }}
                       strokeLinecap="round"
-                      stroke="#00C9E8"
+                      stroke={isDark ? '#00C9E8' : '#087F9C'}
                       fill="transparent"
                       r="18"
                       cx="24"
                       cy="24"
                     />
                   </svg>
-                  <div className="absolute text-[11px] font-black text-white font-mono">
+                  <div className={`absolute text-[11px] font-black font-mono ${isDark ? 'text-white' : 'text-[#14243A]'}`}>
                     <AnimatedCounter value={stats.health} />
                   </div>
                 </div>
@@ -348,7 +352,7 @@ export default function Dashboard() {
             </p>
             <p className="mt-1 text-2xl font-black text-theme-heading font-heading">
               {stat.key === 'patients' ? (
-                <span className="text-emerald-400 text-lg">Active Verified</span>
+                <span className={isDark ? 'text-emerald-400 text-lg' : 'text-[#16835D] text-lg'}>Active Verified</span>
               ) : stat.key === 'health' ? (
                 stats.health === '—' ? '—' : <AnimatedCounter value={stats.health} />
               ) : (
@@ -377,9 +381,9 @@ export default function Dashboard() {
                 <div
                   className="h-full rounded-2xl p-5 transition-all duration-200 flex flex-col justify-between"
                   style={{
-                    background: 'rgba(11, 27, 45, 0.85)',
-                    border: '1px solid rgba(217, 173, 86, 0.28)',
-                    boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                    background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+                    boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.45)' : '0 8px 24px rgba(20, 36, 58, 0.06)',
                   }}
                 >
                   <div>
@@ -418,11 +422,11 @@ export default function Dashboard() {
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.35 }}
-          className="rounded-2xl p-6"
+          className="rounded-2xl p-6 transition-colors"
           style={{
-            background: 'rgba(11, 27, 45, 0.85)',
-            border: '1px solid rgba(217, 173, 86, 0.28)',
-            boxShadow: '0 12px 36px rgba(0,0,0,0.45)',
+            background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+            border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+            boxShadow: isDark ? '0 12px 36px rgba(0,0,0,0.45)' : '0 8px 24px rgba(20, 36, 58, 0.06)',
           }}
         >
           <div className="mb-5 flex items-center justify-between border-b border-theme-border/30 pb-3">

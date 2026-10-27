@@ -3,6 +3,8 @@ dist/
 build/
 .env
 .env.local
+.env.*
+!.env.example
 *.log
 .DS_Store
 Thumbs.db
@@ -11,6 +13,9 @@ backend/src/uploads/*
 backend/src/reports/*
 !backend/src/reports/.gitkeep
 ai-service/__pycache__/
+__pycache__/
+.pytest_cache/
+.cache/
 ai-service/venv/
 ai-service/.venv/
 ai-service/models/*.h5
@@ -19,6 +24,8 @@ ai-service/models/*.keras
 *.pyc
 .vite/
 coverage/
+.cursor/
+.qodo/
 
 # Local Assignment & Thesis Preparation (NEVER push to GitHub)
 my assignment/

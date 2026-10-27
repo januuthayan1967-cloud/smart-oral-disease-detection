@@ -150,7 +150,7 @@ export default function Navbar({ onMenuToggle, showMenuButton = false, variant =
         style={{ borderColor: scrolled ? 'rgba(6,182,212,0.28)' : 'var(--glass-border)' }}
       >
         {/* Left: hamburger + logo */}
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-3">
           {showMenuButton && (
             <button
               type="button"
@@ -195,7 +195,7 @@ export default function Navbar({ onMenuToggle, showMenuButton = false, variant =
                 id="global-search-input"
                 type="text"
                 placeholder="Search anything (patients, appointments, reports...)"
-                className="w-full pl-10 pr-16 py-2 text-xs rounded-xl bg-theme-surface/70 border border-theme-border/40 text-theme-heading placeholder:text-theme-muted/70 focus:outline-none focus:border-[#D9AD56]/70 focus:ring-1 focus:ring-[#D9AD56]/50 transition-all shadow-inner"
+                className="w-full pl-10 pr-20 py-2 text-xs rounded-xl bg-theme-surface/70 border border-theme-border/40 text-theme-heading placeholder:text-theme-muted/70 focus:outline-none focus:border-[#D9AD56]/70 focus:ring-1 focus:ring-[#D9AD56]/50 transition-all shadow-inner"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' && e.target.value.trim()) {
                     const val = e.target.value.trim().toLowerCase();
@@ -216,7 +216,7 @@ export default function Navbar({ onMenuToggle, showMenuButton = false, variant =
             </div>
           </div>
         ) : (
-          <div className="hidden items-center gap-0.5 xl:gap-1 lg:flex bg-theme-surface/60 p-1.5 rounded-2xl border border-theme-border/40 backdrop-blur-xl shadow-sm">
+          <div className="hidden items-center gap-0.5 xl:gap-1 lg:flex bg-theme-surface/60 p-1 xl:p-1.5 rounded-2xl border border-theme-border/40 backdrop-blur-xl shadow-sm min-w-0">
             {publicLinks.map((link) => (
               <NavLink
                 key={link.to}
@@ -229,7 +229,7 @@ export default function Navbar({ onMenuToggle, showMenuButton = false, variant =
                 }}
                 className={({ isActive }) =>
                   [
-                    'relative rounded-xl px-2.5 xl:px-3.5 py-1.5 text-xs xl:text-sm font-semibold whitespace-nowrap transition-all duration-200',
+                    'relative rounded-xl px-2 xl:px-3 py-1.5 text-xs xl:text-sm font-semibold whitespace-nowrap transition-all duration-200',
                     isActive
                       ? 'text-white font-bold shadow-glow'
                       : 'text-theme-muted hover:text-theme-text hover:bg-theme-accent/5',
@@ -261,8 +261,8 @@ export default function Navbar({ onMenuToggle, showMenuButton = false, variant =
         )}
 
         {/* Right: actions */}
-        <div className="flex items-center gap-2">
-          <DateTime />
+        <div className="flex shrink-0 items-center gap-2">
+          <DateTime className={variant === 'public' ? 'xl:hidden 2xl:flex' : ''} />
           <ThemeToggle />
           <NotificationBell />
 
@@ -288,16 +288,16 @@ export default function Navbar({ onMenuToggle, showMenuButton = false, variant =
                   </span>
                 </div>
               </Link>
-              <Button variant="ghost" size="sm" onClick={handleLogout} className="text-xs">
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="shrink-0 whitespace-nowrap text-xs">
                 Logout
               </Button>
             </>
           ) : (
             <>
-              <Button variant="ghost" size="sm" onClick={() => navigate('/login')} className="hidden sm:inline-flex rounded-xl font-medium">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/login')} className="hidden sm:inline-flex shrink-0 whitespace-nowrap rounded-xl font-medium">
                 Login
               </Button>
-              <Button size="sm" onClick={() => navigate('/register')} className="rounded-xl shadow-glow">
+              <Button size="sm" onClick={() => navigate('/register')} className="shrink-0 whitespace-nowrap rounded-xl shadow-glow">
                 Get Started →
               </Button>
             </>

@@ -7,7 +7,9 @@ import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SeverityBadge from '../components/SeverityBadge';
 import { adminAPI, predictionAPI, reportAPI, appointmentAPI, educationAPI } from '../services/api';
+import { useTheme } from '../context/ThemeContext';
 import SparklineWave from '../components/dashboard/SparklineWave';
+import DentalHeroVisual from '../components/dashboard/DentalHeroVisual';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -43,6 +45,8 @@ function AnimatedCounter({ value }) {
 }
 
 export default function AdminDashboard() {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [searchParams] = useSearchParams();
   const tabQuery = searchParams.get('tab');
   const [data, setData] = useState(null);
@@ -418,7 +422,7 @@ export default function AdminDashboard() {
     datasets: [{
       data: charts.diseaseDistribution?.map((d) => d.count) || [],
       backgroundColor: diseaseColors.slice(0, charts.diseaseDistribution?.length || 6),
-      borderColor: '#0B1B2D',
+      borderColor: isDark ? '#0B1B2D' : '#FFFFFF',
       borderWidth: 2,
       hoverOffset: 6,
     }],
@@ -537,69 +541,64 @@ export default function AdminDashboard() {
 
   return (
     <Layout>
-      {/* ── Ultra-Premium Welcome Banner ─────────────────────────────── */}
+      {/* ── Ultra-Premium Welcome Banner with Golden Waves & Holographic 3D Tooth ── */}
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="relative overflow-hidden rounded-2xl mb-6 p-6 sm:p-7"
-        style={{
-          background: 'linear-gradient(135deg, rgba(8, 21, 37, 0.95) 0%, rgba(11, 27, 45, 0.95) 100%)',
-          border: '1px solid rgba(217, 173, 86, 0.35)',
-          boxShadow: '0 16px 40px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(244, 213, 141, 0.2)',
-        }}
+        className="luxury-hero-banner relative overflow-hidden rounded-3xl mb-8 p-6 sm:p-8"
       >
-        {/* Background glow flares */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-10 w-72 h-72 bg-[#D9AD56]/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Flowing Golden Wave Silk Background Overlay */}
+        <div
+          className={`absolute inset-0 pointer-events-none ${isDark ? 'opacity-40 sm:opacity-50' : 'opacity-25'}`}
+          style={{
+            backgroundImage: "url('/assets/golden-wave-ribbon.jpg')",
+            backgroundPosition: 'center right',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat',
+            mixBlendMode: isDark ? 'screen' : 'multiply',
+          }}
+        />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div className="space-y-1.5 max-w-xl">
-            <span className="text-xs font-semibold tracking-wider uppercase text-[#D9AD56]">
-              Welcome Back,
-            </span>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-heading flex items-center gap-2">
-              System Admin <span className="animate-wave inline-block origin-bottom-right">👋</span>
+        {/* Ambient Volumetric Lighting Flares */}
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-10 w-80 h-80 bg-[#D9AD56]/15 rounded-full blur-3xl pointer-events-none" />
+        <div className={`absolute inset-0 pointer-events-none ${
+          isDark
+            ? 'bg-gradient-to-r from-[#050B16] via-[#050B16]/75 to-transparent'
+            : 'bg-gradient-to-r from-white via-white/80 to-transparent'
+        }`} />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-3 max-w-xl min-w-0 flex-1">
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase font-mono ${
+              isDark
+                ? 'bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 shadow-[0_0_12px_rgba(0,201,232,0.2)]'
+                : 'bg-[#087F9C]/10 border border-[#087F9C]/30 text-[#087F9C]'
+            }`}>
+              <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-cyan-400 animate-pulse' : 'bg-[#087F9C]'}`} />
+              <span>ADMIN DASHBOARD</span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-heading leading-tight">
+              Welcome Back,<br />
+              <span className={
+                isDark
+                  ? 'bg-gradient-to-r from-[#F4D58D] via-[#D9AD56] to-cyan-300 bg-clip-text text-transparent'
+                  : 'bg-gradient-to-r from-[#8C6D23] via-[#C69C48] to-[#087F9C] bg-clip-text text-transparent'
+              }>
+                System Admin
+              </span>
             </h1>
             <p className="text-xs sm:text-sm text-theme-muted leading-relaxed">
-              Manage your dental AI platform, patients, appointments and insights all in one place.
+              Manage your dental AI platform, users, appointments and insights all in one place.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 shrink-0">
-            {/* Quote Pill */}
-            <div
-              className="hidden sm:flex flex-col items-end px-4 py-2.5 rounded-xl text-right backdrop-blur-md"
-              style={{
-                background: 'rgba(16, 36, 58, 0.65)',
-                border: '1px solid rgba(217, 173, 86, 0.25)',
-              }}
-            >
-              <span className="text-xs font-serif italic text-[#F4D58D]">
-                "Better Oral Health
-              </span>
-              <span className="text-xs font-serif italic text-white/90">
-                Brighter Smiles"
-              </span>
-            </div>
-
-            {/* 3D Tooth Artwork */}
-            <div
-              className="relative flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl"
-              style={{
-                background: 'radial-gradient(ellipse at center, rgba(0, 201, 232, 0.15) 0%, rgba(5, 11, 22, 0.7) 100%)',
-                border: '1px solid rgba(0, 201, 232, 0.35)',
-                boxShadow: '0 0 25px rgba(0, 201, 232, 0.25)',
-              }}
-            >
-              <img
-                src="/assets/3d-tooth.png"
-                alt="3D Dental AI Model"
-                className="h-16 w-16 object-contain drop-shadow-[0_0_12px_rgba(0,201,232,0.5)]"
-                onError={(e) => { e.target.style.display = 'none'; }}
-              />
-            </div>
-          </div>
+          {/* Realistic 3D Holographic Tooth Visualization + Floating Quote Card */}
+          <DentalHeroVisual
+            quoteLine1="Better Oral Health"
+            quoteLine2="Brighter Smiles"
+          />
         </div>
       </motion.div>
 
@@ -654,7 +653,11 @@ export default function AdminDashboard() {
         {/* Functional Export Report Button */}
         <button
           onClick={() => window.print()}
-          className="inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all shrink-0 hover:bg-[#D9AD56]/10 text-[#F4D58D] border border-[#D9AD56]/50 shadow-[0_0_12px_rgba(217,173,86,0.15)]"
+          className={`inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold transition-all shrink-0 border shadow-[0_0_12px_rgba(217,173,86,0.15)] ${
+            isDark
+              ? 'hover:bg-[#D9AD56]/10 text-[#F4D58D] border-[#D9AD56]/50'
+              : 'hover:bg-[#C69C48]/10 text-[#8C6D23] border-[#C69C48]/60 bg-[#FFFDF8]'
+          }`}
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -682,18 +685,28 @@ export default function AdminDashboard() {
                   transition={{ delay: i * 0.04 }}
                   className="relative overflow-hidden rounded-2xl p-4 transition-all duration-200"
                   style={{
-                    background: 'rgba(11, 27, 45, 0.85)',
-                    border: '1px solid rgba(217, 173, 86, 0.28)',
-                    boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                    background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+                    border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+                    boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.45)' : '0 8px 24px rgba(20, 36, 58, 0.06)',
                   }}
                   whileHover={{
                     y: -3,
-                    borderColor: 'rgba(217, 173, 86, 0.65)',
-                    boxShadow: '0 12px 36px rgba(0,0,0,0.6), 0 0 20px rgba(217, 173, 86, 0.2)',
+                    borderColor: isDark ? 'rgba(217, 173, 86, 0.65)' : 'rgba(198, 156, 72, 0.65)',
+                    boxShadow: isDark
+                      ? '0 12px 36px rgba(0,0,0,0.6), 0 0 20px rgba(217, 173, 86, 0.2)'
+                      : '0 12px 30px rgba(20, 36, 58, 0.12)',
                   }}
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex flex-col justify-between h-full">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[11px] font-semibold text-theme-muted uppercase tracking-wider leading-snug">
+                          {card.label}
+                        </p>
+                        <p className="text-2xl font-black text-theme-heading font-heading mt-1">
+                          <AnimatedCounter value={card.value} />
+                        </p>
+                      </div>
                       <div
                         className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
                         style={{
@@ -704,17 +717,9 @@ export default function AdminDashboard() {
                       >
                         {card.icon}
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-[11px] font-semibold text-theme-muted uppercase tracking-wider truncate">
-                          {card.label}
-                        </p>
-                        <p className="text-2xl font-black text-theme-heading font-heading mt-0.5">
-                          <AnimatedCounter value={card.value} />
-                        </p>
-                      </div>
                     </div>
                     {/* Real SVG sparkline wave */}
-                    <SparklineWave color={card.color} id={card.label} />
+                    <SparklineWave color={card.color} id={card.label} className="w-full h-7 mt-3" />
                   </div>
                 </motion.div>
               ))}
@@ -724,11 +729,11 @@ export default function AdminDashboard() {
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
               {/* Disease Distribution Card */}
               <div
-                className="rounded-2xl p-5"
+                className="min-w-0 overflow-hidden rounded-2xl p-5 transition-colors"
                 style={{
-                  background: 'rgba(11, 27, 45, 0.85)',
-                  border: '1px solid rgba(217, 173, 86, 0.28)',
-                  boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                  background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+                  boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.45)' : '0 8px 24px rgba(20, 36, 58, 0.06)',
                 }}
               >
                 <div className="flex items-center justify-between mb-4 pb-2 border-b border-theme-border/30">
@@ -754,11 +759,11 @@ export default function AdminDashboard() {
                           plugins: {
                             legend: { display: false },
                             tooltip: {
-                              backgroundColor: '#0B1B2D',
-                              borderColor: 'rgba(217, 173, 86, 0.5)',
+                              backgroundColor: isDark ? '#0B1B2D' : '#FFFFFF',
+                              borderColor: isDark ? 'rgba(217, 173, 86, 0.5)' : 'rgba(198, 156, 72, 0.5)',
                               borderWidth: 1,
-                              titleColor: '#F4D58D',
-                              bodyColor: '#F8FAFC',
+                              titleColor: isDark ? '#F4D58D' : '#8C6D23',
+                              bodyColor: isDark ? '#F8FAFC' : '#14243A',
                               padding: 8,
                             },
                           },
@@ -805,11 +810,11 @@ export default function AdminDashboard() {
 
               {/* Monthly Predictions Card */}
               <div
-                className="rounded-2xl p-5"
+                className="min-w-0 overflow-hidden rounded-2xl p-5 transition-colors"
                 style={{
-                  background: 'rgba(11, 27, 45, 0.85)',
-                  border: '1px solid rgba(217, 173, 86, 0.28)',
-                  boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                  background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+                  boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.45)' : '0 8px 24px rgba(20, 36, 58, 0.06)',
                 }}
               >
                 <div className="flex items-center justify-between mb-4 pb-2 border-b border-theme-border/30">
@@ -823,7 +828,7 @@ export default function AdminDashboard() {
                 </div>
 
                 {charts.monthlyPredictions?.length > 0 ? (
-                  <div className="h-56 pt-2">
+                  <div className="relative w-full min-w-0 h-56 pt-2">
                     <Bar
                       data={monthlyChart}
                       options={{
@@ -832,22 +837,22 @@ export default function AdminDashboard() {
                         plugins: {
                           legend: { display: false },
                           tooltip: {
-                            backgroundColor: '#0B1B2D',
-                            borderColor: 'rgba(217, 173, 86, 0.5)',
+                            backgroundColor: isDark ? '#0B1B2D' : '#FFFFFF',
+                            borderColor: isDark ? 'rgba(217, 173, 86, 0.5)' : 'rgba(198, 156, 72, 0.5)',
                             borderWidth: 1,
-                            titleColor: '#F4D58D',
-                            bodyColor: '#F8FAFC',
+                            titleColor: isDark ? '#F4D58D' : '#8C6D23',
+                            bodyColor: isDark ? '#F8FAFC' : '#14243A',
                             padding: 8,
                           },
                         },
                         scales: {
                           x: {
                             grid: { display: false },
-                            ticks: { color: '#94A9BF', font: { size: 10 } },
+                            ticks: { color: isDark ? '#94A9BF' : '#52657A', font: { size: 10 } },
                           },
                           y: {
-                            grid: { color: 'rgba(217, 173, 86, 0.08)' },
-                            ticks: { color: '#94A9BF', font: { size: 10 } },
+                            grid: { color: isDark ? 'rgba(217, 173, 86, 0.08)' : 'rgba(198, 156, 72, 0.12)' },
+                            ticks: { color: isDark ? '#94A9BF' : '#52657A', font: { size: 10 } },
                           },
                         },
                       }}
@@ -862,10 +867,11 @@ export default function AdminDashboard() {
             {/* ── Order & Consultation Status Secondary Metrics ─────────── */}
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
               <div
-                className="rounded-2xl p-5"
+                className="rounded-2xl p-5 transition-colors"
                 style={{
-                  background: 'rgba(11, 27, 45, 0.85)',
-                  border: '1px solid rgba(217, 173, 86, 0.28)',
+                  background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+                  boxShadow: isDark ? 'none' : '0 4px 16px rgba(20, 36, 58, 0.05)',
                 }}
               >
                 <h3 className="text-xs font-bold text-theme-heading uppercase tracking-wider font-heading mb-3">
@@ -892,10 +898,11 @@ export default function AdminDashboard() {
               </div>
 
               <div
-                className="rounded-2xl p-5"
+                className="rounded-2xl p-5 transition-colors"
                 style={{
-                  background: 'rgba(11, 27, 45, 0.85)',
-                  border: '1px solid rgba(217, 173, 86, 0.28)',
+                  background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+                  boxShadow: isDark ? 'none' : '0 4px 16px rgba(20, 36, 58, 0.05)',
                 }}
               >
                 <h3 className="text-xs font-bold text-theme-heading uppercase tracking-wider font-heading mb-3">
@@ -926,11 +933,11 @@ export default function AdminDashboard() {
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
               {/* Card 1: Recent Patients */}
               <div
-                className="rounded-2xl p-5 flex flex-col"
+                className="rounded-2xl p-5 flex flex-col transition-colors"
                 style={{
-                  background: 'rgba(11, 27, 45, 0.85)',
-                  border: '1px solid rgba(217, 173, 86, 0.28)',
-                  boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                  background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+                  boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.45)' : '0 8px 24px rgba(20, 36, 58, 0.06)',
                 }}
               >
                 <div className="flex items-center justify-between mb-3">
@@ -977,11 +984,11 @@ export default function AdminDashboard() {
 
               {/* Card 2: Recent Appointments */}
               <div
-                className="rounded-2xl p-5 flex flex-col"
+                className="rounded-2xl p-5 flex flex-col transition-colors"
                 style={{
-                  background: 'rgba(11, 27, 45, 0.85)',
-                  border: '1px solid rgba(217, 173, 86, 0.28)',
-                  boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                  background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+                  boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.45)' : '0 8px 24px rgba(20, 36, 58, 0.06)',
                 }}
               >
                 <div className="flex items-center justify-between mb-3">
@@ -1032,11 +1039,11 @@ export default function AdminDashboard() {
 
               {/* Card 3: Recent Orders */}
               <div
-                className="rounded-2xl p-5 flex flex-col"
+                className="rounded-2xl p-5 flex flex-col transition-colors"
                 style={{
-                  background: 'rgba(11, 27, 45, 0.85)',
-                  border: '1px solid rgba(217, 173, 86, 0.28)',
-                  boxShadow: '0 8px 30px rgba(0,0,0,0.45)',
+                  background: isDark ? 'rgba(11, 27, 45, 0.85)' : '#FFFFFF',
+                  border: isDark ? '1px solid rgba(217, 173, 86, 0.28)' : '1px solid rgba(198, 156, 72, 0.28)',
+                  boxShadow: isDark ? '0 8px 30px rgba(0,0,0,0.45)' : '0 8px 24px rgba(20, 36, 58, 0.06)',
                 }}
               >
                 <div className="flex items-center justify-between mb-3">

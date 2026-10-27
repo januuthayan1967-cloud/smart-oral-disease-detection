@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import SparklineWave from '../components/dashboard/SparklineWave';
+import DentalHeroVisual from '../components/dashboard/DentalHeroVisual';
 import { dentistDashboardAPI, prescriptionAPI, appointmentAPI } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -55,6 +57,8 @@ function AnimatedCounter({ value, duration = 1.0, prefix = '', suffix = '' }) {
 
 export default function DentistDashboard() {
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState('consultations');
   const [consultationFilter, setConsultationFilter] = useState('all');
   const [patients, setPatients] = useState([]);
@@ -289,43 +293,66 @@ export default function DentistDashboard() {
         {/* ========================================================= */}
         {/* TOP WELCOME BANNER (Ultra-Premium Dark Navy x Champagne Gold) */}
         {/* ========================================================= */}
-        <div className="luxury-card relative overflow-hidden rounded-3xl border border-oral-gold/30 bg-gradient-to-r from-oral-surface via-oral-surface/95 to-oral-card p-6 sm:p-8 shadow-gold-card">
-          <div className="absolute -right-16 -top-16 h-72 w-72 rounded-full bg-oral-gold/10 blur-3xl pointer-events-none" />
-          <div className="absolute right-48 -bottom-16 h-64 w-64 rounded-full bg-oral-cyan/10 blur-3xl pointer-events-none" />
+        {/* ── Ultra-Premium Dentist Welcome Banner with Golden Waves & Holographic 3D Tooth ── */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="luxury-hero-banner relative overflow-hidden rounded-3xl mb-8 p-6 sm:p-8"
+        >
+          {/* Flowing Golden Wave Silk Background Overlay */}
+          <div
+            className={`absolute inset-0 pointer-events-none ${isDark ? 'opacity-40 sm:opacity-50' : 'opacity-25'}`}
+            style={{
+              backgroundImage: "url('/assets/golden-wave-ribbon.jpg')",
+              backgroundPosition: 'center right',
+              backgroundSize: 'cover',
+              backgroundRepeat: 'no-repeat',
+              mixBlendMode: isDark ? 'screen' : 'multiply',
+            }}
+          />
 
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-            <div className="space-y-3 max-w-3xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-oral-gold/10 border border-oral-gold/30 text-oral-gold text-xs font-semibold tracking-wide uppercase">
-                <span className="w-2 h-2 rounded-full bg-oral-gold animate-pulse" />
-                <span>Verified Dental Specialist • Clinical AI Operations</span>
+          {/* Ambient Volumetric Lighting Flares */}
+          <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 right-10 w-80 h-80 bg-[#D9AD56]/15 rounded-full blur-3xl pointer-events-none" />
+          <div className={`absolute inset-0 pointer-events-none ${
+            isDark
+              ? 'bg-gradient-to-r from-[#050B16] via-[#050B16]/75 to-transparent'
+              : 'bg-gradient-to-r from-white via-white/80 to-transparent'
+          }`} />
+
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="space-y-3 max-w-xl min-w-0 flex-1">
+              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase font-mono ${
+                isDark
+                  ? 'bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 shadow-[0_0_12px_rgba(0,201,232,0.2)]'
+                : 'bg-[#087F9C]/10 border border-[#087F9C]/30 text-[#087F9C]'
+              }`}>
+                <span className={`w-2 h-2 rounded-full ${isDark ? 'bg-cyan-400 animate-pulse' : 'bg-[#087F9C]'}`} />
+                <span>CLINICAL DENTIST WORKSPACE</span>
               </div>
-              <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight font-heading text-theme-heading">
-                Welcome back, <span className="bg-gradient-to-r from-oral-gold via-oral-gold-light to-oral-cyan bg-clip-text text-transparent">{doctorDisplayName}</span>
+              <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight font-heading leading-tight">
+                Welcome Back,<br />
+                <span className={
+                  isDark
+                    ? 'bg-gradient-to-r from-[#F4D58D] via-[#D9AD56] to-cyan-300 bg-clip-text text-transparent'
+                    : 'bg-gradient-to-r from-[#8C6D23] via-[#C69C48] to-[#087F9C] bg-clip-text text-transparent'
+                }>
+                  {doctorDisplayName}
+                </span>
               </h1>
-              <p className="text-sm sm:text-base text-theme-muted leading-relaxed">
-                Review scheduled patient appointments, inspect AI disease predictions with confidence metrics, issue electronic prescriptions, and manage your weekly clinic availability.
+              <p className="text-xs sm:text-sm text-theme-muted leading-relaxed">
+                Review scheduled patient appointments, inspect AI disease predictions with confidence metrics, issue electronic prescriptions, and manage clinic availability.
               </p>
             </div>
 
-            <div className="hidden lg:flex items-center gap-4 shrink-0">
-              <div className="relative group">
-                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-oral-gold to-oral-cyan opacity-40 blur group-hover:opacity-60 transition duration-300" />
-                <div className="relative flex items-center gap-3 px-5 py-3 rounded-2xl bg-oral-surface border border-oral-gold/30 shadow-inner">
-                  <div className="w-12 h-12 rounded-xl bg-oral-gold/15 border border-oral-gold/30 flex items-center justify-center text-2xl">
-                    🩺
-                  </div>
-                  <div>
-                    <div className="text-xs uppercase font-bold text-oral-gold tracking-wider">Practice Status</div>
-                    <div className="text-sm font-extrabold text-theme-heading flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                      Active Specialist
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            {/* Realistic 3D Holographic Tooth Visualization + Floating Quote Card */}
+            <DentalHeroVisual
+              quoteLine1="Better Oral Health"
+              quoteLine2="Brighter Smiles"
+            />
           </div>
-        </div>
+        </motion.div>
 
         {/* ========================================================= */}
         {/* CLINICAL KPI METRIC CARDS (100% Real Live Historical Data) */}

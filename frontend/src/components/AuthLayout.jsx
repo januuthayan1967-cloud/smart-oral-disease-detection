@@ -4,7 +4,7 @@ import ToothMascot from './ToothMascot';
 
 export default function AuthLayout({ children, title, subtitle }) {
   return (
-    <div className="page-gradient min-h-screen overflow-hidden">
+    <div className="page-gradient min-h-screen overflow-x-hidden">
       <Navbar variant="public" />
 
       {/* Decorative floating blobs */}
@@ -30,10 +30,10 @@ export default function AuthLayout({ children, title, subtitle }) {
         }}
       />
 
-      <div className="mx-auto flex min-h-[calc(100vh-80px)] max-w-7xl flex-col items-center gap-8 px-4 py-8 lg:flex-row lg:items-center lg:justify-center lg:gap-16">
+      <div className="mx-auto flex min-h-[calc(100vh-80px)] max-w-7xl flex-col items-center gap-8 px-4 py-8 lg:flex-row lg:items-center lg:justify-center lg:gap-12 xl:gap-16">
         {/* Left: mascot + tagline */}
         <motion.div
-          className="flex flex-1 flex-col items-center justify-center"
+          className="flex flex-1 flex-col items-center justify-center lg:sticky lg:top-28"
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.55, delay: 0.1 }}
@@ -47,7 +47,7 @@ export default function AuthLayout({ children, title, subtitle }) {
                 filter: 'blur(20px)',
               }}
             />
-            <ToothMascot size="xl" />
+            <ToothMascot size="xl" showDecorations={false} />
           </div>
 
           <motion.div
@@ -83,13 +83,13 @@ export default function AuthLayout({ children, title, subtitle }) {
 
         {/* Right: form card */}
         <motion.div
-          className="w-full max-w-md flex-1"
+          className="w-full max-w-md lg:max-w-lg flex-1 min-w-0"
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.55, delay: 0.2 }}
         >
           <div
-            className="rounded-2xl p-8"
+            className="rounded-2xl p-6 sm:p-8"
             style={{
               background: 'var(--glass)',
               backdropFilter: 'blur(24px)',

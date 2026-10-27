@@ -7,7 +7,7 @@ const Input = forwardRef(function Input(
   const inputId = id || (label ? label.toLowerCase().replace(/\s+/g, '-') : undefined);
 
   return (
-    <div className="w-full">
+    <div className="w-full min-w-0">
       {label && (
         <label htmlFor={inputId} className="mb-1.5 block text-sm font-medium text-theme-text">
           {label}
@@ -17,10 +17,13 @@ const Input = forwardRef(function Input(
         ref={ref}
         id={inputId}
         className={[
-          'w-full rounded-xl border border-theme-border bg-theme-surface/60 px-4 py-3',
+          'w-full max-w-full min-w-0 rounded-xl border border-theme-border bg-theme-surface/60 px-4 py-3',
           'text-theme-text placeholder:text-theme-muted',
           'transition duration-200',
           'focus:border-theme-accent focus:outline-none focus:ring-2 focus:ring-theme-accent/25',
+          props.type === 'file'
+            ? 'text-xs sm:text-sm file:mr-2.5 file:rounded-lg file:border-0 file:bg-cyan-500/15 file:px-2.5 file:py-1 file:text-xs file:font-semibold file:text-theme-accent overflow-hidden text-ellipsis'
+            : '',
           error ? 'border-red-400 focus:ring-red-400/25' : '',
           className,
         ].join(' ')}

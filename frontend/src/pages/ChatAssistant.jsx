@@ -181,14 +181,14 @@ export default function ChatAssistant() {
         >
           <div className="flex items-center gap-2">
             <span>🔍</span>
-            <span className="font-semibold text-cyan-300">
+            <span className="font-semibold text-cyan-800 dark:text-cyan-300">
               Active Context Attached: {activePredictionContext.predictionContext.displayName} ({activePredictionContext.predictionContext.confidencePercentage}%) — Risk: {activePredictionContext.predictionContext.riskLevel}
             </span>
           </div>
           <button
             type="button"
             onClick={() => setActivePredictionContext(null)}
-            className="text-cyan-400 hover:text-cyan-200 underline font-medium"
+            className="text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-200 underline font-medium"
           >
             Clear Context
           </button>
@@ -201,7 +201,7 @@ export default function ChatAssistant() {
         </div>
       )}
 
-      <Card className="mt-6 flex h-[600px] flex-col overflow-hidden" hover={false} padding={false}>
+      <Card className="mt-6 flex h-[calc(100vh-14.5rem)] min-h-[420px] max-h-[680px] flex-col overflow-hidden" hover={false} padding={false}>
         <div className="flex-1 space-y-4 overflow-y-auto p-4 md:p-6">
           {messages.length === 0 && (
             <div className="flex h-full flex-col items-center justify-center text-center text-theme-muted py-8">

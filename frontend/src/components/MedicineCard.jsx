@@ -112,10 +112,10 @@ export default function MedicineCard({
       </div>
 
       {/* Action Footer */}
-      <div className="border-t border-theme-border/20 p-4 pt-3 flex items-center justify-between">
-        <div>
+      <div className="border-t border-theme-border/20 p-4 pt-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
           <span className="text-xs text-theme-muted block">Price</span>
-          <span className="text-xl font-bold text-theme-heading">Rs. {price.toFixed(2)}</span>
+          <span className="text-lg sm:text-xl font-bold text-theme-heading whitespace-nowrap">Rs. {price.toFixed(2)}</span>
         </div>
 
         {isPharmacyView ? (
@@ -145,7 +145,7 @@ export default function MedicineCard({
           <button
             onClick={() => onAddToCart(medicine)}
             disabled={quantity === 0 || isAdding}
-            className={`btn-primary px-4 py-2 text-sm flex items-center gap-1.5 ${
+            className={`btn-primary px-3.5 py-2 text-xs sm:text-sm whitespace-nowrap shrink-0 flex items-center gap-1.5 ${
               quantity === 0 ? 'opacity-50 cursor-not-allowed bg-gray-500/20 hover:bg-gray-500/20 shadow-none' : ''
             }`}
           >

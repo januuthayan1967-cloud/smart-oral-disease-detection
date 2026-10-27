@@ -446,26 +446,26 @@ export default function Cart() {
       ) : (
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Cart list (2/3 width on large screens) */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 min-w-0 space-y-6">
             {Object.values(groupedItems).map((group) => (
-              <div key={group.pharmacyId} className="card border border-theme-border/40 bg-theme-surface/50 overflow-hidden">
+              <div key={group.pharmacyId} className="card min-w-0 border border-theme-border/40 bg-theme-surface/50 overflow-hidden">
                 {/* Pharmacy Group Header */}
-                <div className="border-b border-theme-border/30 bg-theme-accent/5 px-4 py-3 flex items-center justify-between">
-                  <div>
+                <div className="border-b border-theme-border/30 bg-theme-accent/5 px-4 py-3 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
                     <span className="text-xs text-theme-muted block font-semibold uppercase tracking-wider">Pharmacy</span>
-                    <h3 className="font-bold text-theme-heading text-base">{group.pharmacyName}</h3>
+                    <h3 className="font-bold text-theme-heading text-base truncate">{group.pharmacyName}</h3>
                   </div>
-                  <div className="text-right">
+                  <div className="text-right shrink-0">
                     <span className="text-xs text-theme-muted block">Group Total</span>
-                    <span className="font-bold text-theme-accent">Rs. {group.total.toFixed(2)}</span>
+                    <span className="font-bold text-theme-accent whitespace-nowrap">Rs. {group.total.toFixed(2)}</span>
                   </div>
                 </div>
 
                 {/* Items List */}
                 <div className="divide-y divide-theme-border/20 px-4">
                   {group.items.map((item) => (
-                    <div key={item._id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-4">
+                    <div key={item._id} className="py-4 flex flex-wrap items-center justify-between gap-4">
+                      <div className="flex items-center gap-3.5 min-w-0 flex-1 basis-[200px]">
                         <div className="h-16 w-16 shrink-0 rounded-lg overflow-hidden border border-theme-border/30 bg-theme-background">
                           <img
                             src={getImageUrl(item.image, 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=100')}
@@ -476,8 +476,8 @@ export default function Cart() {
                             }}
                           />
                         </div>
-                        <div>
-                          <h4 className="font-bold text-theme-heading text-sm">{item.medicineName}</h4>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-bold text-theme-heading text-sm truncate" title={item.medicineName}>{item.medicineName}</h4>
                           <span className="rounded bg-theme-accent/10 px-1.5 py-0.5 text-[10px] font-medium text-theme-accent inline-block mt-0.5">
                             {item.category}
                           </span>
@@ -495,7 +495,7 @@ export default function Cart() {
                       </div>
 
                       {/* Quantity & Delete actions */}
-                      <div className="flex items-center justify-between sm:justify-end gap-6">
+                      <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0 ml-auto">
                         <div className="flex items-center gap-1.5">
                           <button
                             type="button"
